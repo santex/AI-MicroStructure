@@ -15,7 +15,7 @@ requires as much concepts for a specific (word,idea,sensor input) as possible to
 
 to be able to fly you require only to types
 
-
+```
 micro new fly
   
                .--'"""""--.>_
@@ -120,7 +120,7 @@ dipterous_insect
 two-winged_insects
 dipteran
 dipteron
-
+``` 
 
 
 
