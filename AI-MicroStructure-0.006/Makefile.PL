@@ -1,0 +1,56 @@
+
+use strict;
+use warnings;
+
+
+
+use ExtUtils::MakeMaker 6.30;
+
+
+
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "AI::MicroStructure   Creates Concepts for words",
+  "AUTHOR" => "santex <santex\@cpan.org>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
+  },
+  "DISTNAME" => "AI-MicroStructure",
+  "EXE_FILES" => [
+    "bin/micro-wiki",
+    "bin/micro",
+    "bin/micrownet",
+    "bin/micro-ontology",
+    "bin/micro-sense",
+    "bin/micro-wnet"
+  ],
+  "LICENSE" => "perl",
+  "NAME" => "AI::MicroStructure",
+  "PREREQ_PM" => {},
+  "VERSION" => "0.006",
+  "test" => {
+    "TESTS" => ""
+  }
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+
