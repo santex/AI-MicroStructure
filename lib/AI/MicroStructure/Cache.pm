@@ -5,7 +5,7 @@ use warnings;
 use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
 use Storable qw(lock_retrieve lock_store);
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 sub new {
   my $pkg = shift;
   my $self = bless {}, $pkg;

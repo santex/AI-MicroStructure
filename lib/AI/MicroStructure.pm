@@ -10,7 +10,7 @@ use File::Glob;
 use Data::Dumper;
 
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 our $Structure = 'any'; # default structure
 our $CODESET = 'utf8';
 our $LANG = '';
