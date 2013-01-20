@@ -609,6 +609,7 @@ if($new==1){
   Type: the number you choose 1..$senses
   \033[0m",$micro->usage($StructureName,$senses,$data));
 
+  $line = 1 unless($senses != 1);
   chomp($line = <STDIN>) unless($line);
 
   my $d = join("#",@{$data->{rows}->{search}});
