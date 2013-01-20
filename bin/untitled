@@ -1,0 +1,216 @@
+#! /bin/bash -e
+progname=$(basename $0)
+
+if [ "$USER" = "" ]
+then
+    USER=$(whoami)
+fi
+
+CURDATE=$(date +"%F")
+DAYOFWEEK=$(date +"%u")
+DATABASE="x20"
+
+if [ "$DAYOFWEEK" -gt 5 ] || [ "$DAYOFWEEK" -eq 1 ]
+then
+    LASTBIZDAY="last friday"
+else
+    LASTBIZDAY="yesterday"
+fi
+
+
+
+function execute
+{
+    echo -n "** Running:     "
+    echo "$1"
+    eval "$1"
+    echo
+}
+
+
+createNewRepo(){
+
+
+files=$(perl -MAI::MicroStructure -E  'my %s=AI::MicroStructure->find_structures(@INC); print join("\n",values %s);')
+name=$(perl -MAI::MicroStructure -E  'my %s=AI::MicroStructure->find_structures(@INC); print join("\n",keys %s);')
+for i in `$files`;
+do
+cp $i $dir;
+git init
+git add *
+git commit -m "My initial commit message"
+
+
+}
+
+
+
+
+prepareSequencer(){
+
+sqldate=$(perl <<'EOF'
+
+sub sqlDate {
+
+  my $in     = shift;
+  my @dateBits = ();
+  my $out      = "";
+
+  if(defined $in and $in =~/-/) {
+      @dateBits = split("-",$in);
+      $out = sprintf("%s/%s/%s",$dateBits[1],$dateBits[2],$dateBits[0]);
+  }elsif(defined $in and $in =~ /\//){
+      @dateBits = split("/",$in);
+      $out = sprintf("%s%s-%s-%s",$dateBits[2] gt 1000 ? "":"20",$dateBits[2],$dateBits[1],$dateBits[0]);
+  }
+  return $out;
+}
+print sqlDate($ENV{"sequencerMaxDate"});
+EOF
+)
+
+
+
+}
+
+
+
+showConfigs()
+{
+
+}
+
+showAnalisisStyle()
+{
+
+}
+
+
+
+showAlgos()
+{
+
+}
+
+showOrderType()
+{
+
+}
+
+showOrders()
+{
+
+}
+
+
+if [ "$1" != 'feed' ] && [ "$1" != 'sequencer' ] && [ "$1" != 'config' ] && [ "$1" != 'algos' ] && [ "$1" != 'ordertype' ] && [ "$1" != 'style'] && [ "$1" != 'orders']; then
+    echo "dont know what to do argument $1"
+	exit
+fi
+
+
+
+#style orders config ordertype algos feed sequencer
+if [ "$1" == 'style' ]; then
+showAnalisisStyle
+exit
+fi
+
+
+if [ "$1" == 'orders' ]; then
+showOrders
+exit
+fi
+
+if [ "$1" == 'config' ]; then
+showConfigs
+exit
+fi
+
+if [ "$1" == 'algos' ]; then
+showAlgos
+exit
+*fi
+
+
+if [ "$1" == 'ordertype' ]; then
+showOrderType
+exit
+fi
+
+
+if [ "$1" == 'algos' ]; then
+showAlgos
+exit
+fi
+
+if [ "$1" == 'feed' ]; then
+
+prepareFeed
+exit
+#feed_start | zenity --text="Feed" --progress --pulsate
+fi
+
+
+if [ "$1" == 'sequencer' ]; then
+
+prepareSequencer
+exit
+#feed_start | zenity --text="Feed" --progress --pulsate
+
+fi
+
+# && [ "$1" != 'sequencer' ]
+#create_mysql_tables
+
+
+
+
+
+
+cd foo_project
+git init
+git add *
+git commit -m "My initial commit message"
+Now, create the repository on your Git server. All of my git repositories are owned by a user git and located at /usr/local/git_root/. You can change these things accordingly to match your server setup.
+
+#On remote machine (Git remote repository)
+sudo su - git
+cd /usr/local/git_root/
+Create your new project git repo as a bare Git repository
+
+mkdir foo-project.git
+cd foo-project.git/
+git --bare init
+Make sure permissions are set properly. These are common options I use for my shared repositories
+
+git config core.sharedrepository 1
+git config receive.denyNonFastforwards true
+find objects -type d -exec chmod 02770 {} \;
+#The core.sharedrepository flag tells git to keep everything group readable and writable.
+#The receive.denyNonFastforwards flag makes sure that merges can't happen when you push to the repo. You have to do the merges on your local machine, and then push the result.
+Now, go back to your local repository, and add the newly created remote repository so it tracks from the remote repository (origin).
+
+#On local machine, in your git project
+git remote add origin ssh://git@example.com:2227/usr/local/git_root/foo_project.git
+### UPDATED:
+If you are on git 1.7+ you can simply do this:
+
+git push -u origin master
+You’re done!
+
+———————-
+If you are on an older version of git, you may need to follow these instructions to make sure your branch tracks the remote branch:
+
+git push origin master
+Now, to ensure that your local branch is tracking when you do a fetch, you need to use -f option to force a new local branch to be created even though it already exists.
+
+#Switch to origin/master so you don't get any error about "fatal: Cannot force update the current branch."
+git checkout origin/master
+#Create the local "master" branch that is tracking the "origin/master" branch
+git branch -f master origin/master
+#Switch back to your "master" branch
+git checkout master
+There you have it. You should be able to push changes to origin and fetch changes to your local copy!
+
+Written by Andrew Waage
