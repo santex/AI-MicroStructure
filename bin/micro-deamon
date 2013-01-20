@@ -77,7 +77,7 @@ p $new->{storage}->{data};
 
 
 1;
-
+__END__
 
 
 # ABSTRACT: AI::MicroStructure   Starts some relation aggregation supposed to grow to a server

@@ -1,38 +1,70 @@
 #!/usr/bin/perl -X
 use strict;
 use warnings;
+
+
+my %conf = ( );
+GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
+                    "check", "category=s", "sources" ,"drop");
+
+our ($new, $write,$drop,$all) =(0,0,0,0);
+
+
+if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };
+
+
 use AI::MicroStructure;
 use Getopt::Long;
 use Data::Dumper;
 use JSON::XS;
 
-our ($new,$debug, $write,$drop) =(0,0,0,0); 
-
 my $usage = << 'EOT';
 
-  there are no structures created yet 
+  #current status
+  #did you create a micro structure yet ?
+  #try something like this
   
-  $ micro new ufo
 
-  $ micro
+  $ micro new ufo;      # creates a structure called ufo
 
-  $ micro ufo
+  $ micro drop ufo;     # deletes the structure called ufo
+
+  $ micro structures;   # shows all structure's you currently have
   
-  $ micro ufo 5
-
-  $ micro any 10
+  #after creation of a structure you can access it in lots of ways
   
-  $ micro drop ufo
+   
+  
+  $ micro;             # one word of a random structure 
 
+  $ micro ufo;         # one word of the ufo structure 
+
+  $ micro ufo all;     # all words of the ufo structure 
+  
+  $ micro ufo 5;       # 5 random words of the ufo structure
+  
+  $ micro any 10;      # 10 random words of any structure you have created
+  
+  # oneliners i like to use 
+  
+  $  for i in `micro structures`; do echo $i; done;       # echos all the structures  
+  
+  $  for i in `micro ufo all`;   do echo $i; done;       # echos all words in ufo
+
+  $  for i in `micro structures`; do micro all $i; done;  # echos all stuctures all words
+  
+  $  for i in `micro ufo all`;   do micro new $i; done;  # new structure for all words in ufo
+  
+  $  for i in `micro ufo all`;   do micro-wiki $i; done; # push all words against the wiki plugin dont forget setting user & password in /usr/local/bin/micro-wiki 
+  
 EOT
 
+my (@remote, @local);
+# real processing starts here
+$\ = $/;
+my $sep = $conf{whitespace} ? ' ' : $\;
 
-if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
-if( grep{/\bdebug\b/} @ARGV ){$debug = 1; cleanArgs("debug"); }; 
-if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  }; 
-if( grep{/\bdrop\b/} @ARGV ){ $write = 1; cleanArgs("drop");  }; 
-
-my $j = AI::MicroStructure->new()->themes();
+my $j = AI::MicroStructure->new()->structures();
 
 
 if($j == 0 || $j eq "any"){  
@@ -41,7 +73,6 @@ print $usage;
 exit;
 }else{
 
-#   print $j;
 
 }
 
@@ -57,55 +88,51 @@ sub cleanArgs{
 }
 
 
-my %conf = ( );
-GetOptions( \%conf, "whitespace|ws!", "version","themes", "help", "remote","new",
-                    "check", "category=s", "sources" ,"drop");
 
-my $theme;
+my $structure;
 
 
-if(defined($ARGV[0]) && $ARGV[0] =~ m/themes/){
+if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
   
-    my $json = encode_json([grep{!/any/}AI::MicroStructure->new()->themes()]);
-    print $json;
-    exit;
+    @local = grep{!/any/}AI::MicroStructure->new()->structures();
 
-
-}
-
-if($conf{"new"} and $ARGV[0] !~/themes/  and $ARGV[0] =~ m{^([^/]+)/(.*)}s) {
-    $theme          = $1;
-    $conf{category} = $2;
-
-    my $meta = AI::MicroStructure->new( $theme, category => "new" );
+    print join $sep, @local, @remote;
     exit;
 }
 
+if($conf{"new"} and $ARGV[0] !~/structures/  and $ARGV[0] =~ m{^([^/]+)/(.*)}s) {
+    $structure          = $1;
+    $conf{category} = $2;
+
+    my $meta = AI::MicroStructure->new( $structure, category => "new" );
+    exit;
+}
 
 
-if(!$conf{"drop"} && !$conf{"write"}and $ARGV[0] !~/themes/){
+
+if(!$conf{"drop"} && !$conf{"write"}and $ARGV[0] !~/structures/){
 
 
 
-# find out the theme name
-$theme = shift || $AI::MicroStructure::Theme;
+# find out the structure name
+$structure = shift || $AI::MicroStructure::structure;
 
-if (!length $conf{category} && $theme =~ m{^([^/]+)/(.*)}s) {
-    $theme          = $1;
+if (!length $conf{category} && $structure =~ m{^([^/]+)/(.*)}s) {
+    $structure          = $1;
     $conf{category} = $2;
 }
 
 
-AI::MicroStructure->new( $theme, category => "new" )
- unless AI::MicroStructure->has_theme( $theme );
+AI::MicroStructure->new( $structure, category => "new" )
+ unless AI::MicroStructure->has_structure( $structure );
 
-my $module = "AI::MicroStructure::$theme";
+my $module = "AI::MicroStructure::$structure";
 
 
-# load the remote theme if needed
+# load the remote structure if needed
 if ( $conf{remote} || $conf{check} || $conf{sources}) {
     eval "require $module;";
-    die "Theme '$theme' is not updatable!\n"
+    die "structure '$structure' is not updatable!\n"
         unless $module->has_remotelist();
 }
 
@@ -114,27 +141,27 @@ print STDERR
 "meta, a simple front-end to AI::MicroStructure version $AI::MicroStructure::VERSION\n"
   if $conf{version};
 print STDERR $usage if $conf{help};
-print map "$_\n", AI::MicroStructure->themes if $conf{themes};
+print map "$_\n", AI::MicroStructure->structures if $conf{structures};
 if ( $conf{sources} ) {
     my @sources = $module->sources( $conf{category} );
     print map "$_\n", @sources;
 }
-exit if $conf{themes} || $conf{version} || $conf{help} || $conf{sources};
+exit if $conf{structures} || $conf{version} || $conf{help} || $conf{sources};
 
-# real processing starts here
-$\ = $/;
-my $sep = $conf{whitespace} ? ' ' : $\;
 
-my $meta = AI::MicroStructure->new( $theme, category => $conf{category} );
+my $meta = AI::MicroStructure->new( $structure, category => $conf{category} );
 
-my (@remote, @local);
 @remote = $module->remote_list( $conf{category} )
     if $conf{remote} || $conf{check};
 if ( !$conf{remote} ) {
     my $count = shift;
     $count = 1 unless defined $count;
     $count = 0 if $conf{check};
+    if($all){
+    @local = $meta->name(0,scalar "");
+    }else{
     @local = $meta->name($count);
+    }
 }
 if ( $conf{check} ) {
     my %seen;
@@ -152,7 +179,7 @@ else {
 }
 
 END{
-#    print Dumper  [$theme,@ARGV,%conf];
+#    print Dumper  [$structure,@ARGV,%conf];
 }
 
 

@@ -31,8 +31,8 @@ sub new {
             ? $self->{lang}
             : $ENV{LANGUAGE} || $ENV{LANG} || '';
         if( !$self->{category} && $^O eq 'MSWin32' ) {
-            eval { require Win32::Locale; };
-            $self->{category} = Win32::Locale::get_language() unless $@;
+            #eval { require Win32::Locale; };
+            #$self->{category} = Win32::Locale::get_language() unless $@;
         }
     }
 

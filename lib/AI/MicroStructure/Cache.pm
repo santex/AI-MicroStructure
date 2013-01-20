@@ -5,7 +5,7 @@ use warnings;
 use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
 use Storable qw(lock_retrieve lock_store);
-our $VERSION = '0.08';
+our $VERSION = '0.012';
 sub new {
   my $pkg = shift;
   my $self = bless {}, $pkg;
@@ -134,14 +134,18 @@ sub includes_name  { exists $_[0]->{ $_[1] } }
 
 
 =head1 NAME
+
   AI::MicroStructure::Cache
+
 =head1 DESCRIPTION
+
   Creates Concepts for words  
+
 =head1 SYNOPSIS    
   
   ~$ micro new world
   
-  ~$ micro themes
+  ~$ micro structures
   
   ~$ micro any 2
   
@@ -179,5 +183,6 @@ sub includes_name  { exists $_[0]->{ $_[1] } }
 
   
 __END__
+
 __DATA__
 

@@ -1,16 +1,15 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -X
 package AI::MicroStructure::Relations;
 use strict;
 use warnings;
 use utf8; # for translator credits
-use Data::Format::Pretty::Console qw(format_pretty);
 use Data::Dumper;
 use AI::MicroStructure::Cache;
 use WWW::Wikipedia;
 use JSON::XS;
 use Statistics::Basic qw(:all);
 
-our $VERSION = '0.08';
+our $VERSION = '0.012';
 our $supports = {};
 our $scale = 1;
 
@@ -37,7 +36,8 @@ my   $result = $wiki->search($next);
 
 
     	eval( 'use IO::Page' );
-      if($result){
+
+      if(defined($result) and $result){
 
         use AnyEvent::Subprocess::Easy qw(qx_nonblock);
         my $micosense = qx_nonblock("micro-sense $next")->recv;
@@ -57,8 +57,8 @@ my   $result = $wiki->search($next);
          $self->{storage}->{data}->{$elem}+1:1; 
 
 
-         if($_ &&
-           !defined($self->{storage}->{data}->{$elem})) {
+#         if($_ &&
+ #          !defined($self->{storage}->{data}->{$elem})) {
 
           # $wiki = WWW::Wikipedia->new();
           # $result = $wiki->search($_);
@@ -70,7 +70,7 @@ my   $result = $wiki->search($next);
 
          #  $self->{storage}->{$_}->{related} = [grep{!/\(/}map{$_=~ s/ /_/g; $_=ucfirst $_;}$result->related()] unless(!$result);
 
-         }
+  #       }
 
 
 
@@ -109,14 +109,19 @@ sub inspect {
 
 
 =head1 NAME
+
   AI::MicroStructure::Relations
+
 =head1 DESCRIPTION
+
   Gets Relations for Concepts based on  words
+
 =head1 SYNOPSIS    
+
   
   ~$ micro new world
   
-  ~$ micro themes
+  ~$ micro structures
   
   ~$ micro any 2
   
@@ -124,6 +129,7 @@ sub inspect {
   
   ~$ micro
   
+
 =head1 AUTHOR
 
   Hagen Geissler <santex@cpan.org>

@@ -4,7 +4,7 @@ use List::Util 'shuffle';
 use AI::MicroStructure;
 use AI::MicroStructure::List;
 
-our $theme = 'any';
+our $structure = 'any';
 
 sub import {
     # export the microany function
@@ -16,11 +16,11 @@ sub import {
 
 sub name {
     my $self  = shift;
-    my $theme =
-      ( shuffle( grep { !/^(any|random)$/ } AI::MicroStructure->themes() ) )[0];
+    my $structure =
+      ( shuffle( grep { !/^(any|random)$/ } AI::MicroStructure->structures() ) )[0];
     
-    if($theme && $theme !~ /any/){
-      $self->{micro}->name( $theme, @_ );
+    if($structure && $structure !~ /any/){
+      $self->{micro}->name( $structure, @_ );
     
     }
     
@@ -33,7 +33,7 @@ sub new {
     return bless { micro => AI::MicroStructure->new( @_ ) }, $class;
 }
 
-sub theme { $theme };
+sub structure { $structure };
 
 sub has_remotelist { };
 

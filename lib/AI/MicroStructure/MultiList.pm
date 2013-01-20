@@ -32,13 +32,13 @@ sub init {
     }
 
     ${"$class\::Default"} = $data->{default} || ':all';
-    ${"$class\::Theme"} = ( split /::/, $class )[-1];
+    ${"$class\::structure"} = ( split /::/, $class )[-1];
 
     *{"$class\::import"} = sub {
         my $callpkg = caller(0);
-        my $theme   = ${"$class\::Theme"};
+        my $structure   = ${"$class\::structure"};
         my $micro    = $class->new;
-        *{"$callpkg\::micro$theme"} = sub { $micro->name(@_) };
+        *{"$callpkg\::micro$structure"} = sub { $micro->name(@_) };
     };
 
     ${"$class\::micro"} = $class->new();
@@ -124,10 +124,10 @@ sub has_category {
     return exists ${"$class\::MultiList"}{$category};
 }
 
-sub theme {
+sub structure {
     my $class = ref $_[0] || $_[0];
     no strict 'refs';
-    return ${"$class\::Theme"};
+    return ${"$class\::structure"};
 }
 
 

@@ -10,8 +10,8 @@ use File::Glob;
 use Data::Dumper;
 
 
-our $VERSION = '0.09';
-our $Theme = 'any'; # default theme
+our $VERSION = '0.012';
+our $Structure = 'any'; # default structure
 our $CODESET = 'utf8';
 our $LANG = '';
 our %MICRO;
@@ -25,16 +25,15 @@ our $item="";
 our @items;
 our @a=();
 
-our ($new,$debug, $write,$drop) =(0,0,0,0);
+our ($new, $write,$drop) =(0,0,0);
 
 
 if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
-if( grep{/\bdebug\b/} @ARGV ){$debug = 1; cleanArgs("debug"); };
 if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  };
 if( grep{/\bdrop\b/} @ARGV ){ $drop = 1; cleanArgs("drop");  };
 
-our $ThemeName = $ARGV[0]; # default theme
-our $theme = $ARGV[0]; # default theme
+our $StructureName = $ARGV[0]; # default structure
+our $structure = $ARGV[0]; # default structure
 sub cleanArgs{
    my ($key) = @_;
    my @tmp=();
@@ -43,10 +42,10 @@ sub cleanArgs{
    @ARGV=@tmp;
 }
 # private class method
-sub find_themes {
+sub find_structures {
    my ( $class, @dirs ) = @_;
    $ALIEN{"base"} =  [map  @$_,
-   grep { $_->[0] !~ /^([A-Z]|foo|any)/ }   # remove the non-theme subclasses
+   grep { $_->[0] !~ /^([A-Z]|foo|any)/ }   # remove the non-structure subclasses
    map  { [ ( fileparse( $_, qr/\.pm$/ ) )[0] => $_ ] }
    map  { File::Glob::bsd_glob(
    File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) ) } @dirs];
@@ -57,13 +56,13 @@ sub find_themes {
    return @{$ALIEN{"base"}};
 }
 
-# fetch the list of standard themes
+# fetch the list of standard structures
 
 
 sub find_modules {
 
 
- my $themes = {};
+ my $structures = {};
    foreach(@INC)
    {
 
@@ -73,21 +72,21 @@ sub find_modules {
      File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) ) } $_;
 
    foreach(@set){
-   $themes->{$_}=$_;# unless($_=~/(usr\/local|basis)/);
+   $structures->{$_}=$_;# unless($_=~/(usr\/local|basis)/);
    }
   }
-  return %$themes;
+  return %$structures;
 }
 
 
 
-$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_themes(@INC)} };
+$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@INC)} };
 $MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
 $search = join("|",keys %MICRO);
 
-#if( grep{/$search/} @ARGV ){ $Theme = $ARGV[0] unless(!$ARGV[0]); }
+#if( grep{/$search/} @ARGV ){ $Structure = $ARGV[0] unless(!$ARGV[0]); }
 
-# fetch the list of standard themes
+# fetch the list of standard structures
 
 #print Dumper keys %MICRO;
 sub getComponents(){
@@ -99,7 +98,7 @@ sub getComponents(){
 
 
 # the functions actually hide an instance
-my $micro = AI::MicroStructure->new($Theme);
+our $micro = AI::MicroStructure->new($Structure);
 
 # END OF INITIALISATION
 
@@ -108,37 +107,37 @@ my $micro = AI::MicroStructure->new($Theme);
 sub import {
    my $class = shift;
    # 'stars' is still first
-   my @themes = ( grep { $_ eq ':all' } @_ )
+   my @structures = ( grep { $_ eq ':all' } @_ )
    ? ( 'stars', grep { !/^(?:stars|:all)$/ } keys %MICRO )
    : @_;
 
-   $Theme = $themes[0] if @themes;
-   $micro = AI::MicroStructure->new( $Theme );
+   $Structure = $structures[0] if @structures;
+   $micro = AI::MicroStructure->new( $Structure );
 
    # export the microname() function
    no strict 'refs';
    my $callpkg = caller;
-   *{"$callpkg\::microname"} = \&microname;   # standard theme
+   *{"$callpkg\::microname"} = \&microname;   # standard structure
 
-   # load the classes in @themes
-   for my $theme( @themes ) {
-   eval "require AI::MicroStructure::$theme; ".
-        "import AI::MicroStructure::$theme;";
+   # load the classes in @structures
+   for my $structure( @structures ) {
+   eval "require AI::MicroStructure::$structure; ".
+        "import AI::MicroStructure::$structure;";
    croak $@ if $@;
-   *{"$callpkg\::micro$theme"} = sub { $micro->name( $theme, @_ ) };
+   *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
    }
 }
 
 sub new {
    my ( $class, @tools ) = ( @_ );
-   my $theme;
-   $theme = shift @tools if @tools % 2;
-   $theme = $Theme unless $theme; # same default everywhere
+   my $structure;
+   $structure = shift @tools if @tools % 2;
+   $structure = $Structure unless $structure; # same default everywhere
   #  my $driver = {};
    #   $driver = AI::MicroStructure::Driver->new;
 
    # defer croaking until name() is actually called
-   my $self = bless { theme => $theme,
+   my $self = bless { structure => $structure,
                      tools => { @tools }, micro => {}}, $class;
 	return $self;
    #if(defined($driverarg) && join("" ,@_)  =~/couch|cache|berkeley/){
@@ -151,46 +150,32 @@ sub _rearrange{
 }
 
 # CLASS METHODS
-sub add_theme {
+sub add_structure {
    my $class  = shift;
-   my %themes = @_;
+   my %structures = @_;
 
-   for my $theme ( keys %themes ) {
-   croak "The theme $theme already exists!" if exists $MICRO{$theme};
-   my @badnames = grep { !/^[a-z_]\w*$/i } @{$themes{$theme}};
-   croak "Invalid names (@badnames) for theme $theme"
+   for my $structure ( keys %structures ) {
+   croak "The structure $structure already exists!" if exists $MICRO{$structure};
+   my @badnames = grep { !/^[a-z_]\w*$/i } @{$structures{$structure}};
+   croak "Invalid names (@badnames) for structure $structure"
    if @badnames;
 
    my $code = << "EOC";
-package AI::MicroStructure::$theme;
+package AI::MicroStructure::$structure;
 use strict;
-use AI::MicroStructure::MultiList;
-our \@ISA = qw( AI::MicroStructure::MultiList );
-our \@List = qw( @{$themes{$theme}} );
-our \%Remote = (
-   source => {
-   default=>sprintf('http://en.wikipedia.org/wiki/\%s',\$ARGV[0]),
-   },
-   extract => sub {
-   return
-   map { AI::MicroStructure::RemoteList::clean(\$_) }
-   grep { ! /^List_|_Groups\$/ }
-   map { s/[-s']/_/g; s/[."]//g; \$_ }
-   \$_[0]
-   =~ m{^<li>(?:<[^>]*>)?(.*?)(?:(?: ?[-,(<]| aka | see ).*)?</li>}mig
-   },
-   ,
-);
+use AI::MicroStructure::List;
+our \@ISA = qw( AI::MicroStructure::List );
+our \@List = qw( @{$structures{$structure}} );
 __PACKAGE__->init();
 1;
 EOC
    eval $code;
-   $MICRO{$theme} = 1; # loaded
+   $MICRO{$structure} = 1; # loaded
 
-   # export the microtheme() function
+   # export the microstructure() function
    no strict 'refs';
    my $callpkg = caller;
-   *{"$callpkg\::micro$theme"} = sub { $micro->name( $theme, @_ ) };
+   *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
    }
 }
 
@@ -201,11 +186,11 @@ EOC
 # load the content of __DATA__ into a structure
 # this class method is used by the other AI::MicroStructure classes
 sub load_data {
-   my ($class, $theme ) = @_;
+   my ($class, $structure ) = @_;
    $data = {};
 
    my $fh;
-   { no strict 'refs'; $fh = *{"$theme\::DATA"}{IO}; }
+   { no strict 'refs'; $fh = *{"$structure\::DATA"}{IO}; }
 
    my $item;
    my @items;
@@ -235,9 +220,6 @@ sub load_data {
    $$_ =~ s/\s+/ /g;
    }
 
-   if($debug) {
-   print Dumper $data;
-   }
 
    return $data;
 }
@@ -248,47 +230,47 @@ sub microname { $micro->name( @_ ) };
 # corresponding method
 sub name {
    my $self = shift;
-   my ( $theme, $count ) = ("any",1);
+   my ( $structure, $count ) = ("any",1);
 
    if (@_) {
-   ( $theme, $count ) = @_;
-   ( $theme, $count ) = ( $self->{theme}, $theme )
-   if defined($theme) && $theme =~ /^(?:0|[1-9]\d*)$/;
+   ( $structure, $count ) = @_;
+   ( $structure, $count ) = ( $self->{structure}, $structure )
+   if defined($structure) && $structure =~ /^(?:0|[1-9]\d*)$/;
    }
    else {
-   ( $theme, $count ) = ( $self->{theme}, 1 );
+   ( $structure, $count ) = ( $self->{structure}, 1 );
    }
 
-   if( ! exists $self->{micro}{$theme} ) {
-   if( ! $MICRO{$theme} ) {
-   eval "require AI::MicroStructure::$theme;";
-   croak "MicroStructure list $theme does not exist!" if $@;
-   $MICRO{$theme} = 1; # loaded
+   if( ! exists $self->{micro}{$structure} ) {
+   if( ! $MICRO{$structure} ) {
+   eval "require AI::MicroStructure::$structure;";
+   croak "MicroStructure list $structure does not exist!" if $@;
+   $MICRO{$structure} = 1; # loaded
    }
-   $self->{micro}{$theme} =
-   "AI::MicroStructure::$theme"->new( %{ $self->{tools} } );
+   $self->{micro}{$structure} =
+   "AI::MicroStructure::$structure"->new( %{ $self->{tools} } );
    }
 
-   $self->{micro}{$theme}->name( $count );
+   $self->{micro}{$structure}->name( $count );
 }
 
 # other methods
-sub themes { wantarray ? ( sort keys %MICRO ) : scalar keys %MICRO }
-sub has_theme { $_[1] ? exists $MICRO{$_[1]} : 0 }
+sub structures { wantarray ? ( sort keys %MICRO ) : scalar keys %MICRO }
+sub has_structure { $_[1] ? exists $MICRO{$_[1]} : 0 }
 sub configure_driver { $_[1] ? exists $MICRO{$_[1]} : 0 }
 sub count {
    my $self = shift;
-   my ( $theme, $count );
+   my ( $structure, $count );
 
    if (@_) {
-   ( $theme, $count ) = @_;
-   ( $theme, $count ) = ( $self->{theme}, $theme )
-   if $theme =~ /^(?:0|[1-9]\d*)$/;
+   ( $structure, $count ) = @_;
+   ( $structure, $count ) = ( $self->{structure}, $structure )
+   if $structure =~ /^(?:0|[1-9]\d*)$/;
    }
 
 
-   if( ! exists $self->{micro}{$theme} ) {
-   return scalar ($self->{micro}{$theme}->new);
+   if( ! exists $self->{micro}{$structure} ) {
+   return scalar ($self->{micro}{$structure}->new);
    }
 
    return 0;
@@ -314,30 +296,30 @@ sub getBundle {
 
 
 
-my @themes = grep { !/^(?:any)/ } AI::MicroStructure->themes;
+my @structures = grep { !/^(?:any)/ } AI::MicroStructure->structures;
 my @micros;
 my @search=[];
-for my $theme (@themes) {
+for my $structure (@structures) {
    no strict 'refs';
-   eval "require AI::MicroStructure::$theme;";
+   eval "require AI::MicroStructure::$structure;";
 
-   my %isa = map { $_ => 1 } @{"AI::MicroStructure::$theme\::ISA"};
+   my %isa = map { $_ => 1 } @{"AI::MicroStructure::$structure\::ISA"};
    if( exists $isa{'AI::MicroStructure::Locale'} ) {
-   for my $lang ( "AI::MicroStructure::$theme"->languages() ) {
+   for my $lang ( "AI::MicroStructure::$structure"->languages() ) {
    push @micros,
-   ["AI::MicroStructure::$theme"->new( lang => $lang ),$lang];
+   ["AI::MicroStructure::$structure"->new( lang => $lang ),$lang];
 
 
    }
    }
    elsif( exists $isa{'AI::MicroStructure::MultiList'} ) {
-   for my $cat ( "AI::MicroStructure::$theme"->categories(), ':all' ) {
+   for my $cat ( "AI::MicroStructure::$structure"->categories(), ':all' ) {
    push @micros,
-   [ "AI::MicroStructure::$theme"->new( category => $cat ),$cat];
+   [ "AI::MicroStructure::$structure"->new( category => $cat ),$cat];
    }
    }
    else {
-   push @micros, ["AI::MicroStructure::$theme"->new(),''];
+   push @micros, ["AI::MicroStructure::$structure"->new(),''];
    }
 }
 
@@ -348,7 +330,7 @@ for my $test (@micros) {
    my %items;
    my $items = $micro->name(0);
    $items{$_}++ for $micro->name(0);
-   my $key=sprintf("%s",$micro->theme);
+   my $key=sprintf("%s",$micro->structure);
    $all->{$key}=[$test->[1],$micro->name($items)];
 
 }
@@ -396,7 +378,7 @@ sub save_default {
   my $dat = {};
   my @in = ();
   my $active=0;
-  $line = $Theme unless($line);
+  $line = $Structure unless($line);
 
   foreach(@{$data->{rows}->{"coordinate"}}){
 
@@ -434,7 +416,7 @@ push @in , values %{$data->{names}};
 $dat->{names} = join(" ",@in);
 $dat->{names} =~ s/$line(.*?)\-\>(.*?) [1-9] /$1 $2/g;
 $dat->{names} =~ s/  / /g;
-my @file = grep{/$Theme/}map{File::Glob::bsd_glob(
+my @file = grep{/$Structure/}map{File::Glob::bsd_glob(
  File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) )}@INC;
 
 
@@ -497,7 +479,7 @@ return $data;
 sub getBlank {
 
   my $self = shift;
-  my $theme = shift;
+  my $structure = shift;
   my $data = shift;
 
 
@@ -506,26 +488,11 @@ my $usage = "";
 
 $usage = "#!/usr/bin/perl -W\n";
 $usage .= << "EOC";
-package AI::MicroStructure::$theme;
+package AI::MicroStructure::$structure;
 use strict;
-use AI::MicroStructure::MultiList;
 use AI::MicroStructure::List;
 our \@ISA = qw( AI::MicroStructure::List );
-our \@List = qw( \@{\$themes{\$theme}} );
-our \%Remote = (
-   source => {
-   go=>sprintf('http://en.wikipedia.org/wiki/\%s',"UFO"),
-   },
-   extract => sub {
-   return
-   map { AI::MicroStructure::RemoteList::clean(\$_) }
-   grep { ! /^List_|_Groups\$/ }
-   map { s/[-s']/_/g; s/[."]//g; \$_ }
-   \$_[0]
-   =~ m{^<li>(?:<[^>]*>)?(.*?)(?:(?: ?[-,(<]| aka | see ).*)?</li>}mig
-   },
-   ,
-);
+our \@List = qw( \@{\$structures{\$structure}} );
 __PACKAGE__->init();
 1;
 EOC
@@ -569,26 +536,26 @@ __DATA__
 sub save_new {
 
 my $self = shift;
-my $ThemeName = shift;
+my $StructureName = shift;
 my $data = shift;
 
 
-$ThemeName = lc $self->trim(`micro`) unless($ThemeName);
+$StructureName = lc $self->trim(`micro`) unless($StructureName);
 my @file = grep{/any/}map{File::Glob::bsd_glob(
  File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) )}@INC;
   my $fh;
   if(@file){
    $file[1]=$file[0];
-   $ThemeName = lc $ThemeName;
-  $file[1] =~ s/any/$ThemeName/g;
+   $StructureName = lc $StructureName;
+  $file[1] =~ s/any/$StructureName/g;
 
   open($fh,">$file[1]") || die $!;
 
-  print $fh $self->getBlank($ThemeName,$data);
+  print $fh $self->getBlank($StructureName,$data);
 
   close $fh;
   }
-  $Theme = $ThemeName;
+  $Structure = $StructureName;
   push @INC,$file[1];
 
   return 1;
@@ -599,9 +566,9 @@ my @file = grep{/any/}map{File::Glob::bsd_glob(
 sub drop {
 
 my $self = shift;
-my $ThemeName = shift;
+my $StructureName = shift;
 
-my @file = grep{/$ThemeName.pm/}map{File::Glob::bsd_glob(
+my @file = grep{/$StructureName.pm/}map{File::Glob::bsd_glob(
 File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) )}@INC;
 my $fh = shift @file;
 if(`ls $fh`)
@@ -619,15 +586,8 @@ print  `rm $fh`;
 
 END{
 
-if(!keys %MICRO && !$new){
-
-
-
-}else{
-
-
 if($drop == 1) {
-   $micro->drop($ThemeName);
+   $micro->drop($StructureName);
 }
 
 if($new==1){
@@ -635,7 +595,7 @@ if($new==1){
   use Term::ReadKey;
   use JSON;
 
-  my $data = decode_json(lc`micro-sense $ThemeName words`);
+  my $data = decode_json(lc`micro-sense $StructureName words`);
 
 
   my $char;
@@ -647,7 +607,7 @@ if($new==1){
   \033[0;34m
   %s
   Type: the number you choose 1..$senses
-  \033[0m",$micro->usage($ThemeName,$senses,$data));
+  \033[0m",$micro->usage($StructureName,$senses,$data));
 
   chomp($line = <STDIN>) unless($line);
 
@@ -657,7 +617,7 @@ if($new==1){
   @{$data->{rows}->{"search"}}=split("#",join("",@d));
 
   if($line>0){
-   $micro->save_new($ThemeName,$data,$line);
+   $micro->save_new($StructureName,$data,$line);
    exit 0;
   }else{
 
@@ -675,7 +635,6 @@ if($new==1){
   }
 }
 
-}
 
 
 
@@ -775,19 +734,27 @@ return $usage;
 
 
 1;
+
+__END__
+
+
 #print Dumper $micro;
 
 # ABSTRACT: AI::MicroStructure   Creates Concepts for words
 
 =head1 NAME
+
   AI::MicroStructure
+
 =head1 DESCRIPTION
+
   Creates Concepts for words
+
 =head1 SYNOPSIS
 
   ~$ micro new world
 
-  ~$ micro themes
+  ~$ micro structures
 
   ~$ micro any 2
 
@@ -805,9 +772,9 @@ return $usage;
 
 =head1 SUPPORT AND DOCUMENTATION
 
-  ☞ [sample using concepts](http://quantup.com)
+ [sample using concepts](http://quantup.com)
 
-  ☞ [PDF info on my works](https://github.com/santex)
+ [PDF info on my works](https://github.com/santex)
 
 
 =head1 SEE ALSO
@@ -824,6 +791,6 @@ return $usage;
   AI-MicroStructure-Plugin-Wiki
 
 
-__END__
+
 __DATA__
 

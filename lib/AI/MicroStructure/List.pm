@@ -18,13 +18,13 @@ sub init {
 
     no strict 'refs';
     no warnings;
-    ${"$class\::Theme"} = ( split /::/, $class )[-1];
+    ${"$class\::structure"} = ( split /::/, $class )[-1];
     @{"$class\::List"} = split /\s+/, $data->{names};
     *{"$class\::import"} = sub {
         my $callpkg = caller(0);
-        my $theme   = ${"$class\::Theme"};
+        my $structure   = ${"$class\::structure"};
         my $micro    = $class->new();
-        *{"$callpkg\::micro$theme"} = sub { $micro->name(@_) };
+        *{"$callpkg\::micro$structure"} = sub { $micro->name(@_) };
       };
     ${"$class\::micro"} = $class->new();
 }
@@ -63,10 +63,10 @@ sub new {
     bless { cache => [] }, $class;
 }
 
-sub theme {
+sub structure {
     my $class = ref $_[0] || $_[0];
     no strict 'refs';
-    return ${"$class\::Theme"};
+    return ${"$class\::structure"};
 }
 
 
