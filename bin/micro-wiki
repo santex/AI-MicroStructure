@@ -14,7 +14,7 @@ my $config = Config::Auto::parse(".micro", path => @CWD);
 $config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
 $config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
 $config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
-$config->{db} || = "micro-relations";
+$config->{db} ||= "micro-relations";
 
 use HTML::Strip;
 use Data::Printer;
