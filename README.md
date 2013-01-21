@@ -103,6 +103,7 @@ hypothetical_creature
 #### Dependencies
 
 * cpan
+* couchdb
 * wordnet
 * xpdf-utils (poppler-utils)
 
