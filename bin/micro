@@ -72,7 +72,7 @@ if($conf{"init"}) {
     if (-e  ".micro") {
         print STDERR "this is already an active memory!\n";
     } else {
-        print `git init && touch .micro && echo .pmc > .gitignore && git add .micro .gitignore && git commit -m 'active memory born'`;
+        print `git init && touch .micro && echo .pmc > .gitignore && echo '*~' >> .gitignore && echo '*swp' >> .gitignore && echo .micro >> .gitignore && git add -f .micro .gitignore && git commit -m 'active memory born'`;
     }
     exit;
 } else {
