@@ -2,6 +2,7 @@
 package AI::MicroStructure;
 use strict;
 use warnings;
+use Cwd;
 use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use File::Basename;
@@ -26,7 +27,9 @@ our @items;
 our @a=();
 
 our ($new, $write,$drop) =(0,0,0);
-
+my @CWD; push @CWD, getcwd();
+our $structdir = "structures";
+our $absstructdir = "$CWD[0]/$structdir";
 
 if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
 if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  };
@@ -45,10 +48,9 @@ sub cleanArgs{
 sub find_structures {
    my ( $class, @dirs ) = @_;
    $ALIEN{"base"} =  [map  @$_,
-   grep { $_->[0] !~ /^([A-Z]|foo|any)/ }   # remove the non-structure subclasses
    map  { [ ( fileparse( $_, qr/\.pm$/ ) )[0] => $_ ] }
    map  { File::Glob::bsd_glob(
-   File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) ) } @dirs];
+   File::Spec->catfile( $_, ($structdir,"*.pm") ) ) } @dirs];
 
    $ALIEN{"store"}=[];
 
@@ -80,7 +82,7 @@ sub find_modules {
 
 
 
-$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@INC)} };
+$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@CWD)} };
 $MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
 $search = join("|",keys %MICRO);
 
@@ -121,8 +123,8 @@ sub import {
 
    # load the classes in @structures
    for my $structure( @structures ) {
-   eval "require AI::MicroStructure::$structure; ".
-        "import AI::MicroStructure::$structure;";
+   eval "require '$absstructdir/$structure.pm';".
+        "import  '$absstructdir/$structure.pm';";
    croak $@ if $@;
    *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
    }
@@ -243,7 +245,7 @@ sub name {
 
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
-   eval "require AI::MicroStructure::$structure;";
+   eval "require '$absstructdir/$structure.pm';";
    croak "MicroStructure list $structure does not exist!" if $@;
    $MICRO{$structure} = 1; # loaded
    }
@@ -301,7 +303,7 @@ my @micros;
 my @search=[];
 for my $structure (@structures) {
    no strict 'refs';
-   eval "require AI::MicroStructure::$structure;";
+   eval "require '$absstructdir/$structure.pm';";
 
    my %isa = map { $_ => 1 } @{"AI::MicroStructure::$structure\::ISA"};
    if( exists $isa{'AI::MicroStructure::Locale'} ) {
@@ -417,7 +419,7 @@ $dat->{names} = join(" ",@in);
 $dat->{names} =~ s/$line(.*?)\-\>(.*?) [1-9] /$1 $2/g;
 $dat->{names} =~ s/  / /g;
 my @file = grep{/$Structure/}map{File::Glob::bsd_glob(
- File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) )}@INC;
+ File::Spec->catfile( $_, ($structdir,"*.pm") ) )}@CWD;
 
 
   if(@file){
@@ -540,25 +542,19 @@ my $StructureName = shift;
 my $data = shift;
 
 
-$StructureName = lc $self->trim(`micro`) unless($StructureName);
-my @file = grep{/any/}map{File::Glob::bsd_glob(
- File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) )}@INC;
-  my $fh;
-  if(@file){
-   $file[1]=$file[0];
-   $StructureName = lc $StructureName;
-  $file[1] =~ s/any/$StructureName/g;
+    $StructureName = lc $self->trim(`micro`) unless($StructureName);
+    my $file = "$absstructdir/$StructureName.pm";
+    print `mkdir $absstructdir` unless(-d $absstructdir);
+    my $fh;
 
-  open($fh,">$file[1]") || die $!;
+    open($fh,">$file") || die $!;
 
-  print $fh $self->getBlank($StructureName,$data);
+    print $fh $self->getBlank($StructureName,$data);
 
-  close $fh;
-  }
-  $Structure = $StructureName;
-  push @INC,$file[1];
-
-  return 1;
+    close $fh;
+    $Structure = $StructureName;
+    push @CWD,$file;
+    return 1;
 }
 
 
@@ -569,14 +565,14 @@ my $self = shift;
 my $StructureName = shift;
 
 my @file = grep{/$StructureName.pm/}map{File::Glob::bsd_glob(
-File::Spec->catfile( $_, qw( AI MicroStructure *.pm ) ) )}@INC;
+File::Spec->catfile( $_, ($structdir,"*.pm") ) )}@CWD;
 my $fh = shift @file;
 if(`ls $fh`)
 {
 
 print  `rm $fh`;
 }
-  #push @INC,$file[1];
+  #push @CWD,$file[1];
 
   return 1;
 }
