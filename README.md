@@ -100,6 +100,12 @@ hypothetical_creature
 
 
 
+#### Dependencies
+
+* cpan
+* wordnet
+* xpdf-utils (poppler-utils)
+
 #### Copyright
 
   Copyright (C) 2009-2012 Hagen "santex" Geissler
