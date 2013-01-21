@@ -188,7 +188,7 @@ sub call  {
 
 
 
-        @{$doc->{audio}} = map{$_=shift imgTranslate($_) } @{$doc->{audio}};
+        @{$doc->{audio}} = map{$_=shift @{(imgTranslate($_)  || [])} } @{$doc->{audio}};
 
         @{$doc->{audio}} = grep{ defined }@{$doc->{audio}};
 
@@ -253,7 +253,7 @@ my $hs = HTML::Strip->new();
 
 
 
-        @{$doc->{image}} = map{$_=shift imgTranslate($_) } @{$doc->{image}};
+        @{$doc->{image}} = map{$_=shift @{(imgTranslate($_) || [])} } @{$doc->{image}};
         @{$doc->{image}} = grep{ defined }@{$doc->{image}};
 
 
