@@ -1,13 +1,19 @@
 #!/usr/bin/perl -X
+use Cwd;
 use strict;
 use warnings;
+use Config::Auto;
 
 
 my %conf = ( );
 GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
+                    "init", "export", "import",
                     "check", "category=s", "sources" ,"drop");
 
 our ($new, $write,$drop,$all) =(0,0,0,0);
+my @CWD; push @CWD, getcwd();
+our $structdir = "structures";
+our $absstructdir = "$CWD[0]/$structdir";
 
 
 if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };
@@ -23,41 +29,73 @@ my $usage = << 'EOT';
   #current status
   #did you create a micro structure yet ?
   #try something like this
-  
 
   $ micro new ufo;      # creates a structure called ufo
 
   $ micro drop ufo;     # deletes the structure called ufo
 
   $ micro structures;   # shows all structure's you currently have
-  
+
   #after creation of a structure you can access it in lots of ways
-  
-   
-  
-  $ micro;             # one word of a random structure 
 
-  $ micro ufo;         # one word of the ufo structure 
 
-  $ micro ufo all;     # all words of the ufo structure 
-  
+
+  $ micro;             # one word of a random structure
+
+  $ micro ufo;         # one word of the ufo structure
+
+  $ micro ufo all;     # all words of the ufo structure
+
   $ micro ufo 5;       # 5 random words of the ufo structure
-  
+
   $ micro any 10;      # 10 random words of any structure you have created
-  
-  # oneliners i like to use 
-  
-  $  for i in `micro structures`; do echo $i; done;       # echos all the structures  
-  
+
+
+  $ micro --init        # initializes active memory
+
+  $ micro --export      # export relations from couchdb into git repo and tag data
+
+
+  # oneliners i like to use
+
+  $  for i in `micro structures`; do echo $i; done;       # echos all the structures
+
   $  for i in `micro ufo all`;   do echo $i; done;       # echos all words in ufo
 
   $  for i in `micro structures`; do micro all $i; done;  # echos all stuctures all words
-  
+
   $  for i in `micro ufo all`;   do micro new $i; done;  # new structure for all words in ufo
-  
-  $  for i in `micro ufo all`;   do micro-wiki $i; done; # push all words against the wiki plugin dont forget setting user & password in /usr/local/bin/micro-wiki 
-  
+
+  $  for i in `micro ufo all`;   do micro-wiki $i; done; # push all words against the wiki plugin dont forget setting user & password in /usr/local/bin/micro-wiki
+
 EOT
+
+# check if this is an active memory or initialize it
+if($conf{"init"}) {
+    if (-e  ".micro") {
+        print STDERR "this is already an active memory!\n";
+    } else {
+        print `git init && touch .micro && echo .pmc > .gitignore && echo '*~' >> .gitignore && echo '*swp' >> .gitignore && echo .micro >> .gitignore && git add -f .micro .gitignore && git commit -m 'active memory born'`;
+    }
+    exit;
+} else {
+    if (!-e ".micro") {
+        print STDERR "this directory is not an active memory!\n";
+        exit;
+    }
+}
+
+my $config = Config::Auto::parse(".micro", path => @CWD);
+$config->{couchdb} ||= "http://user::pass\@localhost:5984/";
+$config->{db}      ||= "micro-relations";
+
+if ($conf{"export"}) {
+    my $hash = "uniqqualityhash"; # FIXME
+    my $url = sprintf("%s/%s/_all_docs", $config->{couchdb}, $config->{db});
+    print `mkdir -p relations && wget -O relations/any.json $url && git add relations/any.json $structdir/*.pm && git commit -m 'active memory release' && git tag $hash`; # FIXME check for errors FIXME also that we commit per structure and/or per relation
+
+    exit;
+}
 
 my (@remote, @local);
 # real processing starts here
@@ -67,23 +105,20 @@ my $sep = $conf{whitespace} ? ' ' : $\;
 my $j = AI::MicroStructure->new()->structures();
 
 
-if($j == 0 || $j eq "any"){  
+if($j == 0 || $j eq "any"){
 
 print $usage;
 exit;
-}else{
-
-
 }
 
 
 
 sub cleanArgs{
-    my ($key) = @_; 
+    my ($key) = @_;
     my @tmp=();
-    foreach(@ARGV){ 
+    foreach(@ARGV){
     push @tmp,$_ unless($_=~/$key/);}
-    
+
     @ARGV=@tmp;
 }
 
@@ -91,9 +126,8 @@ sub cleanArgs{
 
 my $structure;
 
-
 if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
-  
+
     @local = grep{!/any/}AI::MicroStructure->new()->structures();
 
     print join $sep, @local, @remote;
@@ -126,12 +160,13 @@ if (!length $conf{category} && $structure =~ m{^([^/]+)/(.*)}s) {
 AI::MicroStructure->new( $structure, category => "new" )
  unless AI::MicroStructure->has_structure( $structure );
 
-my $module = "AI::MicroStructure::$structure";
+# my $module = "AI::MicroStructure::$structure";
+my $module = "$absstructdir/$structure.pm";
 
 
 # load the remote structure if needed
 if ( $conf{remote} || $conf{check} || $conf{sources}) {
-    eval "require $module;";
+    eval "require '$module';";
     die "structure '$structure' is not updatable!\n"
         unless $module->has_remotelist();
 }
