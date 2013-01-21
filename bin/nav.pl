@@ -1,12 +1,17 @@
 #!/usr/bin/perl -W
+use Cwd;
 use strict;
 use warnings;
 use JSON::XS;
+use Config::Auto;
 use Data::Dumper;
 use AI::MicroStructure;
 use Storable::CouchDB;
 my @ARGVX = ();
 
+my @CWD; push @CWD, getcwd();
+my $config = Config::Auto::parse(".micro", path => @CWD);
+$config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};
 
@@ -21,10 +26,10 @@ my $x = AI::MicroStructure->new;
 
 sub getAll {
   my $key =shift;
-    
+
   require LWP::UserAgent;
   my $ua = LWP::UserAgent->new;
-  my ($server,$db) = (sprintf("http://%s:5984",$ARGVX[2]),"table");
+  my ($server,$db) = ($config->{couchdb},"table");
   my $res = $ua->get(sprintf('%s/%s/_design/base/_view/instances?reduce=false&start_key=["%s"]&end_key=["%sZZZ"]',
                               $server,
                               $db,
@@ -59,10 +64,10 @@ my @datax = getAll($ARGV[0]);
 if($#datax){
 
 
-foreach my $i(0..$#datax) { 
+foreach my $i(0..$#datax) {
 
   printf("%s\n","".$datax[$i]) unless(!$datax[$i]);
-  
+
 }
 }
 
