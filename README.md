@@ -110,3 +110,17 @@ hypothetical_creature
 #### Copyright
 
   Copyright (C) 2009-2012 Hagen "santex" Geissler
+for o in 01-naive_bayes.t
+02-experiment.t
+03-weka.t
+04-decision_tree.t
+05-svm.t
+06-knn.t
+07-guesser.t
+09-rocchio.t
+10-tools.t
+11-feature_vector.t
+12-hypothesis.t
+13-document.t
+14-collection.t
+15-knowledge_set.t;do echo 15-knowledge_set.t; perl 15-knowledge_set.t; done

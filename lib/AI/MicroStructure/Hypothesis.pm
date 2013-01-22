@@ -1,22 +1,18 @@
 package AI::MicroStructure::Hypothesis;
-
-use strict;
-
-use AI::Catergorizer;
+use base("AI::Categorizer::Hypothesis");
 use Class::Container;
-use base qw(AI::MicroStructure);
 use Params::Validate qw(:types);
 
 
 
 
 __PACKAGE__->valid_params
-  (
-   all_categories => {type => ARRAYREF},
-   scores => {type => HASHREF},
-   threshold => {type => SCALAR},
+ (
+  # all_categories => {type => ARRAYREF},
+ #  scores => {type => HASHREF},
+  # threshold => {type => SCALAR},
    document_name => {type => SCALAR, optional => 1},
-  );
+ );
 
 
 
@@ -59,18 +55,8 @@ sub scores {
 }
 
 1;
-my  $document = {};
  # Hypotheses are usually created by the Learner's categorize() method.
  # (assume here that $learner and $document have been created elsewhere)
-
-my $learner = AI::Categorizer::Hypothesis::new();
- my $h = $learner->categorize($document);
- 
- print "Assigned categories: ", join ', ', $h->categories, "\n";
- print "Best category: ", $h->best_category, "\n";
- print "Assigned scores: ", join ', ', $h->scores( $h->categories ), "\n";
- print "Chosen from: ", join ', ', $h->all_categories, "\n";
- print +($h->in_category('geometry') ? '' : 'not '), "assigned to geometry\n";
 
 __END__
 

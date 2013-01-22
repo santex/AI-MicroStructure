@@ -8,7 +8,6 @@ use File::Spec;
 use Data::Dumper;
 use BerkeleyDB;
 use Cache::Memcached::Fast;
-use AI::MicroStructure::Remember;
 require AI::Categorizer;
 require AI::Categorizer::Learner::NaiveBayes;
 require AI::Categorizer::Document;

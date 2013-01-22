@@ -9,8 +9,10 @@ use AI::MicroStructure;
 use Storable::CouchDB;
 my @ARGVX = ();
 
-my @CWD; push @CWD, getcwd();
-my $config = Config::Auto::parse(".micro", path => @CWD);
+my @CWD; 
+push @CWD, getcwd();
+push @CWD,"/home/hagen/data";
+my $config = Config::Auto::parse(".micro", path =>[@CWD]);
 $config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};

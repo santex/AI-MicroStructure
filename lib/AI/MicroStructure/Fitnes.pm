@@ -3,7 +3,7 @@ package AI::MicroStructure::Fitnes;
 use strict;
 use warnings;
 use JSON;
-use Data::Dumper;
+use Data::Printer;
 use Statistics::MVA::HotellingTwoSample;
 use Algorithm::BaumWelch;
 use Statistics::Distributions::Ancova;
@@ -24,7 +24,7 @@ use vars qw(
 
 
 sub import {
-	##$self->{log} .= sprintf "import called with @_\n";
+	##$ex->{log} .= sprintf "import called with @_\n";
 	local $configure = @_; # shame that Getopt::Long isn't structured better!
 	use Getopt::Long ();
 
@@ -48,8 +48,8 @@ sub new {
   my $self = bless { cache => [] }, $class;
   $configure = $args;
   $self->{"log"}="";  
-  $self->import;
-  $self->connectStats;
+  $class->import;
+  $class->connectStats;
 
  
   return $self;
@@ -90,7 +90,7 @@ sub connectStats{
       $self->{configure} = $configure;
    }
   
-END{ 
+END{
 	
 my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, input_verbosity => 1, output_verbosity => 1 } );
          use Statistics::Descriptive;
@@ -190,8 +190,9 @@ my $correct_categories=sprintf "%d" ,$_+rand 10;
  }
  
 
+ my $ex = AI::MicroStructure::Fitnes->new;
  
-$self->{log} .= sprintf $s->stats_table; # Show several stats in table form
+$ex->{log} .=  $s->stats_table; # Show several stats in table form
 
  my $stats = $s->category_stats;
  my $show = {};
@@ -205,9 +206,9 @@ $self->{log} .= sprintf $s->stats_table; # Show several stats in table form
 
 
 while (my ($cat, $value) = each %$stats) {
- $self->{log} .= sprintf "Category '$cat': \n"; $self->{log} .= sprintf "  Accuracy: $value->{accuracy}\n";
- $self->{log} .= sprintf "  Precision: $value->{precision}\n";
- $self->{log} .= sprintf "  F1: $value->{F1}\n";
+ $ex->{log} .= sprintf "Category '$cat': \n"; $ex->{log} .= sprintf "  Accuracy: $value->{accuracy}\n";
+ $ex->{log} .= sprintf "  Precision: $value->{precision}\n";
+ $ex->{log} .= sprintf "  F1: $value->{F1}\n";
 }
 
 
@@ -284,10 +285,10 @@ $anc->load_data ( { data => $h_ref } );
 $anc->ancova_analysis;
 
 # To access results use results method. The return of this method is context dependent (see METHODS).
-# To$self->{log} .= sprintf a report to STDOUT call results in VOID context.
+# To$ex->{log} .= sprintf a report to STDOUT call results in VOID context.
 $anc->results();
 
-print Dumper $mva;
+p $mva;
 }
 
 }

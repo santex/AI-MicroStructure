@@ -2,26 +2,12 @@ package AI::MicroStructure::Scoring;
 
 use strict;
 
-=head2 new
 
- Title   : new
- Usage   : my $obj = Bio::Matrix::Scoring->new();
- Function: Builds a new Bio::Matrix::Scoring object 
- Returns : an instance of Bio::Matrix::Scoring
- Args    :
-
-
-=cut
-
-
-
-
-my $q =  AI::MicroStructure::Scoring::new(0..100);
 
 
 sub new { 
 
-  my($class,$args) = @_;
+  my($class) = shift ;
  
   my $self = bless { cache => [] }, $class;
 	 
@@ -30,7 +16,7 @@ sub new {
   
     my ($entropy,$expected,$scale,$scaleval,$database,
 		  $lowestscore,$highestscore,$lambda,$H);
-    #$class->entropy($entropy);
+    $class->entropy($entropy);
     $class->expected_score($expected);
     $class->scale($scale);
     $class->scale_value($scaleval);
