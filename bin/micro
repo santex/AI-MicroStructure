@@ -23,7 +23,7 @@ use AI::MicroStructure;
 use Getopt::Long;
 use Data::Dumper;
 use JSON::XS;
-
+our $main = AI::MicroStructure->new();
 my $usage = << 'EOT';
 
   #current status
@@ -90,7 +90,7 @@ $config->{couchdb} ||= "http://user::pass\@localhost:5984/";
 $config->{db}      ||= "micro-relations";
 
 if ($conf{"export"}) {
-    my $hash = "uniqqualityhash"; # FIXME
+    my $hash =  $main->fitnes($config); # FIXME
     my $url = sprintf("%s/%s/_all_docs", $config->{couchdb}, $config->{db});
     print `mkdir -p relations && wget -O relations/any.json $url && git add relations/any.json $structdir/*.pm && git commit -m 'active memory release' && git tag $hash`; # FIXME check for errors FIXME also that we commit per structure and/or per relation
 
@@ -102,7 +102,7 @@ my (@remote, @local);
 $\ = $/;
 my $sep = $conf{whitespace} ? ' ' : $\;
 
-my $j = AI::MicroStructure->new()->structures();
+my $j = $main->structures();
 
 
 if($j == 0 || $j eq "any"){

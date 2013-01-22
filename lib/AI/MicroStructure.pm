@@ -226,6 +226,15 @@ sub load_data {
    return $data;
 }
 
+
+#fitnes 
+
+sub fitnes {
+  
+   my ($self, $config,$structure, $config ) = (shift,shift,[$self->structures()]);
+
+}
+
 # main function
 sub microname { $micro->name( @_ ) };
 
