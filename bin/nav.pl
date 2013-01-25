@@ -1,19 +1,14 @@
 #!/usr/bin/perl -W
-use Cwd;
 use strict;
 use warnings;
 use JSON::XS;
-use Config::Auto;
 use Data::Dumper;
 use AI::MicroStructure;
+use AI::MicroStructure::util;
 use Storable::CouchDB;
 my @ARGVX = ();
 
-my @CWD; 
-push @CWD, getcwd();
-push @CWD,"/home/hagen/data";
-my $config = Config::Auto::parse(".micro", path =>[@CWD]);
-$config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
+my (@CWD, $config) = AI::MicroStructure::util::config();
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};
 

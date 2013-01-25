@@ -27,12 +27,11 @@ use JSON::XS;
 use Config::Auto;
 use Data::Dumper;
 use AI::MicroStructure;
+use AI::MicroStructure::util;
 use Storable::CouchDB;
 my @ARGVX = ();
 
-my @CWD; push @CWD, getcwd();
-my $config = Config::Auto::parse(".micro", path => @CWD);
-$config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
+my (@CWD, $config) = AI::MicroStructure::util::config();
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};
 
@@ -79,12 +78,12 @@ my $cont = {};
 
 
  my $pdf = decode_json($res->content);
- 
 
- foreach(@{$pdf->{rows}}) { 
+
+ foreach(@{$pdf->{rows}}) {
 	 foreach my $l(@{$_->{value}}){
-		 
-		
+
+
 		$cc->{$l} = 1 unless($l!~ m/^http.*.pdf$/i);
 	}
 }
@@ -98,14 +97,14 @@ my $cont = {};
 
 
  my $img  = decode_json($res->content);
- 
- 
- foreach(@{$img->{rows}}) { 
+
+
+ foreach(@{$img->{rows}}) {
 	 foreach my $l(@{$_->{value}}){
 		$cc->{$l} = 1 unless($l!~ m/upload.*.(png|jpg|gif|svg|jpeg)$/i);
 	}
 }
- 
+
 
 $res = $ua->get(sprintf('%s/%s/_design/base/_view/audio?reduce=false&start_key="%s"&end_key="%sZZZ"',
                               $server,
@@ -115,8 +114,8 @@ $res = $ua->get(sprintf('%s/%s/_design/base/_view/audio?reduce=false&start_key="
 
 
  my $media  = decode_json($res->content);
- 
- foreach(@{$media->{rows}}) { 
+
+ foreach(@{$media->{rows}}) {
 	 foreach my  $l  (@{$_->{value}}){
 		$cc->{$l} = 1 unless($l!~ m/upload.*.(ogg|avi|mpg)$/i);
 	}
@@ -156,16 +155,16 @@ sub printer {
      $msg = "space" unless($msg);
 
      my @data = getAll($msg);
-	
+
 	my $plus = pop @data;
-     
-     
+
+
 
      $cmd->{q} = join(" ",@data);
 
      $cmd->{action} = [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g; $_={neighbour => $a[0][1], spawn => $a[0][0]}} split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq | egrep "[2-9][0-9]"`)];
-     
-     
+
+
 
      $cmd->{json} = JSON::XS->new->pretty(1)->encode({ "query" => $msg,
                                                       "callback" => "makeList",
@@ -186,10 +185,10 @@ my $server = Net::Async::WebSocket::Server->new(
          on_frame => sub {
             my ( $self, $frame ) = @_;
             $self->{frame} = $frame;
-            
+
             $list = printer($frame);
             $self->send_frame( $list );
-    
+
          },
       );
    }
