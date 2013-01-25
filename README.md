@@ -105,6 +105,7 @@ hypothetical_creature
 * cpan
 * couchdb
 * wordnet
+* tesseract
 * xpdf-utils (poppler-utils)
 
 #### Copyright
