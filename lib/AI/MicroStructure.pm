@@ -237,11 +237,12 @@ sub load_data {
 }
 
 
-#fitnes 
+#fitnes
 
 sub fitnes {
-  
-   my ($self, $config,$structure, $config ) = (shift,shift,[$self->structures()]);
+
+    my $self = shift;
+   my ($config,$structure, $config ) = (shift,[$self->structures()]);
 
 }
 
