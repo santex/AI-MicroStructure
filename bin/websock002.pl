@@ -31,7 +31,7 @@ use AI::MicroStructure::util;
 use Storable::CouchDB;
 my @ARGVX = ();
 
-my (@CWD, $config) = AI::MicroStructure::util::config();
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};
 

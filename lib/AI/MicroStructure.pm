@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
+use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use File::Basename;
 use File::Spec;
 use File::Glob;
@@ -28,7 +29,7 @@ our @a=();
 
 our ($new, $write,$drop) =(0,0,0);
 
-my (@CWD, $config) = AI::MicroStructure::util::load_config();
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 our $structdir = "structures";
 our $absstructdir = "$CWD[0]/$structdir";
 
@@ -233,6 +234,7 @@ sub load_data {
 sub fitnes {
 
     my $self = shift;
+    return sha1_hex($self->structures());
    ##my ($config,$structure, $config ) = (shift,[$self->structures()]); FIXME
 
 }
