@@ -1,9 +1,7 @@
 #!/usr/bin/perl -X
-use Cwd;
 use strict;
 use warnings;
-use Config::Auto;
-
+use AI::MicroStructure::util;
 
 my %conf = ( );
 GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
@@ -11,9 +9,6 @@ GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","
                     "check", "category=s", "sources" ,"drop");
 
 our ($new, $write,$drop,$all) =(0,0,0,0);
-my @CWD; push @CWD, getcwd();
-our $structdir = "structures";
-our $absstructdir = "$CWD[0]/$structdir";
 
 
 if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };
@@ -79,20 +74,20 @@ if($conf{"init"}) {
     }
     exit;
 } else {
-    if (!-e ".micro") {
+    if (!-e ".micro" && !-e $ENV{HOME}."/.micro") {
         print STDERR "this directory is not an active memory!\n";
         exit;
     }
 }
 
-my $config = Config::Auto::parse(".micro", path => @CWD);
-$config->{couchdb} ||= "http://user::pass\@localhost:5984/";
-$config->{db}      ||= "micro-relations";
+my (@CWD, $config) = AI::MicroStructure::util::config();
+our $structdir = "structures";
+our $absstructdir = "$CWD[0]/$structdir";
 
 if ($conf{"export"}) {
-    my $hash =  $main->fitnes($config); # FIXME
+    my $hash = $main->fitnes();
     my $url = sprintf("%s/%s/_all_docs", $config->{couchdb}, $config->{db});
-    print `mkdir -p relations && wget -O relations/any.json $url && git add relations/any.json $structdir/*.pm && git commit -m 'active memory release' && git tag $hash`; # FIXME check for errors FIXME also that we commit per structure and/or per relation
+    print `cd $CWD[0] && mkdir -p relations && wget -O relations/any.json $url && git add relations/any.json $structdir/*.pm && git commit -m 'active memory release' && git tag $hash`; # FIXME check for errors FIXME also that we commit per structure and/or per relation
 
     exit;
 }
