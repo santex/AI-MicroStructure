@@ -233,7 +233,7 @@ sub load_data {
 sub fitnes {
 
     my $self = shift;
-   my ($config,$structure, $config ) = (shift,[$self->structures()]);
+   ##my ($config,$structure, $config ) = (shift,[$self->structures()]); FIXME
 
 }
 
