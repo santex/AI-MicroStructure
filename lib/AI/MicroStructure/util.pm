@@ -16,26 +16,37 @@ sub get_cwd {
 sub load_config {
 
     my @CWD = AI::MicroStructure::util::get_cwd();
-    my $config = Config::Auto::parse(".micro", path => @CWD);
+    my $config = Config::Auto::parse(".micro", path => @CWD) || {};
+    if (-e ".micro" && -e $ENV{HOME}."/.micro") {
+        my $c = Config::Auto::parse("$ENV{HOME}/.micro");
+        foreach (keys %{$c}) { $config->{$_} ||= $c->{$_}; }
+    }
     if($config->{default}) {
         shift @CWD;
         push @CWD, $config->{default};
+        if (-e "$CWD[0]/.micro") {
+            my $c = Config::Auto::parse("$CWD[0]/.micro");
+            foreach (keys %{$config}) { $c->{$_} ||= $config->{$_}; }
+            $config = $c;
+        }
     }
-    return @CWD;
-    return $config;
+    return { "cwd" => @CWD, "cfg" => $config };
 
 }
 
+
 sub config {
-    my (@CWD, $config) = AI::MicroStructure::util::load_config();
+#     my ($ref_1, $ref_2) = AI::MicroStructure::util::load_config();
+#     my (@CWD, $config) = (@$ref_1, $ref_2);
+    my $state = AI::MicroStructure::util::load_config();
+    print "and we should have a winner here: $state->{cfg} \n";
 
-    $config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
-    $config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
-    $config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
-    $config->{db} ||= "micro-relations";
+    $state->{cfg}->{couchdb}    ||= "http://user::pass\@localhost:5984/";
+    $state->{cfg}->{conceptimg} ||= "http://localhost/tiny/concept2.php";
+    $state->{cfg}->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
+    $state->{cfg}->{db} ||= "micro-relations";
 
-    return @CWD;
-    return $config;
+    return $state;
 }
 
 1;

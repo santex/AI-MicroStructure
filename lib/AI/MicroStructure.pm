@@ -28,7 +28,7 @@ our @a=();
 
 our ($new, $write,$drop) =(0,0,0);
 
-my (@CWD, $config) = AI::MicroStructure::util::load_config();
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 our $structdir = "structures";
 our $absstructdir = "$CWD[0]/$structdir";
 

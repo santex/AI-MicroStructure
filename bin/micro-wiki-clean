@@ -12,7 +12,7 @@ use AI::MicroStructure::util;
 #use AI::MicroStructure::Collection;
 use Storable::CouchDB;
 
-my (@CWD, $config) = AI::MicroStructure::util::config();
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 
 
 
