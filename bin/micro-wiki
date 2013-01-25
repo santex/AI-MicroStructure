@@ -1,20 +1,14 @@
 #!/usr/bin/perl -X
-use Cwd;
 use utf8;
 use File::Spec;
-use Config::Auto;
 use Parallel::Iterator qw( iterate );
+use AI::MicroStructure::util;
 
 
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
-my @CWD; push @CWD, getcwd();
-my $config = Config::Auto::parse(".micro", path => @CWD);
-$config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
-$config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
-$config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
-$config->{db} ||= "micro-relations";
+my (@CWD, $config) = AI::MicroStructure::util::config();
 
 use HTML::Strip;
 use Data::Printer;

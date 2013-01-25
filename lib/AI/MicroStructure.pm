@@ -2,14 +2,13 @@
 package AI::MicroStructure;
 use strict;
 use warnings;
-use Cwd;
 use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use File::Basename;
 use File::Spec;
 use File::Glob;
-use Config::Auto;
 use Data::Dumper;
+use AI::MicroStructure::util;
 
 
 our $VERSION = '0.013';
@@ -28,16 +27,8 @@ our @items;
 our @a=();
 
 our ($new, $write,$drop) =(0,0,0);
-my @CWD; if (!-e ".micro") {
-    push @CWD, $ENV{HOME};
-} else {
-    push @CWD, getcwd();
-}
-my $config = Config::Auto::parse(".micro", path => @CWD);
-if($config->{default}) {
-    shift @CWD;
-    push @CWD, $config->{default};
-}
+
+my (@CWD, $config) = AI::MicroStructure::util::load_config();
 our $structdir = "structures";
 our $absstructdir = "$CWD[0]/$structdir";
 
