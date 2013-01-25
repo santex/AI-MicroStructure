@@ -1,7 +1,9 @@
 #!/usr/bin/perl -X
+use Cwd;
 use strict;
 use warnings;
 use JSON::XS;
+use Config::Auto;
 use Data::Printer;
 use AI::MicroStructure;
 #use AI::MicroStructure::Fitnes;
@@ -12,6 +14,10 @@ use AI::MicroStructure;
 use Storable::CouchDB;
 my @ARGVX = ();
 
+my @CWD; push @CWD, getcwd();
+my $config = Config::Auto::parse(".micro", path => @CWD);
+$config->{couchdb} ||= "http://user::pass\@localhost:5984/";
+$config->{db} ||= "micro-relations";
 
 
 
@@ -23,10 +29,10 @@ my @ARGVX = ();
 
     require LWP::UserAgent;
     my $ua = LWP::UserAgent->new;
-    my ($server,$db) = (sprintf("http://%s:5984","localhost"),"table");
+    my ($server,$db) = ($config->{couchdb},$config->{db});
 
    my $res ;
-                                
+
     $res = $ua->get(sprintf('%s/%s/_design/base/_view/instances?reduce=false&start_key=["%s"]&end_key=["%sz"]',
                               $server,
                               $db,
@@ -36,14 +42,14 @@ my @ARGVX = ();
 
 $res = decode_json($res->content);
 return @{$res->{rows}};
-    
-  
+
+
 }
 
 
    our $x = Storable::CouchDB->new(
-                                      uri =>"http://hagen:hagen123pass\@localhost:5984/",  #default
-                                      db  =>"table"
+                                      uri => $config->{couchdb},  #default
+                                      db  => $config->{db}
                                      );
 
 
@@ -56,11 +62,11 @@ my @set = checkIsThere($ARGV[0]);
 print  map{  push @q,$_->{id} unless(!$_->{id});}@set;
 print join "\n",@q;
 map{ $x->delete($_); }@q;
-  
+
 #p @set;
 #print map{  p @set,$x;}@set;
 #map{ $x->delete($_->{id}); }@set;
-  
+
   1;
-  
+
   __END__
