@@ -1,5 +1,4 @@
 #!/usr/bin/perl -X
-use Cwd;
 use utf8;
 use File::Spec;
 use Config::Auto;
@@ -22,12 +21,16 @@ binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
 my @CWD; push @CWD, getcwd();
 my $config = Config::Auto::parse(".micro", path => @CWD);
+
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+
 $config->{couchdb}    ||= "http://localhost:5984/";
 $config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
 $config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
 $config->{buffer} = "";
 $config->{out} ||= "json";
 $config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$PWD,$ARGV[0]);
+
 
 p $config;
 #exit(0) unless (!checkIsThere($ARGV[0]));
@@ -326,9 +329,33 @@ my $url_iter = list_iter( @{$result->{$urlx}->{related}});
 
 my $page_iter = iterate( \&call, $url_iter );
 
-  our $out = {};
+  our $out = {abs=>{pdf=>{},related=>{},image=>{},ogg=>{}}};
+
      while ( my ( $index, $value ) = $page_iter->() ) {
          $out->{$index} = $value;
+         
+         
+         foreach(@{$value->{related}}) {
+         
+         $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
+         
+         }
+         
+         foreach(@{$value->{pdf}}) {
+         
+         $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
+         
+         }
+         foreach(@{$value->{image}}) {
+         
+         $out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
+         
+         }
+         foreach(@{$value->{audio}}) {
+         
+         $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
+         
+         }
      }
 
     exit;
@@ -352,7 +379,7 @@ END{
 
 
 	my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
-                                                  "responce" =>[$out]});
+                                                  "responce" =>[$conf->{abs} ? $out->{abs}:$out]});
 		 
  
       open (MYFILE, '>>'.$config->{db});

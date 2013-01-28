@@ -2,13 +2,14 @@
 package AI::MicroStructure;
 use strict;
 use warnings;
-use Cwd;
 use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
+use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use File::Basename;
 use File::Spec;
 use File::Glob;
 use Data::Dumper;
+use AI::MicroStructure::util;
 
 
 our $VERSION = '0.014';
@@ -27,7 +28,8 @@ our @items;
 our @a=();
 
 our ($new, $write,$drop) =(0,0,0);
-my @CWD; push @CWD, getcwd();
+
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 our $structdir = "structures";
 our $absstructdir = "$CWD[0]/$structdir";
 
@@ -227,11 +229,13 @@ sub load_data {
 }
 
 
-#fitnes 
+#fitnes
 
 sub fitnes {
-  
-   my ($self, $config,$structure, $config ) = (shift,shift,[$self->structures()]);
+
+    my $self = shift;
+    return sha1_hex($self->structures());
+   ##my ($config,$structure, $config ) = (shift,[$self->structures()]); FIXME
 
 }
 
