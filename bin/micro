@@ -68,7 +68,46 @@ my $usage = << 'EOT';
 
   $  for i in `micro ufo all`;   do micro-wiki $i; done; # push all words against the wiki plugin dont forget setting user & password in /usr/local/bin/micro-wiki
 
+  ###################################################################################
+  # try to follow the logic combine
+  # your-word=micro new ? ->concept->concepts->relations->node
+
+
+  $ micro new biology
+  $ micro new biological_process
+
+  $ for i in `micro structures`; do
+  $ for y in `micro all $i `; do
+  $ echo "$i=$y";
+  $ micro new $y;
+  $ done
+  $ done
+
+  #!!!!!###Hard cpu to expect ### make sure couch is on   ######  or disable the store methode in micro-wiki and print $doc or consume otherweise
+  # test as single before you loope 
+  
+  $ micro-wiki ufo
+  
+  # proceed
+
+  $ for i in `micro structures`; do
+  $ for y in `micro all $i `; do
+  $ echo "$i=$y";
+  $ micro-wiki $y;
+  $ done
+  $ done
+
+
 EOT
+
+
+if($conf{"help"}) {
+
+    printf($usage);
+    exit(0);
+
+}
+
 
 # check if this is an active memory or initialize it
 if($conf{"init"}) {

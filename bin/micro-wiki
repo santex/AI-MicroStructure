@@ -3,30 +3,33 @@ use Cwd;
 use utf8;
 use File::Spec;
 use Config::Auto;
-use Parallel::Iterator qw( iterate );
-
-
-binmode STDOUT, ':utf8';
-binmode STDERR, ':utf8';
-
-my @CWD; push @CWD, getcwd();
-my $config = Config::Auto::parse(".micro", path => @CWD);
-$config->{couchdb}    ||= "http://user::pass\@localhost:5984/";
-$config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
-$config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
-$config->{db} ||= "micro-relations";
-
-use HTML::Strip;
 use Data::Printer;
+use Parallel::Iterator qw( iterate );
+use Env qw/PWD/;
+use JSON::XS;
+use HTML::Strip;
 use Digest::MD5 qw(md5_hex);
 use AI::MicroStructure::WordBlacklist;
 use JSON::XS;
 use WWW::Wikipedia;
 use Storable::CouchDB;
-require LWP::UserAgent;
+use LWP::UserAgent;
 
-$ARGV[0] = "Planet" unless($ARGV[0]);
 
+
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+die("require a argument") unless($ARGV[0]);
+my @CWD; push @CWD, getcwd();
+my $config = Config::Auto::parse(".micro", path => @CWD);
+$config->{couchdb}    ||= "http://localhost:5984/";
+$config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
+$config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
+$config->{buffer} = "";
+$config->{out} ||= "json";
+$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$PWD,$ARGV[0]);
+
+p $config;
 #exit(0) unless (!checkIsThere($ARGV[0]));
 
 
@@ -150,7 +153,7 @@ sub call  {
 
   my ($idx,$url) = @_;
 
-  return () unless (!checkIsThere($url) || $idx==0);
+  return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
 
   warn "doing $url";
 #
@@ -192,7 +195,7 @@ sub call  {
 
       	  $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
 
-          @links = grep{/^http:\/\/en.wikipedia.org\/wiki/}@links; # FIXME replace with $config->{wikipedia}
+          @links = grep{/^http:\/\/$config->{wikipedia}\/wiki/}@links;
           $linkdata->{image}=[grep{/^http.*.[\.](JPG|GIF|PNG|svg|jpg|png|gif)$/}@links];
 
 
@@ -298,8 +301,10 @@ my $hs = HTML::Strip->new();
 
     #       my @L  = [sort {$a cmp $b}grep{/(wiki|book|Category|List_of_)/i} @links];
 #p $doc;
-       $x->store("$url" ,$doc);
+	
+       $x->store("$url" ,$doc) unless($config->{out}=~/json/);
 
+		
   #     p $doc;
 
         return $doc;
@@ -321,9 +326,9 @@ my $url_iter = list_iter( @{$result->{$urlx}->{related}});
 
 my $page_iter = iterate( \&call, $url_iter );
 
-  my @out = ( );
+  our $out = {};
      while ( my ( $index, $value ) = $page_iter->() ) {
-         $out[$index] = $value;
+         $out->{$index} = $value;
      }
 
     exit;
@@ -342,7 +347,21 @@ BEGIN{
 }
 END{
     `IFS=\$IFS_BAK;`;
-     p @out;
+     
+     if($config->{out}=~/json/) {
+
+
+	my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
+                                                  "responce" =>[$out]});
+		 
+ 
+      open (MYFILE, '>>'.$config->{db});
+		print MYFILE $json;
+		close (MYFILE); 
+
+     
+	}
+
      exit(0);
 
 }

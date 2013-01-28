@@ -1,9 +1,13 @@
 #!/usr/bin/perl
-
+use Cwd;
 use strict;
 use warnings;
+use JSON::XS;
+use Config::Auto;
 use Data::Dumper;
 use Data::Printer;
+use AI::MicroStructure;
+use Storable::CouchDB;
 use IO::Async::Loop;
 use Digest::MD5;
 use Net::Async::WebSocket::Server;
@@ -20,14 +24,6 @@ my $JSON = {};
 my $pwd = $PWD;
 
 
-use Cwd;
-use strict;
-use warnings;
-use JSON::XS;
-use Config::Auto;
-use Data::Dumper;
-use AI::MicroStructure;
-use Storable::CouchDB;
 my @ARGVX = ();
 
 my @CWD; push @CWD, getcwd();
@@ -171,7 +167,7 @@ sub printer {
                                                       "callback" => "makeList",
                                                       "responce" =>
                                                       [$cmd->{action},
-                                                      sort values $plus]});
+                                                      sort values %$plus]});
 
       return $cmd->{json};
 

@@ -6,11 +6,11 @@ use File::Spec;
 #use AI::MicroStructure;
 use JSON::XS;
 use Data::Printer;
-
+use Data::Dumper;
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
-
+our $buff = {};
 BEGIN 
 {
 `IFS_BAK=\$IFS;
@@ -65,16 +65,20 @@ my $sense = JSON::XS->new->pretty(1)->allow_blessed($new->{storage});
 
 foreach(sort {$a <=> $b} keys %{$new->{storage}->{dominant}}){
 
-printf("\n%s = %d",$new->{storage}->{dominant}->{$_},$_) unless($_==1);
+$buff->{out} .= sprintf("%s = %d\n",$new->{storage}->{dominant}->{$_},$_) unless($_==1);
 
 }
 
-`IFS=\$IFS_BAK;`;
+#`IFS=\$IFS_BAK;`;
 
 
-p $new->{storage}->{data};
+$buff->{out} .= sprintf(p $new->{storage}->{data});
 
 
+END{
+  print $buff->{out};	
+	
+	}
 
 1;
 __END__

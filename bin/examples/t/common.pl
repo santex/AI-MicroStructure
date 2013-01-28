@@ -22,16 +22,10 @@ sub skip_test {
 }
 
 sub training_docs {
-  return (
-	  doc1 => {categories => ['farming'],
-		   content => 'Sheep are very valuable in farming.' },
-	  doc2 => {categories => ['farming'],
-		   content => 'Farming requires many kinds of animals.' },
-	  doc3 => {categories => ['vampire'],
-		   content => 'Vampires drink blood and vampires may be staked.' },
-	  doc4 => {categories => ['vampire'],
-		   content => 'Vampires cannot see their images in mirrors.'},
-	 );
+  sub{
+	  sprintf("%sdoc",$_) => {categories => [`micro any 1`],
+		   content =>  },
+	 } for(0..199);
 }
 
 sub run_test_docs {
