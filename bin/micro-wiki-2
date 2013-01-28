@@ -1,0 +1,442 @@
+#!/usr/bin/perl -X
+use utf8;
+use Cwd;
+use File::Spec;
+use Config::Auto;
+use Data::Printer;
+use Parallel::Iterator qw( iterate );
+use Env qw/PWD/;
+use JSON::XS;
+use HTML::Strip;
+use Digest::MD5 qw(md5_hex);
+use AI::MicroStructure::WordBlacklist;
+use WWW::Wikipedia;
+use Storable::CouchDB;
+use LWP::UserAgent;
+use HTML::SimpleLinkExtor;
+use URI::Escape qw( uri_unescape );
+use HTTP::Request::Common;
+no warnings 'utf8';
+ 
+
+
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+
+die("require a argument") unless($ARGV[0]);
+my @CWD; push @CWD, getcwd();
+our $config = Config::Auto::parse(".micro", path => @CWD);
+$config->{couchdb}    ||= "http://localhost:5984/";
+$config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
+$config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
+$config->{buffer} = "";
+$config->{tempdir} ||= sprintf("/tmp/micro-temp/%s",$ARGV[0]);
+$config->{language} ||= "en";
+$config->{out} ||= "json";
+$config->{"abs"} ||= 1;
+$config->{download} ||= 1;
+
+$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$PWD,$ARGV[0]);
+
+
+
+our $doc ={};
+our @links;
+our $linkdata = {};
+our $result;
+my $url = $ARGV[0];
+our $done;
+our $doneit={};
+my @inx;
+my @test;
+my $search="";
+my $TOP="";
+
+    my $s=AI::MicroStructure::WordBlacklist::getStopWords('en');
+    our @s = keys %$s;
+    #print join('|',@s);
+
+
+
+
+
+   our $x = Storable::CouchDB->new(
+            uri =>$config->{couchdb},  #default
+            db  =>$config->{db}
+           );
+
+
+    my $carry = {count=>0,max=>0};
+
+
+
+  sub list_iter {
+               my @ar = @_;
+               my $pos = 0;
+               return sub {
+                   return if $pos >= @ar;
+                   my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
+                   $pos++;
+                   return @r;
+               };
+           }
+
+
+  sub checkIsThere {
+
+    my $key =shift;
+
+
+    my $ua = LWP::UserAgent->new;
+    my ($server,$db) = ($config->{couchdb},$config->{db});
+
+    my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
+                                $server,
+                                $db,
+                                $key));
+  my $r =  JSON::XS::decode_json($res->content);
+  my @rows =  @{$r->{rows}};
+  if(@rows)
+  {
+    return 1;
+  }else{
+  return 0;
+  }
+  return 1;
+}
+
+sub URLDecode {
+my $theURL = $_[0];
+$theURL =~ tr/+/ /;
+$theURL =~ s/%([a-fA-F0-9]{2,2})/chr(hex($1))/eg;
+$theURL =~ s/<!--(.|\n)*-->//g;
+return $theURL;
+}
+
+sub URLEncode {
+my $theURL = $_[0];
+$theURL =~ s/([\W])/"%" . uc(sprintf("%2.2x",ord($1)))/eg;
+return $theURL;
+}
+
+sub smartdecode {
+
+  my $x = my $y = uri_unescape($_[0]);
+  return $x if utf8::decode($x);
+  return $y;
+}
+
+sub imgTranslate {
+
+
+   my ($url) = @_;
+
+if($url){
+	my $request = HTTP::Request::Common::GET(sprintf("%s?img=%s", $config->{conceptimg}, $url));
+       $request->content_type('application/x-www-form-urlencoded');
+
+	my  $ua = LWP::UserAgent->new;
+	my $response = $ua->request($request);
+
+    if ($response->is_success) {
+        $response->decoded_content;
+
+	$url = decode_json($response->decoded_content);
+
+	return \@{$url->{result}};
+    }
+    else {
+        #print STDERR $response->status_line, "\n";
+    }
+  }
+}
+
+
+
+
+sub addAbs {
+
+   my ($doc,$out,$type) = @_; 
+
+    return unless($doc && $out && $type);
+  
+
+     foreach(@{$doc->{$type}}) {
+
+     $out->{abs}->{$type}->{$_} = defined($out->{abs}->{$type}->{$_})? $out->{abs}->{$type}->{$_}+1 : 1;
+
+     }
+
+}      
+
+
+sub delAbs {
+
+   my ($out,$type) = @_; 
+
+    return unless( $out && $type);
+  
+
+     foreach(sort keys %{$out->{abs}->{$type}}) {
+
+     delete($out->{abs}->{$type}->{$_}) unless($out->{abs}->{$type}->{$_}>1);
+     }
+
+}            
+
+sub call  {
+
+  my ($idx,$url) = @_;
+
+  return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
+
+ # warn "doing $url";
+#
+
+#  return unless($url=~/Planet/);
+
+  my $ua = LWP::UserAgent->new;
+
+
+
+  my $content ;
+  my $response ="";
+ # @book = ();
+
+  my @book = ();
+    $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
+
+
+
+
+
+#      if ($response->base =~ /m{$TOP}/ ) {
+          my $doc={};
+          my $linkdata={};
+
+          my $e = HTML::SimpleLinkExtor->new($response->base);
+          $e->parse($response->decoded_content);
+          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}$e->links;
+
+          foreach(@links){
+
+            $linkdata->{base}->{$_} = 1 unless($linkdata->{base}->{$_});
+
+          }
+          @links = keys %{$linkdata->{base}};
+          $linkdata->{pdf}=[grep{/^http.*.[\.](pdf|PDF)$/}@links];
+
+      	  $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
+
+          @links = grep{/^http:\/\/$config->{wikipedia}\/wiki/}@links;
+          $linkdata->{image}=[grep{/^http.*.[\.](JPG|GIF|PNG|svg|jpg|png|gif)$/}@links];
+
+
+
+        @{$doc->{audio}} = map{$_=shift @{(imgTranslate($_)  || [])} } @{$doc->{audio}};
+
+        @{$doc->{audio}} = grep{ defined }@{$doc->{audio}};
+
+
+
+
+          #
+#         warn $#links."\n";
+
+
+
+my $wiki = WWW::Wikipedia->new(language=>$config->{language});
+my $hs = HTML::Strip->new();
+
+      my $result = $wiki->search(ucfirst $url);
+      if (defined($result) && $result->text() ) {
+
+      my $clean_text = $hs->parse($result->text() );
+      $hs->eof;
+
+  #            print "\n"x10,$clean_text;
+
+               $doc={};
+               $doc->{linknr}=$#links;
+               $doc->{url}=$url;
+               $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
+               $doc->{instances}= {};
+               $doc->{members}={};
+
+               my $ltxt = join("\n",@links);
+                  $ltxt =~ s/http:\/\/en.wikipedia.org\/wiki\///g; # FIXME replace with $config->{wikipedia}
+
+               push @{$doc->{tags}},map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} split("\n",$ltxt);
+               foreach(@{$doc->{tags}}){
+                if($_->[0] && $_->[1]){
+                $doc->{instances}->{lc $_->[0]}=lc $_->[1];
+                push @test,lc $_->[0];
+                }
+  #              push @test,$_->[1];
+
+
+               }
+
+               my @instances = [grep{!/\W/}values %{$doc->{instances}}];
+
+                 $doc->{members}=[grep{!/\W/}keys %{$doc->{instances}}];
+                 $doc->{instances}=[grep{!/\W/}values %{$doc->{instances}}];
+#                 push @{$doc->{instances}},lc($url);
+
+                 $doc->{article}=$clean_text;
+                 $doc->{links}=[grep{!/:Wikipedia/}@links];
+                 $doc->{image}=$linkdata->{image};
+                 $doc->{audio}=$linkdata->{audio};
+                 # FIXME replace with $config->{wikipedia}
+                 $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
+                 $doc->{portal}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Portal:/}@{$doc->{links}}];
+                 $doc->{cat}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Category:/}@{$doc->{links}}];
+                 $doc->{list}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/List_of/}@{$doc->{links}}];
+                 $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
+                 $doc->{pdf}=$linkdata->{pdf};
+                 $doc->{recorded}=time;
+
+
+
+
+        @{$doc->{image}} = map{$_=shift @{(imgTranslate($_) || [])} } @{$doc->{image}};
+        @{$doc->{image}} = grep{ defined }@{$doc->{image}};
+
+
+        #
+
+
+        $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
+                                              related
+                                              categories
+                                              headings
+                                              currentlang);
+
+                $doc->{related} = [grep{!/#/}map{my $a = $_; $a =~ s/ /_/g; $_=ucfirst $a;}@{$doc->{related}}];
+                $doc->{size} = length sprintf($doc);
+
+
+ 
+       $x->store("$url" ,$doc) unless($config->{out}=~/json/);
+
+        return $doc;
+
+  }
+
+
+}
+
+foreach my $urlx (@ARGV) {
+if($urlx) { $result->{$urlx} = call(0,$urlx); }
+
+
+
+if(defined($result->{$urlx}) && @{$result->{$urlx}->{related}}){
+
+my $url_iter = list_iter( @{$result->{$urlx}->{related}});
+
+
+my $page_iter = iterate( \&call, $url_iter );
+
+     while ( my ( $index, $value ) = $page_iter->() ) {
+         $out->{$index} = $value;
+         addAbs($out->{$index},$out,$_) for(qw(related image pdf audio));
+        
+     }
+
+     delAbs($out,$_) for (qw(related));
+       
+     
+
+         
+   }  
+
+}
+
+
+sub createJsonFile{
+
+  my $json = shift;
+  
+
+  open (MYFILE, '>'.$config->{db});
+  print MYFILE $json;
+  close (MYFILE);
+
+#    p $json;
+  }
+
+
+BEGIN{
+#    `IFS_BAK=\$IFS;
+ #      IFS=\$'\n';`;
+
+
+}
+END{
+ #   `IFS=\$IFS_BAK;`;
+#
+     if($config->{out}=~/json/) {
+
+	my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
+                                                "responce" =>[$config->{"abs"}==1 ? $out->{abs}:$out]});
+
+    createJsonFile($json);
+    $config->{buff} = $json;
+    p $config;
+	}
+  
+  
+  if($config->{download}==1){
+    `mkdir -p $config->{tempdir}`;
+    `cd $config->{tempdir}`;
+     `mkdir -p $config->{tempdir}"/$_";` for(qw(json image audio pdf));
+     `cd $config->{tempdir}"/pdf"`;
+     
+     
+     
+     my @pdfs = keys %{$out->{abs}->{pdf}};
+     foreach (sort @pdfs){
+      my @f = split("/",$_);
+       my $f = pop  @f;
+
+      system(sprintf("wget %s -T 60 -O  %s/pdf/%s &",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/pdf/%s",$config->{tempdir},$f));
+      }
+    `cd $config->{tempdir}/audio`;
+      my @oggs = keys %{$out->{abs}->{audio}};
+     foreach (sort @oggs){
+      my @f = split("/",$_);
+       my $f = pop  @f;
+
+      system(sprintf("wget %s -T 60 -O  %s/audio/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/audio/%s",$config->{tempdir},$f));
+      
+     }
+     
+     @pdfs = keys %{$out->{abs}->{pdf}};
+     foreach (sort @pdfs){
+      my @f = split("/",$_);
+       my $f = pop  @f;
+
+      if(-f sprintf("%s/pdf/%s",$config->{tempdir},$f)) { 
+		 system(sprintf("pdfimages  -f 1 -l 10  %s/pdf/%s %s/image/%s;",$config->{tempdir},$f,$config->{tempdir},$f));
+		}
+     }
+    
+    my $x = sprintf("cp %s %s/json",$config->{db} ,$config->{tempdir});
+    `cp $x`;
+    
+    `cd $config->{tempdir}/pdf;  micro-rename ;  micro-steemer`;
+    #  my $pdfd = $config->{tempdir}."/pdf";
+    #  `cd $pdfd`;
+    # `for i in $(ls *.pdf); do pdftotext $i ../text/$i;  done;`;
+     
+  }
+  exit(0);
+
+}
+
+
+
+1;
+
+__END__
