@@ -355,7 +355,7 @@ END{
                                                   "responce" =>[$conf->{abs} ? $out->{abs}:$out]});
 
 
-      open (MYFILE, '>>'.$config->{db});
+      open (MYFILE, '>>'.$config->{jsonout});
         print MYFILE $json;
         close (MYFILE);
 
