@@ -217,7 +217,7 @@ sub call  {
 
           my $e = HTML::SimpleLinkExtor->new($response->base);
           $e->parse($response->decoded_content);
-          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}$e->links;
+          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}$e->links;
 
           foreach(@links){
 
@@ -225,12 +225,13 @@ sub call  {
 
           }
           @links = keys %{$linkdata->{base}};
-          $linkdata->{pdf}=[grep{/^http.*.[\.](pdf|PDF)$/}@links];
+          $linkdata->{pdf}=[grep{/^http.*.[\.](pdf)$/i}@links];
 
-      	  $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
+      	  $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg)$/i}@links];
 
-          @links = grep{/^http:\/\/$config->{wikipedia}\/wiki/}@links;
-          $linkdata->{image}=[grep{/^http.*.[\.](JPG|GIF|PNG|svg|jpg|png|gif)$/}@links];
+#           @links = grep{/^http:\/\/$config->{wikipedia}\/wiki/i}@links;
+          $linkdata->{image}=[grep{/^http.*.[\.](svg|jpg|jpeg|png|gif|tif|tiff|bmp)$/i}@links];
+
 
 
 
@@ -401,6 +402,7 @@ END{
 
       system(sprintf("wget %s -T 60 -O  %s/pdf/%s &",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/pdf/%s",$config->{tempdir},$f));
       }
+
     `cd $config->{tempdir}/audio`;
       my @oggs = keys %{$out->{abs}->{audio}};
      foreach (sort @oggs){
