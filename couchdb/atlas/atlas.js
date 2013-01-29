@@ -1,6 +1,8 @@
 (function(){
 
-    var LIMIT = window.LIMIT = {rel:16, node:10};
+window.LIMIT = {rel:16, node:10};
+window.FETCH = "scores";
+
   Renderer = function(canvas){
     canvas = $(canvas).get(0)
     var ctx = canvas.getContext("2d")
@@ -29,39 +31,43 @@
         if (particleSystem===null) return
 
         ctx.clearRect(0,0, canvas.width, canvas.height)
-        ctx.strokeStyle = "#d3d3d3"
-        ctx.lineWidth = 1
+        ctx.strokeStyle = "#d3d3d3";
+        ctx.lineWidth = 1;
         ctx.beginPath()
         particleSystem.eachEdge(function(edge, pt1, pt2){
           // edge: {source:Node, target:Node, length:#, data:{}}
           // pt1:  {x:#, y:#}  source position in screen coords
           // pt2:  {x:#, y:#}  target position in screen coords
 
-          var weight = null // Math.max(1,edge.data.border/100)
-          var color = null // edge.data.color
-          if (!color || (""+color).match(/^[ \t]*$/)) color = null
+//           var weight = null // Math.max(1,edge.data.border/100)
+          var color = null; // edge.data.color
+//           if (!color || (""+color).match(/^[ \t]*$/)) color = null
+            if (!color && edge.data.fuz!==undefined)
+                color = "rgb(255,0,"+(255*edge.data.fuz)+")";
 
-          if (color!==undefined || weight!==undefined){
-            ctx.save()
-            ctx.beginPath()
+          if (color!==null){// || weight!==null){
+            ctx.stroke()
+            ctx.save();
+            ctx.beginPath();
 
-            if (!isNaN(weight)) ctx.lineWidth = weight
+            ctx.lineWidth = 2;
+//             if (!isNaN(weight)) ctx.lineWidth = weight
 
             if (edge.source.data.region==edge.target.data.region){
-              ctx.strokeStyle = palette[edge.source.data.region]
+              ctx.strokeStyle = palette[edge.source.data.region];
             }
 
-            // if (color) ctx.strokeStyle = color
-            ctx.fillStyle = null
+            if (color) {ctx.strokeStyle = color}
+            ctx.fillStyle = null;
 
-            ctx.moveTo(pt1.x, pt1.y)
-            ctx.lineTo(pt2.x, pt2.y)
-            ctx.stroke()
-            ctx.restore()
+            ctx.moveTo(pt1.x, pt1.y);
+            ctx.lineTo(pt2.x, pt2.y);
+            ctx.stroke();
+            ctx.restore();
           }else{
             // draw a line from pt1 to pt2
-            ctx.moveTo(pt1.x, pt1.y)
-            ctx.lineTo(pt2.x, pt2.y)
+            ctx.moveTo(pt1.x, pt1.y);
+            ctx.lineTo(pt2.x, pt2.y);
           }
         })
         ctx.stroke()
@@ -240,7 +246,7 @@
         return false
       },
       selectMap:function(map_id){
-        var url = "http://localhost:5984/table/_design/base/_view/articles?"
+        var url = "http://localhost:5984/table/_design/base/_view/" + FETCH + "?"
             + "start_key=[%22"+map_id+"%22]&"
             + "end_key=[%22"+map_id+"ZZ%22]&"
             + "reduce=false&limit="+LIMIT.node;
@@ -249,6 +255,7 @@
             var nodes = {};
             var edges = {};
             console.log("got data");
+if (FETCH == "articles") {
             data.rows.forEach(function (row) {
                 var relations = {};
                 row.value[1].node = true;
@@ -263,6 +270,28 @@
                     relations[rel] = {};
                 };
             });
+} else if (FETCH == "scores") {
+            data.rows.forEach(function (row) {
+                row.id // _id
+                row.key // density instances
+                row.value // fuzzy match
+                var instances = {}; // sorted with density
+                nodes[row.id] = {label:row.id, node:true};
+                edges[row.id] = instances;
+                var len = Math.min(LIMIT.rel, row.key.length);
+                for (var inst, i = 0 ; i < len ; i++) {
+                    inst = row.key[i];
+                    if (!nodes[inst]) nodes[inst] = {label:inst};
+                    instances[inst] = {};
+                };
+                row.value.forEach(function (match) {
+                    var inst = match[1];
+                    if (!nodes[inst]) nodes[inst] = {label:inst};
+                    if (!instances[inst]) instances[inst] = {};
+                    instances[inst].fuz = match[0]
+                });
+            });
+}
             var keys = Object.keys(nodes);
             var counter = keys.length;
             console.log("current nodes", nodes, counter)
