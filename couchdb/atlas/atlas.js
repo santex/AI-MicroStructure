@@ -269,6 +269,7 @@
             keys.forEach(function (node_id) {
                 var url = "http://localhost:5984/table/_design/base/_view/linkcount?"
                     + "start_key=%22"+node_id+"%22&"
+                    + "end_key=%22"+node_id+"ZZ%22&"
                     + "group=true&limit=1";
                 $.getJSON(url,function(data){
                     if (data.rows[0])
