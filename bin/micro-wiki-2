@@ -1,8 +1,6 @@
 #!/usr/bin/perl -X
 use utf8;
-use Cwd;
 use File::Spec;
-use Config::Auto;
 use Data::Printer;
 use Parallel::Iterator qw( iterate );
 use Env qw/PWD/;
@@ -10,6 +8,7 @@ use JSON::XS;
 use HTML::Strip;
 use Digest::MD5 qw(md5_hex);
 use AI::MicroStructure::WordBlacklist;
+use AI::MicroStructure::util;
 use WWW::Wikipedia;
 use Storable::CouchDB;
 use LWP::UserAgent;
@@ -17,15 +16,14 @@ use HTML::SimpleLinkExtor;
 use URI::Escape qw( uri_unescape );
 use HTTP::Request::Common;
 no warnings 'utf8';
- 
+
 
 
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
 die("require a argument") unless($ARGV[0]);
-my @CWD; push @CWD, getcwd();
-our $config = Config::Auto::parse(".micro", path => @CWD);
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 $config->{couchdb}    ||= "http://localhost:5984/";
 $config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
 $config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
@@ -36,7 +34,7 @@ $config->{out} ||= "json";
 $config->{"abs"} ||= 1;
 $config->{download} ||= 1;
 
-$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$PWD,$ARGV[0]);
+$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$CWD[0],$ARGV[0]);
 
 
 
@@ -95,8 +93,8 @@ my $TOP="";
                                 $db,
                                 $key));
   my $r =  JSON::XS::decode_json($res->content);
-  my @rows =  @{$r->{rows}};
-  if(@rows)
+  my $rows = $r && $r->{rows} && @{$r->{rows}};
+  if($rows)
   {
     return 1;
   }else{
@@ -156,10 +154,10 @@ if($url){
 
 sub addAbs {
 
-   my ($doc,$out,$type) = @_; 
+   my ($doc,$out,$type) = @_;
 
     return unless($doc && $out && $type);
-  
+
 
      foreach(@{$doc->{$type}}) {
 
@@ -167,22 +165,22 @@ sub addAbs {
 
      }
 
-}      
+}
 
 
 sub delAbs {
 
-   my ($out,$type) = @_; 
+   my ($out,$type) = @_;
 
     return unless( $out && $type);
-  
+
 
      foreach(sort keys %{$out->{abs}->{$type}}) {
 
      delete($out->{abs}->{$type}->{$_}) unless($out->{abs}->{$type}->{$_}>1);
      }
 
-}            
+}
 
 sub call  {
 
@@ -316,7 +314,7 @@ my $hs = HTML::Strip->new();
                 $doc->{size} = length sprintf($doc);
 
 
- 
+
        $x->store("$url" ,$doc) unless($config->{out}=~/json/);
 
         return $doc;
@@ -341,15 +339,15 @@ my $page_iter = iterate( \&call, $url_iter );
      while ( my ( $index, $value ) = $page_iter->() ) {
          $out->{$index} = $value;
          addAbs($out->{$index},$out,$_) for(qw(related image pdf audio));
-        
+
      }
 
      delAbs($out,$_) for (qw(related));
-       
-     
 
-         
-   }  
+
+
+
+   }
 
 }
 
@@ -357,7 +355,7 @@ my $page_iter = iterate( \&call, $url_iter );
 sub createJsonFile{
 
   my $json = shift;
-  
+
 
   open (MYFILE, '>'.$config->{db});
   print MYFILE $json;
@@ -385,16 +383,16 @@ END{
     $config->{buff} = $json;
     p $config;
 	}
-  
-  
+
+
   if($config->{download}==1){
     `mkdir -p $config->{tempdir}`;
     `cd $config->{tempdir}`;
      `mkdir -p $config->{tempdir}"/$_";` for(qw(json image audio pdf));
      `cd $config->{tempdir}"/pdf"`;
-     
-     
-     
+
+
+
      my @pdfs = keys %{$out->{abs}->{pdf}};
      foreach (sort @pdfs){
       my @f = split("/",$_);
@@ -409,27 +407,27 @@ END{
        my $f = pop  @f;
 
       system(sprintf("wget %s -T 60 -O  %s/audio/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/audio/%s",$config->{tempdir},$f));
-      
+
      }
-     
+
      @pdfs = keys %{$out->{abs}->{pdf}};
      foreach (sort @pdfs){
       my @f = split("/",$_);
        my $f = pop  @f;
 
-      if(-f sprintf("%s/pdf/%s",$config->{tempdir},$f)) { 
+      if(-f sprintf("%s/pdf/%s",$config->{tempdir},$f)) {
 		 system(sprintf("pdfimages  -f 1 -l 10  %s/pdf/%s %s/image/%s;",$config->{tempdir},$f,$config->{tempdir},$f));
 		}
      }
-    
+
     my $x = sprintf("cp %s %s/json",$config->{db} ,$config->{tempdir});
     `cp $x`;
-    
+
     `cd $config->{tempdir}/pdf;  micro-rename ;  micro-steemer`;
     #  my $pdfd = $config->{tempdir}."/pdf";
     #  `cd $pdfd`;
     # `for i in $(ls *.pdf); do pdftotext $i ../text/$i;  done;`;
-     
+
   }
   exit(0);
 
