@@ -3,6 +3,7 @@ package AI::MicroStructure::util;
 use strict;
 use Cwd;
 use Config::Auto;
+use Env qw/PWD/;
 
 sub get_cwd {
     my @CWD; if (!-e ".micro") {
@@ -36,15 +37,28 @@ sub load_config {
 
 
 sub config {
-#     my ($ref_1, $ref_2) = AI::MicroStructure::util::load_config();
-#     my (@CWD, $config) = (@$ref_1, $ref_2);
+
+
     my $state = AI::MicroStructure::util::load_config();
+
     print "and we should have a winner here: $state->{cfg} \n";
 
-    $state->{cfg}->{couchdb}    ||= "http://user::pass\@localhost:5984/";
-    $state->{cfg}->{conceptimg} ||= "http://localhost/tiny/concept2.php";
+
+    my @CWD = get_cwd();
+
+    $state->{cfg}->{query}      ||= "micro";
+    $state->{cfg}->{couchdb}    ||= "http://localhost:5984/";
+    $state->{cfg}->{conceptimg} ||= "http://qunatup.com/tiny/concept2.php";
     $state->{cfg}->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
-    $state->{cfg}->{db} ||= "micro-relations";
+    $state->{cfg}->{db}         ||= "table";
+    $state->{cfg}->{out}        ||= "json";
+    $state->{cfg}->{jsonout}      =  sprintf("%/%s-relations",
+                                              $state->{cfg}->{db},
+                                              $state->{cfg}->{query});
+
+
+
+
 
     return $state;
 }

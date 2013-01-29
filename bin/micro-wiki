@@ -16,6 +16,8 @@ use LWP::UserAgent;
 
 
 
+
+push @ARGV, 'utf8';
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
@@ -121,29 +123,30 @@ sub smartdecode {
 
 sub imgTranslate {
 
-   require HTTP::Request::Common;
+
    my ($url) = @_;
 
 if($url){
-	my $request = HTTP::Request::Common::GET(sprintf("%s?img=%s", $config->{conceptimg}, $url));
-       $request->content_type('application/x-www-form-urlencoded');
+    my $request = HTTP::Request::Common::GET($url);
 
-	my  $ua = LWP::UserAgent->new;
-	my $response = $ua->request($request);
+    my  $ua = LWP::UserAgent->new;
+    my $response = $ua->request($request);
 
     if ($response->is_success) {
-        $response->decoded_content;
+        print ".";
 
-	$url = JSON::XS::decode_json($response->decoded_content);
+    my $e = HTML::SimpleLinkExtor->new($response->base);
+       $e->parse($response->decoded_content);
 
-	return \@{$url->{result}};
+        return \@{$e->img};
     }
     else {
+        print "E";
         #print STDERR $response->status_line, "\n";
+        return ();
     }
   }
 }
-
 
 
 
@@ -191,11 +194,10 @@ sub call  {
           @links = keys %{$linkdata->{base}};
           $linkdata->{pdf}=[grep{/^http.*.[\.](pdf|PDF)$/}@links];
 
-      	  $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
+          $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
 
-          @links = grep{/^http:\/\/$config->{wikipedia}\/wiki/}@links;
+          #@links = grep{/^http:\/\/$config->{wikipedia}\/wiki/}@links;
           $linkdata->{image}=[grep{/^http.*.[\.](JPG|GIF|PNG|svg|jpg|png|gif)$/}@links];
-
 
 
         @{$doc->{audio}} = map{$_=shift @{(imgTranslate($_)  || [])} } @{$doc->{audio}};
@@ -206,7 +208,8 @@ sub call  {
 
 
           #
-#         warn $#links."\n";
+
+            warn $#links."\n";
 
 
 
@@ -221,7 +224,6 @@ my $hs = HTML::Strip->new();
 
   #            print "\n"x10,$clean_text;
 
-               $doc={};
                $doc->{linknr}=$#links;
                $doc->{url}=$url;
                $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
@@ -250,7 +252,6 @@ my $hs = HTML::Strip->new();
 
                  $doc->{article}=$clean_text;
                  $doc->{links}=[grep{!/:Wikipedia/}@links];
-                 $doc->{image}=$linkdata->{image};
                  $doc->{audio}=$linkdata->{audio};
                  # FIXME replace with $config->{wikipedia}
                  $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
@@ -260,6 +261,7 @@ my $hs = HTML::Strip->new();
                  $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
                  $doc->{pdf}=$linkdata->{pdf};
                  $doc->{recorded}=time;
+
 
 
 
@@ -282,28 +284,9 @@ my $hs = HTML::Strip->new();
                 $doc->{related} = [grep{!/#/}map{my $a = $_; $a =~ s/ /_/g; $_=ucfirst $a;}@{$doc->{related}}];
                 $doc->{size} = length sprintf($doc);
 
-#                 my $tmp = $doc->{fulltext};
- #                   $tmp =~ s/( |'|,|")/\n/g;
-  #              my @tmp =  split("\n",$tmp);
 
-  #                 $tmp = grep{!@s}@tmp;
+       $x->store("$url" ,$doc) ;
 
-
-
-  #    $doc->{wn} = `wn $url  -over`;
-
-
-   #   warn "doing $doc->{wn}";
-
-
-
-    #       my @L  = [sort {$a cmp $b}grep{/(wiki|book|Category|List_of_)/i} @links];
-#p $doc;
-
-       $x->store("$url" ,$doc) unless($config->{out}=~/json/);
-
-
-  #     p $doc;
 
         return $doc;
 
@@ -352,7 +335,7 @@ my $page_iter = iterate( \&call, $url_iter );
 
          }
      }
-
+    p $out;
     exit;
 
 }
@@ -373,16 +356,16 @@ END{
      if($config->{out}=~/json/) {
 
 
-	my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
+    my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
                                                   "responce" =>[$conf->{abs} ? $out->{abs}:$out]});
 
 
       open (MYFILE, '>>'.$config->{db});
-		print MYFILE $json;
-		close (MYFILE);
+        print MYFILE $json;
+        close (MYFILE);
 
 
-	}
+    }
 
      exit(0);
 
