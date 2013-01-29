@@ -129,24 +129,23 @@ sub imgTranslate {
    my ($url) = @_;
 
 if($url){
-	my $request = HTTP::Request::Common::GET(sprintf("%s?img=%s", $config->{conceptimg}, $url));
-       $request->content_type('application/x-www-form-urlencoded');
-
+	my $request = HTTP::Request::Common::GET($url);
+       
 	my  $ua = LWP::UserAgent->new;
 	my $response = $ua->request($request);
 
     if ($response->is_success) {
         print ".";
-        $response->decoded_content;
 
-	$url = decode_json($response->decoded_content);
+    my $e = HTML::SimpleLinkExtor->new($response->base);
+       $e->parse($response->decoded_content);
 
-	return \@{$url->{result}};
+      	return \@{$e->img};
     }
     else {
         print "E";
         #print STDERR $response->status_line, "\n";
-        return \@{[]};
+        return ();
     }
   }
 }
@@ -303,7 +302,7 @@ my $hs = HTML::Strip->new();
 
 
         @{$doc->{image}} = map{$_=shift imgTranslate($_)} @{$doc->{image}};
-        @{$doc->{image}} = grep{ defined }@{$doc->{image}};
+        #@{$doc->{image}} = grep{ defined }@{$doc->{image}};
 
 
         #
