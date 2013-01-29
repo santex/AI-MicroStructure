@@ -79,7 +79,7 @@ use utf8;
 
     require LWP::UserAgent;
     my $ua = LWP::UserAgent->new;
-    my ($server,$db) = ($config->{couchdb},"table");
+    my ($server,$db) = ($config->{couchdb},$config->{db});
 
     my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
                                 $server,
@@ -143,7 +143,7 @@ sub call  {
   #return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
 
 
-  warn "doing",keys %$url;
+  warn "doing ", $url;
 
   my $ua = LWP::UserAgent->new;
 
