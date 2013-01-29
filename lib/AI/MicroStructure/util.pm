@@ -38,14 +38,7 @@ sub load_config {
 
 sub config {
 
-
     my $state = AI::MicroStructure::util::load_config();
-
-    print "and we should have a winner here: $state->{cfg} \n";
-
-
-    my @CWD = get_cwd();
-
     $state->{cfg}->{query}      ||= "micro";
     $state->{cfg}->{couchdb}    ||= "http://localhost:5984/";
     $state->{cfg}->{conceptimg} ||= "http://qunatup.com/tiny/concept2.php";
@@ -53,7 +46,7 @@ sub config {
     $state->{cfg}->{db}         ||= "table";
     $state->{cfg}->{out}        ||= "json";
     $state->{cfg}->{jsonout}      =  sprintf("%s/%s/%s-relations",
-                                              $CWD[0],
+                                              $state->{cwd}[0],
                                               $state->{cfg}->{db},
                                               $state->{cfg}->{query});
 
