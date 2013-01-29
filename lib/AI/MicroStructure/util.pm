@@ -40,6 +40,7 @@ sub config {
 
     my $state = AI::MicroStructure::util::load_config();
     $state->{cfg}->{query}      ||= "micro";
+    $state->{cfg}->{tempdir}    ||= "/tmp/micro-temp/";
     $state->{cfg}->{couchdb}    ||= "http://localhost:5984/";
     $state->{cfg}->{conceptimg} ||= "http://qunatup.com/tiny/concept2.php";
     $state->{cfg}->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";

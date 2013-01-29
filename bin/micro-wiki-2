@@ -38,7 +38,7 @@ use utf8;
   my $TOP="wikipedia";
 
 
-  our $x = Storable::CouchDB->new(
+  our $couchdb = Storable::CouchDB->new(
     uri =>$config->{couchdb},  #default
     db  =>$config->{db}
   ) or die(@$);
@@ -179,8 +179,8 @@ sub call  {
           no warnings 'utf8';
           my $e = HTML::SimpleLinkExtor->new($response->base);
           $e->parse($response->decoded_content);
-          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}@{$e->links};
-
+          my @all_links = $e->links;
+          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}map{$_="$_"}@all_links;
 
 
           $linkdata->{pdf}=[grep{/^http.*.[\.](pdf)$/i}@links];
@@ -188,7 +188,6 @@ sub call  {
           $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif)$/i}@links];
 
           $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|og)$/i}@links];
-
 
         my $url_iter = down_iter( @{$linkdata->{image}});
         my $page_iter = iterate( \&imgTranslate, $url_iter );
@@ -234,14 +233,15 @@ sub call  {
 
                  $doc->{article}=$clean_text;
                  $doc->{links}=@links;
+                 $doc->{pdf}=$linkdata->{pdf};
                  $doc->{audio}=$linkdata->{audio};
+                 $doc->{image}=$linkdata->{image};
                  # FIXME replace with $config->{wikipedia}
                  $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
                  $doc->{portal}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Portal:/}@{$doc->{links}}];
                  $doc->{cat}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Category:/}@{$doc->{links}}];
                  $doc->{list}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/List_of/}@{$doc->{links}}];
                  $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
-                 $doc->{pdf}=$linkdata->{pdf};
                  $doc->{recorded}=time;
 
 
@@ -257,7 +257,7 @@ sub call  {
                 $doc->{size} = length sprintf($doc);
 
 
-        $x->store("$url" ,$doc) ;
+        $couchdb->store("$url" ,$doc) ;
         createJsonFile($url,$doc);
 
 
