@@ -214,6 +214,7 @@ sub call  {
 #      if ($response->base =~ /m{$TOP}/ ) {
           my $doc={};
           my $linkdata={};
+          $linkdata->{base} = {};
 
           my $e = HTML::SimpleLinkExtor->new($response->base);
           $e->parse($response->decoded_content);
