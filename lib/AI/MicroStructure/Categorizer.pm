@@ -6,7 +6,8 @@ use warnings;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use File::Spec;
 use Data::Dumper;
-use BerkeleyDB;
+
+#use BerkeleyDB;
 use Cache::Memcached::Fast;
 require AI::Categorizer;
 require AI::Categorizer::Learner::NaiveBayes;
@@ -180,7 +181,7 @@ my $amount = shift;
    
 my  $test_set = { };
 
-my @theme = split("\n",`perl -MAI::MicroStructure -le 'print for AI::MicroStructure->themes;'`);
+my @theme = split("\n",`perl -MAI::MicroStructure -le 'print for AI::MicroStructure->structures;'`);
 my $add = lc `micro`;
 foreach(@theme){
 
