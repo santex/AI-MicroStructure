@@ -414,6 +414,16 @@ END{
 
      }
 
+    `cd $config->{tempdir}/image`;
+      my @images = keys %{$out->{abs}->{image}};
+     foreach (sort @images){
+      my @f = split("/",$_);
+       my $f = pop  @f;
+
+      system(sprintf("wget %s -T 60 -O  %s/image/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/image/%s",$config->{tempdir},$f));
+
+     }
+
 #      @pdfs = keys %{$out->{abs}->{pdf}};
 #      foreach (sort @pdfs){
 #       my @f = split("/",$_);
