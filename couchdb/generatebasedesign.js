@@ -177,7 +177,7 @@ doc.views.articles = {
 };
 
 
-doc.views.instancescores = {
+doc.views.scores = {
     map: tr(function (doc) {
 
 var FuzzySet=(function(){return function(arr,useLevenshtein,gramSizeLower,gramSizeUpper){
@@ -455,11 +455,32 @@ var FuzzySet=(function(){return function(arr,useLevenshtein,gramSizeLower,gramSi
 
 })();
 
+var density = function (arr) {
+    var count = {}, res = [];
+    arr.forEach(function (k) {
+        count[k] = (count[k] || 0) + 1;
+    });
+    Object.keys(count).forEach(function (k) {
+        res.push([count[k],k]);
+    });
+    res.sort(function(a, b) {
+            if (a[0] < b[0]) {
+                return 1;
+            } else if (a[0] > b[0]) {
+                return -1;
+            } else {
+                return 0;
+            }
+    });
+    return res.map(function (v) {return v[1]});
+};
+
         if (doc && doc.data &&
             doc.data.instances[0] &&
             doc.data.instances[0].length > 0) {
-            var res = FuzzySet(doc.data.instances).get(doc._id);
-            if (res) emit(doc.data.instances, res);
+            var dense = density(doc.data.instances);
+            var res = FuzzySet(dense).get(doc._id);
+            if (res) emit(dense, res);
         }
     }),
     reduce: tr(function(doc) {
