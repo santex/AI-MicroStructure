@@ -39,25 +39,24 @@ sub load_config {
 sub config {
 
 
-    my $state = {};#AI::MicroStructure::util::load_config();
+    my $state = AI::MicroStructure::util::load_config();
 
     print "and we should have a winner here: $state->{cfg} \n";
 
 
     my @CWD = get_cwd();
 
-    $state->{cfg}->{query}      ||= "";
+    $state->{cfg}->{query}      ||= "micro";
     $state->{cfg}->{couchdb}    ||= "http://localhost:5984/";
     $state->{cfg}->{conceptimg} ||= "http://qunatup.com/tiny/concept2.php";
     $state->{cfg}->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
     $state->{cfg}->{db}         ||= "table";
     $state->{cfg}->{out}        ||= "json";
+    $state->{cfg}->{jsonout}      =  sprintf("%/%s-relations",
+                                              $state->{cfg}->{db},
+                                              $state->{cfg}->{query});
 
-    $state->{cfg}->{db} = $state->{cfg}->{out} =~ /wiki/ ?
-                          $state->{cfg}->{db} :
-                          sprintf("%s-relations.json",
-                                  $state->{cfg}->{db},
-                                  $state->{cfg}->{query});
+
 
 
 

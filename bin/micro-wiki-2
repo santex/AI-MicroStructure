@@ -20,7 +20,7 @@ use utf8;
   my $state  = AI::MicroStructure::util::config();
 
   my @CWD    = $state->{cwd};
-  my $config = $state->{cfg};
+  our $config = $state->{cfg};
 
 
   die("require a argument") unless($ARGV[0]);
@@ -194,7 +194,6 @@ sub call  {
 
         while ( my ( $index, $value ) = $page_iter->() ) {
 
-        print "\n".$index;
         }
 
 
@@ -206,7 +205,6 @@ sub call  {
 
 
 
-               $doc={};
                $doc->{linknr}=$#links;
                $doc->{url}=$url;
                $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
@@ -258,12 +256,8 @@ sub call  {
                 $doc->{size} = length sprintf($doc);
 
 
-
-
-       $x->store("$url" ,$doc) ;
-
-
-        createJsonFile(sprintf("%s/%s",$config->{db},$url),$doc);
+        $x->store("$url" ,$doc) ;
+        createJsonFile($url,$doc);
 
 
         return $doc;
@@ -307,10 +301,13 @@ sub createJsonFile{
   my $uri = shift;
   my $json = shift;
 
-  print map{$_=$_."\n"}keys %$json;
-  #open (MYFILE,sprintf( '>%s',$uri));
-  #print MYFILE encode_json($json);
-  #close (MYFILE);
+
+
+
+
+  open (MYFILE,sprintf( '>%s-%s.json',$config->{jsonout},$uri));
+  print MYFILE encode_json($json);
+  close (MYFILE);
 
 }
 
