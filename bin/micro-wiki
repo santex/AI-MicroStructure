@@ -1,7 +1,6 @@
 #!/usr/bin/perl -X
 use utf8;
 use File::Spec;
-use Config::Auto;
 use Data::Printer;
 use Parallel::Iterator qw( iterate );
 use Env qw/PWD/;
@@ -9,6 +8,7 @@ use JSON::XS;
 use HTML::Strip;
 use Digest::MD5 qw(md5_hex);
 use AI::MicroStructure::WordBlacklist;
+use AI::MicroStructure::util;
 use JSON::XS;
 use WWW::Wikipedia;
 use Storable::CouchDB;
@@ -19,20 +19,15 @@ use LWP::UserAgent;
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
-my @CWD; push @CWD, getcwd();
-my $config = Config::Auto::parse(".micro", path => @CWD);
-
 my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
-
 $config->{couchdb}    ||= "http://localhost:5984/";
 $config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
 $config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
 $config->{buffer} = "";
 $config->{out} ||= "json";
-$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$PWD,$ARGV[0]);
+$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$CWD[0],$ARGV[0]);
 
 
-p $config;
 #exit(0) unless (!checkIsThere($ARGV[0]));
 
 
@@ -304,10 +299,10 @@ my $hs = HTML::Strip->new();
 
     #       my @L  = [sort {$a cmp $b}grep{/(wiki|book|Category|List_of_)/i} @links];
 #p $doc;
-	
+
        $x->store("$url" ,$doc) unless($config->{out}=~/json/);
 
-		
+
   #     p $doc;
 
         return $doc;
@@ -333,28 +328,28 @@ my $page_iter = iterate( \&call, $url_iter );
 
      while ( my ( $index, $value ) = $page_iter->() ) {
          $out->{$index} = $value;
-         
-         
+
+
          foreach(@{$value->{related}}) {
-         
+
          $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
-         
+
          }
-         
+
          foreach(@{$value->{pdf}}) {
-         
+
          $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
-         
+
          }
          foreach(@{$value->{image}}) {
-         
+
          $out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
-         
+
          }
          foreach(@{$value->{audio}}) {
-         
+
          $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
-         
+
          }
      }
 
@@ -374,19 +369,19 @@ BEGIN{
 }
 END{
     `IFS=\$IFS_BAK;`;
-     
+
      if($config->{out}=~/json/) {
 
 
 	my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
                                                   "responce" =>[$conf->{abs} ? $out->{abs}:$out]});
-		 
- 
+
+
       open (MYFILE, '>>'.$config->{db});
 		print MYFILE $json;
-		close (MYFILE); 
+		close (MYFILE);
 
-     
+
 	}
 
      exit(0);
