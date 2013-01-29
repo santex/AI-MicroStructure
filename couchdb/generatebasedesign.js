@@ -456,39 +456,46 @@ var FuzzySet=(function(){return function(arr,useLevenshtein,gramSizeLower,gramSi
 })();
 
 var density = function (arr) {
-    var count = {}, res = [];
+    var count = {}, buf = [],
+        res = [], max = 0;
     arr.forEach(function (k) {
         count[k] = (count[k] || 0) + 1;
     });
     Object.keys(count).forEach(function (k) {
-        res.push([count[k],k]);
+        max = Math.max(max, count[k]);
+        buf.push([count[k],k]);
     });
-    res.sort(function(a, b) {
-            if (a[0] < b[0]) {
-                return 1;
-            } else if (a[0] > b[0]) {
-                return -1;
-            } else {
-                return 0;
-            }
+    buf.sort(function(a, b) {
+            if (a[0] < b[0])      return  1;
+            else if (a[0] > b[0]) return -1;
+            else                  return  0;
     });
-    return res.map(function (v) {return v[1]});
+    var blen = buf.length;
+    for (var c = 0 ; c < max ; c++)
+        for (var i = 0 ; i < blen ; i++)
+            if(buf[i][0]-- > 0)
+                res.push(buf[i][1]);
+    return res;
 };
 
         if (doc && doc.data &&
             doc.data.instances[0] &&
             doc.data.instances[0].length > 0) {
             var dense = density(doc.data.instances);
-            var res = FuzzySet(dense).get(doc._id);
-            if (res) emit(dense, res);
+            emit(dense, FuzzySet(dense).get(doc._id) || [[0, doc._id]]);
         }
     }),
-    reduce: tr(function(doc) {
-        if(doc.data) {
-            var prefix = doc.data.instances.length;
-            if(prefix)
-                emit(prefix, doc._id);
-        }
+    reduce: tr(function(keys, values) {
+        var count = {};
+        keys.forEach(function (key) {
+            key.split(',').forEach(function (k) {
+                count[k] = (count[k] || 0) + 1
+            });
+        });
+        values.forEach(function (value) {
+            value.forEach(function (v) { count[v] = (count[v] || 0) + 1 });
+        });
+        return count;
     }),
 };
 
