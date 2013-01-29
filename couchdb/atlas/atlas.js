@@ -1,5 +1,6 @@
 (function(){
 
+window.COUCHDB = "http://localhost:5984/table";
 window.LIMIT = {rel:16, node:10};
 window.FETCH = "scores";
 
@@ -246,7 +247,7 @@ window.FETCH = "scores";
         return false
       },
       selectMap:function(map_id){
-        var url = "http://localhost:5984/table/_design/base/_view/" + FETCH + "?"
+        var url = COUCHDB + "/_design/base/_view/" + FETCH + "?"
             + "start_key=[%22"+map_id+"%22]&"
             + "end_key=[%22"+map_id+"ZZ%22]&"
             + "reduce=false&limit="+LIMIT.node;
@@ -296,7 +297,7 @@ if (FETCH == "articles") {
             var counter = keys.length;
             console.log("current nodes", nodes, counter)
             keys.forEach(function (node_id) {
-                var url = "http://localhost:5984/table/_design/base/_view/linkcount?"
+                var url = COUCHDB + "/_design/base/_view/linkcount?"
                     + "start_key=%22"+node_id+"%22&"
                     + "end_key=%22"+node_id+"ZZ%22&"
                     + "group=true&limit=1";
