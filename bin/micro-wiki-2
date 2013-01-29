@@ -57,8 +57,7 @@ my $TOP="";
 
 
 
-
-   our $x = Storable::CouchDB->new(
+   our $couch = Storable::CouchDB->new(
             uri =>$config->{couchdb},  #default
             db  =>$config->{db}
            );
@@ -161,6 +160,7 @@ sub addAbs {
 
     return unless($doc && $out && $type);
 
+print "[abs+$type]";
 
      foreach(@{$doc->{$type}}) {
 
@@ -177,6 +177,7 @@ sub delAbs {
 
     return unless( $out && $type);
 
+print "[abs-$type]";
 
      foreach(sort keys %{$out->{abs}->{$type}}) {
 
@@ -188,6 +189,7 @@ sub delAbs {
 sub call  {
 
   my ($idx,$url) = @_;
+  print "\ncheckout $url\n";
 
   return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
 
@@ -209,7 +211,7 @@ sub call  {
 
 
 
-
+print "[links]";
 
 #      if ($response->base =~ /m{$TOP}/ ) {
           my $doc={};
@@ -247,7 +249,7 @@ sub call  {
 #         warn $#links."\n";
 
 
-
+print "[wiki]";
 my $wiki = WWW::Wikipedia->new(language=>$config->{language});
 my $hs = HTML::Strip->new();
 
@@ -305,7 +307,7 @@ my $hs = HTML::Strip->new();
 
 
         #
-
+    print "[json]";
 
         $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
                                               related
@@ -318,9 +320,9 @@ my $hs = HTML::Strip->new();
 
 
 
-       $x->store("$url" ,$doc) unless($config->{out}=~/json/);
+       $couch->store("$url" ,$doc) unless($config->{out}=~/json/);
 
-        return $doc;
+        print "[done]"; return $doc;
 
   }
 
@@ -328,7 +330,7 @@ my $hs = HTML::Strip->new();
 }
 
 foreach my $urlx (@ARGV) {
-if($urlx) { $result->{$urlx} = call(0,$urlx); }
+if($urlx) { $result->{$urlx} = call(0,$urlx); print "\n"; }
 
 
 
@@ -343,12 +345,12 @@ my $page_iter = iterate( \&call, $url_iter );
          $out->{$index} = $value;
          addAbs($out->{$index},$out,$_) for(qw(related image pdf audio));
 
+        print "\n";
      }
 
      delAbs($out,$_) for (qw(related));
 
-
-
+        print "\n";
 
    }
 
@@ -434,7 +436,7 @@ END{
 # 		}
 #      }
 
-    my $x = sprintf("cp %s %s/json",$config->{db} ,$config->{tempdir});
+    my $x = sprintf("%s %s/json",$config->{db} ,$config->{tempdir});
     `cp $x`;
 
     `cd $config->{tempdir}/pdf;  micro-rename ;  micro-steemer`;
