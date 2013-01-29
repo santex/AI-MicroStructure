@@ -3,6 +3,7 @@
 window.COUCHDB = "http://localhost:5984/table";
 window.LIMIT = {rel:16, node:10};
 window.FETCH = "scores";
+window.LEVEL = 4;
 
   Renderer = function(canvas){
     canvas = $(canvas).get(0)
@@ -40,19 +41,21 @@ window.FETCH = "scores";
           // pt1:  {x:#, y:#}  source position in screen coords
           // pt2:  {x:#, y:#}  target position in screen coords
 
-//           var weight = null // Math.max(1,edge.data.border/100)
+          var weight = null; // Math.max(1,edge.data.border/100)
           var color = null; // edge.data.color
+            if (!weight && edge.data.dens!==undefined)
+                weight = edge.data.dens;
 //           if (!color || (""+color).match(/^[ \t]*$/)) color = null
             if (!color && edge.data.fuz!==undefined)
                 color = "rgb(255,0,"+(255*edge.data.fuz)+")";
 
-          if (color!==null){// || weight!==null){
+          if (color!==null || weight!==null){
             ctx.stroke()
             ctx.save();
             ctx.beginPath();
 
             ctx.lineWidth = 2;
-//             if (!isNaN(weight)) ctx.lineWidth = weight
+            if (!isNaN(weight)) {ctx.lineWidth = weight;ctx.strokeStyle="lime";}
 
             if (edge.source.data.region==edge.target.data.region){
               ctx.strokeStyle = palette[edge.source.data.region];
@@ -273,9 +276,6 @@ if (FETCH == "articles") {
             });
 } else if (FETCH == "scores") {
             data.rows.forEach(function (row) {
-                row.id // _id
-                row.key // density instances
-                row.value // fuzzy match
                 var instances = {}; // sorted with density
                 nodes[row.id] = {label:row.id, node:true};
                 edges[row.id] = instances;
@@ -289,12 +289,32 @@ if (FETCH == "articles") {
                     var inst = match[1];
                     if (!nodes[inst]) nodes[inst] = {label:inst};
                     if (!instances[inst]) instances[inst] = {};
-                    instances[inst].fuz = match[0]
+                    instances[inst].fuz = match[0];
                 });
             });
 }
             var keys = Object.keys(nodes);
-            var counter = keys.length;
+            var counter = keys.length + 1;
+
+            var url = COUCHDB + "/_design/base/_view/scores?"
+            + "start_key=[%22"+map_id+"%22]&"
+            + "end_key=[%22"+map_id+"ZZ%22]&"
+            + "group=true&group_level=" + LEVEL;
+            $.getJSON(url,function(data){
+                console.log("DENSE", data)
+                data.rows.forEach(function (row) {
+                    row.key.forEach(function (key) {
+                        if (edges[key]) Object.keys(row.value||{}).forEach(function (v) {
+                            if (edges[key][v])
+                                edges[key][v].dens = (edges[key][v].dens||0) + row.value[v];
+                            if (edges[v] && edges[v][key])
+                                edges[v][key].dens = (edges[v][key].dens||0) + row.value[v];
+                        });
+                    });
+                });
+                counter--
+            });
+
             console.log("current nodes", nodes, counter)
             keys.forEach(function (node_id) {
                 var url = COUCHDB + "/_design/base/_view/linkcount?"
