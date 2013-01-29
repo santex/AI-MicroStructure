@@ -8,6 +8,7 @@ use File::Spec;
 use Data::Dumper;
 
 #use BerkeleyDB;
+use AI::MicroStructure::util;
 use Cache::Memcached::Fast;
 require AI::Categorizer;
 require AI::Categorizer::Learner::NaiveBayes;
@@ -15,7 +16,8 @@ require AI::Categorizer::Document;
 require AI::Categorizer::KnowledgeSet;
 require Lingua::StopWords;
 
-
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+$config->{memcached} ||= "localhost:11211";
 
 sub new {
   my $this = shift;
@@ -29,9 +31,9 @@ sub new {
 sub initialize {
   my $self = shift;
   %$self=@_;
-  
+
   $self->{cache} = new Cache::Memcached::Fast({
-      servers => [ { address => 'localhost:11211',
+      servers => [ { address => $config->{memcached},
                      weight => 2.5 }],
       namespace => 'my:',
       connect_timeout => 0.2,
@@ -78,31 +80,31 @@ sub catfile{
 #  print $path;
   my $cat = {};
   my @cat = map{
-               my @x = split(":",$_); 
-                  $_ = $self->trim($x[1]); 
-               }split("\n",lc 
+               my @x = split(":",$_);
+                  $_ = $self->trim($x[1]);
+               }split("\n",lc
     `microdict $path | data-freq --limit 500`);
-  
+
   $cat->{subject} = [@cat[0..10]];
   $cat->{body}    = [@cat];
-  
+
   return $cat;
-  
+
 }
 
 sub getBookList{
 
   my $self = shift;
   my $dir  = shift;
-  
+
   $dir = $self->{bookpath}      unless defined($dir);
   die "$dir is not a directory" unless -d $dir;
   opendir(DIR, $dir) or die $!;
-  
-  my @mp3s = grep { $_ = sprintf("%s",$_);  } 
+
+  my @mp3s = grep { $_ = sprintf("%s",$_);  }
               sort grep /^[\x20-\x7E]+$/,
-              readdir(DIR);  
-              
+              readdir(DIR);
+
   closedir DIR;
 
   return @mp3s;
@@ -117,43 +119,43 @@ sub analyseBookNames{
   my $content = {};
   my $name = "";
   my $namehex = "";
-  
+
   foreach(@books) {
     $content = {};
     $namehex = md5_hex($_);
-  
+
     next if($_ eq "." || $_ eq "..");
 
     $content = $self->{cache}->get($namehex);
     $name = sprintf("%s/%s",$self->{bookpath},$_);
-  
+
     if(defined($content->{body})){
-      
-      $returns->{$namehex} = 
+
+      $returns->{$namehex} =
         {subject => $content->{subject},
          body    => $content->{body},
          name    => $name,
-         md5hex  => $namehex};    
-          
+         md5hex  => $namehex};
+
     }else{
-    
+
       $content  = $self->catfile($_);
-    
-      $returns->{$namehex} = 
+
+      $returns->{$namehex} =
         {subject=>$content->{subject},
          body=>$content->{body},
          name=>$name,
          md5hex=>$namehex};
-    
+
       $self->{cache}->set($namehex,$content);
-      
+
     }
-    
-  }  
-  
+
+  }
+
 
   return $returns;
-  
+
 }
 
 
@@ -161,14 +163,14 @@ sub analyseBookNames{
 sub getFeatures {
 
   my $self = shift;
-      
-  my %features = 
+
+  my %features =
     (content_weights => {subject =>2,
                          body => 1},
       stopwords => Lingua::StopWords::getStopWords('en'),
       stemming => 'porter');
 
-  
+
   return %features;
 }
 
@@ -178,7 +180,7 @@ sub getTestDocs {
 my $self = shift;
 my $amount = shift;
    $amount = 5 unless($amount);
-   
+
 my  $test_set = { };
 
 my @theme = split("\n",`perl -MAI::MicroStructure -le 'print for AI::MicroStructure->structures;'`);
@@ -190,19 +192,19 @@ next if($_ =~ /any|new/);
   my $name = lc $_;
   my $sub = "";
   my $body = "";
-    
+
   foreach my $i (0..($amount/2)) {
      $add = lc `micro $name` ;
      $sub .= " $add" unless($sub =~ m/$add/);
-  } 
-      
+  }
 
-  
+
+
  foreach my $i (0..$amount) {
      $add = lc `micro $name` ;
      $body .= " $add" unless($body =~ m/$add/);
-  } 
-      
+  }
+
     $body .= " $name" ;
     $sub  .= " $name" ;
   $body=~ s/\n/ /g;
@@ -213,7 +215,7 @@ next if($_ =~ /any|new/);
   $test_set->{$name} = {content =>{
                             subject => $self->trim($sub),
                             body    => $self->trim($body)}};
-                                      
+
 
 }
 
@@ -225,27 +227,27 @@ next if($_ =~ /any|new/);
 sub training_books {
 
   my $self = shift;
-  my $i = 0; 
+  my $i = 0;
   my $booklist = $self->analyseBookNames();
   my $chaps = {};
   my @keys = keys %$booklist;
   my @subject = ();
   my @body = ();
-  
+
   foreach(@keys) {
-    
+
     @subject = @{$booklist->{$keys[$i]}->{subject}};
     @body =    @{$booklist->{$keys[$i]}->{body}};
-    
+
     if(@subject && @body){
       $self->{booknames}->{$i}=$booklist->{$keys[$i]}->{name};
-      
+
       $chaps->{$i} = {subject=>join(" ",@subject),
                       body=>join(" ",@body)};
       $i++;
     }
   }
-  
+
   return $chaps;
 
 }
@@ -253,7 +255,7 @@ sub training_books {
 sub perform_standard_tests {
 
   my $self = shift;
-  
+
   my %features = $self->getFeatures();
   my $chaps =    $self->training_books();
   my $test_set = $self->getTestDocs();
@@ -267,7 +269,7 @@ sub perform_standard_tests {
 		        },
 	    };
   }
-  my $c = AI::Categorizer->new(knowledge_set => 
+  my $c = AI::Categorizer->new(knowledge_set =>
            AI::Categorizer::KnowledgeSet->new( name => 'CSL'),
 	         verbose => 0,
 	        );
@@ -275,7 +277,7 @@ sub perform_standard_tests {
   while (my ($name, $data) = each %$docs) {
     $c->knowledge_set->make_document(name => $name, %$data, %features);
   }
- 
+
   my $learner = $c->learner;
      $learner->train;
 
@@ -284,12 +286,12 @@ sub perform_standard_tests {
 
   my $threshold = 0.9;
   while (my ($name, $data) = each %$test_set) {
-  
+
      my $doc = AI::Categorizer::Document->new
           (name => $name,
            content => $data->{content},
           %features);
-  
+
      my $r = $learner->categorize($doc);
         $r->threshold($threshold);
 my $b = $r->best_category;
@@ -318,7 +320,7 @@ END{
 
 __DATA__
 
-  
+
   new Cache::Memcached::Fast({
       servers => [ { address => 'localhost:11211',
                      weight => 2.5 }],
