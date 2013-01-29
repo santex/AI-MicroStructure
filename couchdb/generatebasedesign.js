@@ -485,15 +485,24 @@ var density = function (arr) {
             emit(dense, FuzzySet(dense).get(doc._id) || [[0, doc._id]]);
         }
     }),
-    reduce: tr(function(keys, values) {
+    reduce: tr(function(keys, values, rereduce) {
         var count = {};
-        keys.forEach(function (key) {
-            key.split(',').forEach(function (k) {
-                count[k] = (count[k] || 0) + 1
+        (keys || []).forEach(function (key) {
+            key[0].forEach(function (k) {
+                count[k] = (count[k] || 0) + 1;
             });
         });
-        values.forEach(function (value) {
-            value.forEach(function (v) { count[v] = (count[v] || 0) + 1 });
+        if (rereduce) {
+            values.forEach(function (value) {
+                value.forEach(function (v) {
+                    v.forEach(function (k) {
+                        count[k] = (count[k] || 0) + 1;
+                    });
+                });
+            });
+        }
+        Object.keys(count).forEach(function (k) {
+            if (count[k] < 2) delete count[k];
         });
         return count;
     }),
