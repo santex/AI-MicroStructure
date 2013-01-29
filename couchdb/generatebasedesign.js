@@ -1,29 +1,33 @@
 
+function tr(fun) {
+    return (""+fun).replace(/    /g, "");
+}
+
 var doc = {_id:"_design/base", language:"javascript", views:{}};
 
 doc.views.audio = {
-    map: ""+function (doc) {
+    map:tr(function (doc) {
         if(doc.data.audio.length > 0)
             emit(doc._id, doc.data.audio);
-    },
+    }),
 };
 
 doc.views.image = {
-    map: ""+function (doc) {
+    map:tr(function (doc) {
         if(doc.data.image.length > 0)
             emit(doc._id, doc.data.image);
-    },
+    }),
 };
 
 doc.views.pdf = {
-    map: ""+function (doc) {
+    map:tr(function (doc) {
         if(doc.data.pdf.length > 0)
             emit(doc._id, doc.data.pdf);
-    },
+    }),
 };
 
 doc.views.lists = {
-    map: ""+function (doc) {
+    map:tr(function (doc) {
         var test, qq = [];
         if(doc.data.links.length) {
             test = doc.data.links;
@@ -35,11 +39,11 @@ doc.views.lists = {
         }
         if(qq.length)
             emit(qq, doc._id);
-    },
+    }),
 };
 
 doc.views.files = {
-    map: ""+function (doc) {
+    map: tr(function (doc) {
         var test, qq = [];
         if(doc.data.links.length) {
             test = doc.data.links;
@@ -51,71 +55,71 @@ doc.views.files = {
         }
         if(qq.length)
             emit(qq, doc._id);
-    },
+    }),
 };
 
 doc.views.tags = {
-    map: ""+function (doc) {
+    map: tr(function (doc) {
         if(doc.data.tags.length > 0)
             emit(doc._id, doc.data.tags);
-    },
-    reduce: ""+function (doc) {
+    }),
+    reduce: tr(function (doc) {
         if(doc.data) {
             var prefix = doc.data.tags;
             if(prefix)
                 emit(prefix, doc._id);
         }
-    },
+    }),
 };
 
 doc.views.tagcount = {
-    map: ""+function (doc) {
+    map: tr(function (doc) {
         if (doc.tags.length)
             emit(doc._id, doc.data.tags.length);
-    },
-    reduce: ""+function(keys, values) {
+    }),
+    reduce: tr(function(keys, values) {
         return sum(values);
-    },
+    }),
 };
 
 doc.views.instances = {
-    map: ""+function (doc) {
+    map: tr(function (doc) {
         if (doc && doc.data &&
             doc.data.instances[0] &&
             doc.data.instances[0].length > 0)
             emit(doc.data.instances, doc._id);
-    },
-    reduce: ""+function(doc) {
+    }),
+    reduce: tr(function(doc) {
         if(doc.data) {
             var prefix = doc.data.instances.length;
             if(prefix)
                 emit(prefix, doc._id);
         }
-    },
+    }),
 };
 
 doc.views.linkcount = {
-    map: ""+function (doc) {
+    map: tr(function (doc) {
         if (doc.linknr)
             emit(doc._id, doc.data.linknr);
-    },
-    reduce: ""+function(keys, values) {
+    }),
+    reduce: tr(function(keys, values) {
         return sum(values);
-    },
+    }),
 };
 
 doc.views.linkcountbig = {
-    map: ""+function (doc) {
+    map: tr(function (doc) {
         if (doc.linknr > 1000)
             emit(doc._id, doc.data.linknr);
-    },
-    reduce: ""+function(keys, values) {
+    }),
+    reduce: tr(function(keys, values) {
         return sum(values);
-    },
+    }),
 };
 
 doc.views.articles = {
-    map: ""+function(doc) {
+    map: tr(function(doc) {
         var mediaratio = 0;
         if (doc.data) {
             var links = {};
