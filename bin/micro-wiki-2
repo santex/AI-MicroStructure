@@ -411,15 +411,15 @@ END{
 
      }
 
-     @pdfs = keys %{$out->{abs}->{pdf}};
-     foreach (sort @pdfs){
-      my @f = split("/",$_);
-       my $f = pop  @f;
+#      @pdfs = keys %{$out->{abs}->{pdf}};
+#      foreach (sort @pdfs){
+#       my @f = split("/",$_);
+#        my $f = pop  @f;
 
-      if(-f sprintf("%s/pdf/%s",$config->{tempdir},$f)) {
-		 system(sprintf("pdfimages  -f 1 -l 10  %s/pdf/%s %s/image/%s;",$config->{tempdir},$f,$config->{tempdir},$f));
-		}
-     }
+#       if(-f sprintf("%s/pdf/%s",$config->{tempdir},$f)) {
+# 		 system(sprintf("pdfimages  -f 1 -l 10  %s/pdf/%s %s/image/%s;",$config->{tempdir},$f,$config->{tempdir},$f));
+# 		}
+#      }
 
     my $x = sprintf("cp %s %s/json",$config->{db} ,$config->{tempdir});
     `cp $x`;
