@@ -74,7 +74,7 @@ doc.views.tags = {
 
 doc.views.tagcount = {
     map: tr(function (doc) {
-        if (doc.tags.length)
+        if (doc.data.tags.length)
             emit(doc._id, doc.data.tags.length);
     }),
     reduce: tr(function(keys, values) {
@@ -100,7 +100,7 @@ doc.views.instances = {
 
 doc.views.linkcount = {
     map: tr(function (doc) {
-        if (doc.linknr)
+        if (doc.data.linknr)
             emit(doc._id, doc.data.linknr);
     }),
     reduce: tr(function(keys, values) {
@@ -110,7 +110,7 @@ doc.views.linkcount = {
 
 doc.views.linkcountbig = {
     map: tr(function (doc) {
-        if (doc.linknr > 1000)
+        if (doc.data.linknr > 1000)
             emit(doc._id, doc.data.linknr);
     }),
     reduce: tr(function(keys, values) {
