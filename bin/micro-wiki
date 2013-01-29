@@ -22,12 +22,7 @@ binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
 my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
-$config->{couchdb}    ||= "http://localhost:5984/";
-$config->{conceptimg} ||= "http://localhost/tiny/concept2.php";
-$config->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
 $config->{buffer} = "";
-$config->{out} ||= "json";
-$config->{db} = $config->{out} =~ /wiki/ ? "micro-relations" : sprintf("%s/%s-relations.json",$CWD[0],$ARGV[0]);
 
 
 #exit(0) unless (!checkIsThere($ARGV[0]));
