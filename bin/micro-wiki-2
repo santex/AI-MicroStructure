@@ -188,7 +188,7 @@ sub call  {
 
           $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif)$/i}@links];
 
-          $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|og)$/i}@links];
+          $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|ogg)$/i}@links];
 
         my $url_iter = down_iter( @{$linkdata->{image}});
         my $page_iter = iterate( \&imgTranslate, $url_iter );
@@ -258,7 +258,7 @@ sub call  {
                 $doc->{size} = length sprintf($doc);
 
 
-        $couchdb->store("$url" ,$doc) ;
+        eval '$couchdb->store("$url" ,$doc)' or warn "error: $@\n";
         createJsonFile($url,$doc);
 
 
@@ -286,7 +286,7 @@ if($urlx) { $result->{$urlx} = call(0,$urlx); }
 
       while ( my ( $index, $value ) = $page_iter->() ) {
          $out[$index] = $value;
-         print $index."\n"
+         print "$index\n";
 
 
       }
