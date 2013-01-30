@@ -38,7 +38,7 @@ sub load_config {
 
 sub config {
 
-    my $state = AI::MicroStructure::util::load_config();
+    my $state = AI::MicroStructure::util::load_config(); my @CWD = $state->{cwd};
     $state->{cfg}->{query}      ||= "micro";
     $state->{cfg}->{tempdir}    ||= "/tmp/micro-temp/";
     $state->{cfg}->{couchdb}    ||= "http://localhost:5984/";
@@ -46,10 +46,10 @@ sub config {
     $state->{cfg}->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
     $state->{cfg}->{db}         ||= "table";
     $state->{cfg}->{out}        ||= "json";
-    $state->{cfg}->{jsonout}      =  sprintf("%s/%s/%s-relations",
-                                              $state->{cwd}[0],
-                                              $state->{cfg}->{db},
-                                              $state->{cfg}->{query});
+    $state->{cfg}->{jsonout}      = sprintf("%s/%s/%s-relations",
+                                            $state->{cwd},
+                                            $state->{cfg}->{db},
+                                            $state->{cfg}->{query});
 
 
 
