@@ -4,6 +4,7 @@ use utf8;
   use Data::Printer;
   use Data::Dumper;
   use Parallel::Iterator qw( iterate );
+  use URI::Escape qw( uri_unescape );
   use Env qw/PWD/;
   use JSON::XS;
   use HTML::Strip;
