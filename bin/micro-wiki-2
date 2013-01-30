@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use utf8;
+<<<<<<< Updated upstream
   use File::Basename;
   use Data::Printer;
   use Data::Dumper;
@@ -14,87 +15,102 @@ use utf8;
   use LWP::UserAgent;
   use HTML::SimpleLinkExtor;
   our $e = HTML::SimpleLinkExtor->new;
+=======
+use File::Basename;
+use Data::Printer;
+use Data::Dumper;
+use Parallel::Iterator qw( iterate );
+use Env qw/PWD/;
+use JSON::XS;
+use HTML::Strip;
+use AI::MicroStructure::util;
+use WWW::Wikipedia;
+use Storable::CouchDB;
+use LWP::UserAgent;
+use HTML::SimpleLinkExtor;
+our $e = HTML::SimpleLinkExtor->new;
+>>>>>>> Stashed changes
 
-  binmode STDOUT, ':utf8';
-  binmode STDERR, ':utf8';
-
-
-  my $state  = AI::MicroStructure::util::config();
-
-  my @CWD    = $state->{cwd};
-  our $config = $state->{cfg};
-
-
-  die("require a argument") unless($ARGV[0]);
-
-  our $doc ={};
-  our @links;
-  our $linkdata = {};
-  our $result;
-
-  my $url = $ARGV[0];
-  my @inx;
-  my @test;
-  my $search="";
-  my $TOP="wikipedia";
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
 
 
-  our $couchdb = Storable::CouchDB->new(
-    uri =>$config->{couchdb},  #default
-    db  =>$config->{db}
-  ) or die(@$);
+my $state  = AI::MicroStructure::util::config();
+
+my @CWD    = $state->{cwd};
+our $config = $state->{cfg};
+
+
+die("require a argument") unless($ARGV[0]);
+
+our $doc ={};
+our @links;
+our $linkdata = {};
+our $result;
+
+my $url = $ARGV[0];
+my @inx;
+my @test;
+my $search="";
+my $TOP="wikipedia";
+
+
+our $couchdb = Storable::CouchDB->new(
+uri =>$config->{couchdb},  #default
+db  =>$config->{db}
+) or die(@$);
 
 
 
-  my $carry = {count=>0,max=>0};
+my $carry = {count=>0,max=>0};
 
 
 
-  sub list_iter {
-               my @ar = @_;
-               my $pos = 0;
-               return sub {
-                   return if $pos >= @ar;
-                   my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
-                   $pos++;
-                   return @r;
-               };
-           }
+sub list_iter {
+           my @ar = @_;
+           my $pos = 0;
+           return sub {
+               return if $pos >= @ar;
+               my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
+               $pos++;
+               return @r;
+           };
+       }
 
-  sub down_iter {
-               my @ar = @_;
-               my $pos = 0;
-               return sub {
-                   return if $pos >= @ar;
-                   my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
-                   $pos++;
-                   return @r;
-               };
-           }
-
-
-  sub checkIsThere {
-
-    my $key =shift;
+sub down_iter {
+           my @ar = @_;
+           my $pos = 0;
+           return sub {
+               return if $pos >= @ar;
+               my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
+               $pos++;
+               return @r;
+           };
+       }
 
 
-    require LWP::UserAgent;
-    my $ua = LWP::UserAgent->new;
-    my ($server,$db) = ($config->{couchdb},$config->{db});
+sub checkIsThere {
 
-    my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
-                                $server,
-                                $db,
-                                $key));
-  my $r =  JSON::XS::decode_json($res->content);
-  my @rows =  @{$r->{rows}};
-  if(@rows)
-  {
-    return 1;
-  }else{
-  return 0;
-  }
-  return 1;
+my $key =shift;
+
+
+require LWP::UserAgent;
+my $ua = LWP::UserAgent->new;
+my ($server,$db) = ($config->{couchdb},$config->{db});
+
+my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
+                            $server,
+                            $db,
+                            $key));
+my $r =  JSON::XS::decode_json($res->content);
+my @rows =  @{$r->{rows}};
+if(@rows)
+{
+return 1;
+}else{
+return 0;
+}
+return 1;
 }
 
 sub URLDecode {
@@ -112,159 +128,168 @@ return $theURL;
 }
 
 sub smartdecode {
-  use URI::Escape qw( uri_unescape );
-  use utf8;
-  my $x = my $y = uri_unescape($_[0]);
-  return $x if utf8::decode($x);
-  return $y;
+use URI::Escape qw( uri_unescape );
+use utf8;
+my $x = my $y = uri_unescape($_[0]);
+return $x if utf8::decode($x);
+return $y;
 }
 
 sub imgTranslate {
 
-  my ($idx,$url) = @_;
+my ($idx,$url) = @_;
 
 
 if($url){
 
 
-    my $request = HTTP::Request::Common::GET($url);
-    #my $response = $request->request($url);
-      $e->parse($request->decoded_content);
+my $request = HTTP::Request::Common::GET($url);
+#my $response = $request->request($url);
+  $e->parse($request->decoded_content);
 
-      return $e->{img};
-  }
+  return $e->{img};
+}
 }
 
 
 
 sub call  {
 
-  my ($idx,$url) = @_;
+my ($idx,$url) = @_;
 
-  #return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
-
-
-  warn "doing ", $url;
-
-  my $ua = LWP::UserAgent->new;
+#return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
 
 
-  my $content ;
-  my $response ="";
-  my @book = ();
+warn "doing ", $url;
+
+my $ua = LWP::UserAgent->new;
 
 
-    $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
+my $content ;
+my $response ="";
+my @book = ();
 
 
+$response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
 
 
 
 
-          my $doc={};
-          my $linkdata={};
+
+
+      my $doc={};
+      my $linkdata={};
 
 
 
 
-          my $wiki = WWW::Wikipedia->new();
-          my $hs = HTML::Strip->new();
+      my $wiki = WWW::Wikipedia->new();
+      my $hs = HTML::Strip->new();
 
-          my $result = $wiki->search(ucfirst $url);
-          if (defined($result) && $result->text() ) {
+      my $result = $wiki->search(ucfirst $url);
+      if (defined($result) && $result->text() ) {
 
-          my $clean_text = $hs->parse($result->text() );
-          $hs->eof;
+      my $clean_text = $hs->parse($result->text() );
+      $hs->eof;
 
-          require HTML::SimpleLinkExtor;
-          no warnings 'utf8';
-          my $e = HTML::SimpleLinkExtor->new($response->base);
-          $e->parse($response->decoded_content);
-          my @all_links = $e->links;
-          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}map{$_="$_"}@all_links;
+      require HTML::SimpleLinkExtor;
+      no warnings 'utf8';
+      my $e = HTML::SimpleLinkExtor->new($response->base);
+      $e->parse($response->decoded_content);
+      my @all_links = $e->links;
+      @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}map{$_="$_"}@all_links;
 
 
-          $linkdata->{pdf}=[grep{/^http.*.[\.](pdf)$/i}@links];
+      $linkdata->{pdf}=[grep{/^http.*.[\.](pdf)$/i}@links];
 
-          $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif)$/i}@links];
+      $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif)$/i}@links];
 
+<<<<<<< Updated upstream
           $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|ogg)$/i}@links];
+=======
+      $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|og)$/i}@links];
+>>>>>>> Stashed changes
 
-        my $url_iter = down_iter( @{$linkdata->{image}});
-        my $page_iter = iterate( \&imgTranslate, $url_iter );
+    my $url_iter = down_iter( @{$linkdata->{image}});
+    my $page_iter = iterate( \&imgTranslate, $url_iter );
 
-        while ( my ( $index, $value ) = $page_iter->() ) {
+    while ( my ( $index, $value ) = $page_iter->() ) {
 
-        }
-
-
-
-
-
+    }
 
 
 
 
 
-               $doc->{linknr}=$#links;
-               $doc->{url}=$url;
-               $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
-               $doc->{instances}= {};
-               $doc->{members}={};
-
-               my $ltxt = join("\n",@links);
-                  $ltxt =~ s/http:\/\/en.wikipedia.org\/wiki\///g; # FIXME replace with $config->{wikipedia}
-
-               push @{$doc->{tags}},map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} split("\n",$ltxt);
-               foreach(@{$doc->{tags}}){
-                if($_->[0] && $_->[1]){
-                $doc->{instances}->{lc $_->[0]}=lc $_->[1];
-                push @test,lc $_->[0];
-                }
-  #              push @test,$_->[1];
 
 
-               }
 
-               my @instances = [grep{!/\W/}values %{$doc->{instances}}];
 
-                 $doc->{members}=[grep{!/\W/}keys %{$doc->{instances}}];
-                 $doc->{instances}=[grep{!/\W/}values %{$doc->{instances}}];
+
+           $doc->{linknr}=$#links;
+           $doc->{url}=$url;
+           $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
+           $doc->{instances}= {};
+           $doc->{members}={};
+
+           my $ltxt = join("\n",@links);
+              $ltxt =~ s/http:\/\/en.wikipedia.org\/wiki\///g; # FIXME replace with $config->{wikipedia}
+
+           push @{$doc->{tags}},map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} split("\n",$ltxt);
+           foreach(@{$doc->{tags}}){
+            if($_->[0] && $_->[1]){
+            $doc->{instances}->{lc $_->[0]}=lc $_->[1];
+            push @test,lc $_->[0];
+            }
+#              push @test,$_->[1];
+
+
+           }
+
+           my @instances = [grep{!/\W/}values %{$doc->{instances}}];
+
+             $doc->{members}=[grep{!/\W/}keys %{$doc->{instances}}];
+             $doc->{instances}=[grep{!/\W/}values %{$doc->{instances}}];
 #                 push @{$doc->{instances}},lc($url);
 
-                 $doc->{article}=$clean_text;
-                 $doc->{links}=@links;
-                 $doc->{pdf}=$linkdata->{pdf};
-                 $doc->{audio}=$linkdata->{audio};
-                 $doc->{image}=$linkdata->{image};
-                 # FIXME replace with $config->{wikipedia}
-                 $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
-                 $doc->{portal}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Portal:/}@{$doc->{links}}];
-                 $doc->{cat}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Category:/}@{$doc->{links}}];
-                 $doc->{list}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/List_of/}@{$doc->{links}}];
-                 $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
-                 $doc->{recorded}=time;
+             $doc->{article}=$clean_text;
+             $doc->{links}=@links;
+             $doc->{pdf}=$linkdata->{pdf};
+             $doc->{audio}=$linkdata->{audio};
+             $doc->{image}=$linkdata->{image};
+             # FIXME replace with $config->{wikipedia}
+             $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
+             $doc->{portal}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Portal:/}@{$doc->{links}}];
+             $doc->{cat}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Category:/}@{$doc->{links}}];
+             $doc->{list}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/List_of/}@{$doc->{links}}];
+             $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
+             $doc->{recorded}=time;
 
 
 
 
-        $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
-                                              related
-                                              categories
-                                              headings
-                                              currentlang);
+    $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
+                                          related
+                                          categories
+                                          headings
+                                          currentlang);
 
-                $doc->{related} = [grep{!/#/}map{my $a = $_; $a =~ s/ /_/g; $_=ucfirst $a;}@{$doc->{related}}];
-                $doc->{size} = length sprintf($doc);
+            $doc->{related} = [grep{!/#/}map{my $a = $_; $a =~ s/ /_/g; $_=ucfirst $a;}@{$doc->{related}}];
+            $doc->{size} = length sprintf($doc);
 
 
+<<<<<<< Updated upstream
         eval '$couchdb->store("$url" ,$doc)' or warn "error: $@\n";
         createJsonFile($url,$doc);
+=======
+    $couchdb->store("$url" ,$doc) ;
+    createJsonFile($url,$doc);
+>>>>>>> Stashed changes
 
 
-        return $doc;
+    return $doc;
 
-  }
+}
 
 
 }
@@ -277,39 +302,45 @@ if($urlx) { $result->{$urlx} = call(0,$urlx); }
 
 
 
-  if(defined($result->{$urlx}) && @{$result->{$urlx}->{related}}){
+if(defined($result->{$urlx}) && @{$result->{$urlx}->{related}}){
 
-      my $url_iter = list_iter( @{$result->{$urlx}->{related}});
+  my $url_iter = list_iter( @{$result->{$urlx}->{related}});
 
 
-      my $page_iter = iterate( \&call, $url_iter );
+  my $page_iter = iterate( \&call, $url_iter );
 
+<<<<<<< Updated upstream
       while ( my ( $index, $value ) = $page_iter->() ) {
          $out[$index] = $value;
          print "$index\n";
+=======
+  while ( my ( $index, $value ) = $page_iter->() ) {
+     $out[$index] = $value;
+     print $index."\n"
+>>>>>>> Stashed changes
 
-
-      }
-
-
-
-    }
 
   }
 
 
 
+}
+
+}
+
+
+
 sub createJsonFile{
-  my $uri = shift;
-  my $json = shift;
+my $uri = shift;
+my $json = shift;
 
 
 
-  my $p = dirname($config->{jsonout});
-  print `mkdir -p $p`;
-  open (MYFILE,sprintf( '>%s-%s.json',$config->{jsonout},$uri));
-  print MYFILE encode_json($json);
-  close (MYFILE);
+my $p = dirname($config->{jsonout});
+print `mkdir -p $p`;
+open (MYFILE,sprintf( '>%s-%s.json',$config->{jsonout},$uri));
+print MYFILE encode_json($json);
+close (MYFILE);
 
 }
 
@@ -372,56 +403,56 @@ my @test;
 my $search="";
 my $TOP="";
 
-    my $s=AI::MicroStructure::WordBlacklist::getStopWords('en');
-    our @s = keys %$s;
-    #print join('|',@s);
+my $s=AI::MicroStructure::WordBlacklist::getStopWords('en');
+our @s = keys %$s;
+#print join('|',@s);
 
 
 
 
-   our $couch = Storable::CouchDB->new(
-            uri =>$config->{couchdb},  #default
-            db  =>$config->{db}
-           );
+our $couch = Storable::CouchDB->new(
+        uri =>$config->{couchdb},  #default
+        db  =>$config->{db}
+       );
 
 
-    my $carry = {count=>0,max=>0};
+my $carry = {count=>0,max=>0};
 
 
 
-  sub list_iter {
-               my @ar = @_;
-               my $pos = 0;
-               return sub {
-                   return if $pos >= @ar;
-                   my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
-                   $pos++;
-                   return @r;
-               };
-           }
+sub list_iter {
+           my @ar = @_;
+           my $pos = 0;
+           return sub {
+               return if $pos >= @ar;
+               my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
+               $pos++;
+               return @r;
+           };
+       }
 
 
-  sub checkIsThere {
+sub checkIsThere {
 
-    my $key =shift;
+my $key =shift;
 
 
-    my $ua = LWP::UserAgent->new;
-    my ($server,$db) = ($config->{couchdb},$config->{db});
+my $ua = LWP::UserAgent->new;
+my ($server,$db) = ($config->{couchdb},$config->{db});
 
-    my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
-                                $server,
-                                $db,
-                                $key));
-  my $r =  JSON::XS::decode_json($res->content);
-  my $rows = $r && $r->{rows} && @{$r->{rows}};
-  if($rows)
-  {
-    return 1;
-  }else{
-  return 0;
-  }
-  return 1;
+my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
+                            $server,
+                            $db,
+                            $key));
+my $r =  JSON::XS::decode_json($res->content);
+my $rows = $r && $r->{rows} && @{$r->{rows}};
+if($rows)
+{
+return 1;
+}else{
+return 0;
+}
+return 1;
 }
 
 sub URLDecode {
@@ -440,36 +471,36 @@ return $theURL;
 
 sub smartdecode {
 
-  my $x = my $y = uri_unescape($_[0]);
-  return $x if utf8::decode($x);
-  return $y;
+my $x = my $y = uri_unescape($_[0]);
+return $x if utf8::decode($x);
+return $y;
 }
 
 sub imgTranslate {
 
 
-   my $url = shift;
+my $url = shift;
 
 if($url){
-  my $request = HTTP::Request::Common::GET($url);
+my $request = HTTP::Request::Common::GET($url);
 
-  my  $ua = LWP::UserAgent->new;
-  my $response = $ua->request($request);
+my  $ua = LWP::UserAgent->new;
+my $response = $ua->request($request);
 
-    if ($response->is_success) {
-        print ".";
+if ($response->is_success) {
+    print ".";
 
-    my $e = HTML::SimpleLinkExtor->new($response->base);
-       $e->parse($response->decoded_content);
+my $e = HTML::SimpleLinkExtor->new($response->base);
+   $e->parse($response->decoded_content);
 
-        return \@{$e->img};
-    }
-    else {
-        print "E";
-        #print STDERR $response->status_line, "\n";
-        return ();
-    }
-  }
+    return \@{$e->img};
+}
+else {
+    print "E";
+    #print STDERR $response->status_line, "\n";
+    return ();
+}
+}
 }
 
 
@@ -477,126 +508,126 @@ if($url){
 
 sub addAbs {
 
-   my ($doc,$out,$type) = @_;
+my ($doc,$out,$type) = @_;
 
-    return unless($doc && $out && $type);
-    my $to = $out->{abs}->{$type};
+return unless($doc && $out && $type);
+my $to = $out->{abs}->{$type};
 
 print "[abs+$type]";
 
-     foreach(@{$doc->{$type}}) {
+ foreach(@{$doc->{$type}}) {
 
-     $to->{$_} = defined($to->{$_})? $to->{$_}+1 : 1 if($_);
+ $to->{$_} = defined($to->{$_})? $to->{$_}+1 : 1 if($_);
 
-     }
+ }
 
 }
 
 
 sub delAbs {
 
-   my ($out,$type) = @_;
+my ($out,$type) = @_;
 
-    return unless( $out && $type);
+return unless( $out && $type);
 
 print "[abs-$type]";
 
-     foreach(sort keys %{$out->{abs}->{$type}}) {
+ foreach(sort keys %{$out->{abs}->{$type}}) {
 
-     delete($out->{abs}->{$type}->{$_}) unless($out->{abs}->{$type}->{$_}>1);
-     }
+ delete($out->{abs}->{$type}->{$_}) unless($out->{abs}->{$type}->{$_}>1);
+ }
 
 }
 
 sub call  {
 
-  my ($idx,$url) = @_;
-  print "\ncheckout $url\n";
+my ($idx,$url) = @_;
+print "\ncheckout $url\n";
 
-  #return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
+#return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
 
- # warn "doing $url";
+# warn "doing $url";
 #
 
 #  return unless($url=~/Planet/);
 
-  my $ua = LWP::UserAgent->new;
+my $ua = LWP::UserAgent->new;
 
 
 
-  my $content ;
-  my $response ="";
- # @book = ();
+my $content ;
+my $response ="";
+# @book = ();
 
-  my @book = ();
-    $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
+my @book = ();
+$response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
 
 
 
 print "[links]";
 
 #      if ($response->base =~ /m{$TOP}/ ) {
-          my $doc={};
-          my $linkdata={};
-          $linkdata->{base} = {};
+      my $doc={};
+      my $linkdata={};
+      $linkdata->{base} = {};
 
-          my $e = HTML::SimpleLinkExtor->new($response->base);
-          $e->parse($response->decoded_content);
+      my $e = HTML::SimpleLinkExtor->new($response->base);
+      $e->parse($response->decoded_content);
 
-          my @links = [$e->all];
+      my @links = [$e->all];
 
-          print "[$#links]";
-
-
-          my $wiki = WWW::Wikipedia->new(language=>$config->{language});
-          my $hs = HTML::Strip->new();
-
-      my $result = $wiki->search(ucfirst $url);
-      if (defined($result) && $result->text() ) {
-
-      my $clean_text = $hs->parse($result->text() );
-      $hs->eof;
-
-  #            print "\n"x10,$clean_text;
-
-               $doc={};
-               $doc->{linknr}=$#links;
-               $doc->{url}=$url;
-               $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
-               $doc->{instances}= {};
-               $doc->{members}={};
-
-               my $ltxt = join("\n",@links);
-                  $ltxt =~ s/http:\/\/en.wikipedia.org\/wiki\///g; # FIXME replace with $config->{wikipedia}
-
-               push @{$doc->{tags}},map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} split("\n",$ltxt);
-               foreach(@{$doc->{tags}}){
-                if($_->[0] && $_->[1]){
-                $doc->{instances}->{lc $_->[0]}=lc $_->[1];
-                push @test,lc $_->[0];
-                }
-  #              push @test,$_->[1];
+      print "[$#links]";
 
 
-               }
+      my $wiki = WWW::Wikipedia->new(language=>$config->{language});
+      my $hs = HTML::Strip->new();
 
-               my @instances = [grep{!/\W/}values %{$doc->{instances}}];
+  my $result = $wiki->search(ucfirst $url);
+  if (defined($result) && $result->text() ) {
 
-                 $doc->{members}=[grep{!/\W/}keys %{$doc->{instances}}];
-                 $doc->{instances}=[grep{!/\W/}values %{$doc->{instances}}];
+  my $clean_text = $hs->parse($result->text() );
+  $hs->eof;
+
+#            print "\n"x10,$clean_text;
+
+           $doc={};
+           $doc->{linknr}=$#links;
+           $doc->{url}=$url;
+           $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
+           $doc->{instances}= {};
+           $doc->{members}={};
+
+           my $ltxt = join("\n",@links);
+              $ltxt =~ s/http:\/\/en.wikipedia.org\/wiki\///g; # FIXME replace with $config->{wikipedia}
+
+           push @{$doc->{tags}},map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} split("\n",$ltxt);
+           foreach(@{$doc->{tags}}){
+            if($_->[0] && $_->[1]){
+            $doc->{instances}->{lc $_->[0]}=lc $_->[1];
+            push @test,lc $_->[0];
+            }
+#              push @test,$_->[1];
+
+
+           }
+
+           my @instances = [grep{!/\W/}values %{$doc->{instances}}];
+
+             $doc->{members}=[grep{!/\W/}keys %{$doc->{instances}}];
+             $doc->{instances}=[grep{!/\W/}values %{$doc->{instances}}];
 #                 push @{$doc->{instances}},lc($url);
 
-                 $doc->{article}=$clean_text;
-                 $doc->{links}=@links;
-                 $doc->{audio}=$linkdata->{audio};
-                 # FIXME replace with $config->{wikipedia}
-                 $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
-                 $doc->{portal}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Portal:/}@{$doc->{links}}];
-                 $doc->{cat}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Category:/}@{$doc->{links}}];
-                 $doc->{list}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/List_of/}@{$doc->{links}}];
-                 $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
-                 $doc->{pdf}=$linkdata->{pdf};
-                 $doc->{recorded}=time;
+             $doc->{article}=$clean_text;
+             $doc->{links}=@links;
+             $doc->{audio}=$linkdata->{audio};
+             # FIXME replace with $config->{wikipedia}
+             $doc->{book}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Book:/}@{$doc->{links}}];
+             $doc->{portal}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Portal:/}@{$doc->{links}}];
+             $doc->{cat}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Category:/}@{$doc->{links}}];
+             $doc->{list}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/List_of/}@{$doc->{links}}];
+             $doc->{tmpl}=[grep{/^http:\/\/en.wikipedia.org\/wiki\/Template:/}@{$doc->{links}}];
+             $doc->{pdf}=$linkdata->{pdf};
+             $doc->{recorded}=time;
 
 
 #        @{$doc->{image}} = map{$_=shift imgTranslate($_)} @{$doc->{image}};
@@ -604,22 +635,22 @@ print "[links]";
 
 
 
-        $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
-                                              related
-                                              categories
-                                              headings
-                                              currentlang);
+    $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
+                                          related
+                                          categories
+                                          headings
+                                          currentlang);
 
-                $doc->{related} = [grep{!/#/}map{my $a = $_; $a =~ s/ /_/g; $_=ucfirst $a;}@{$doc->{related}}];
-                $doc->{size} = length sprintf($doc);
+            $doc->{related} = [grep{!/#/}map{my $a = $_; $a =~ s/ /_/g; $_=ucfirst $a;}@{$doc->{related}}];
+            $doc->{size} = length sprintf($doc);
 
 
 
-       $couch->store("$url" ,$doc) unless($config->{out}=~/json/);
+   $couch->store("$url" ,$doc) unless($config->{out}=~/json/);
 
-        print "[done]\n"; return $doc;
+    print "[done]\n"; return $doc;
 
-  }
+}
 
 
 }
@@ -637,56 +668,56 @@ my $url_iter = list_iter( @{$result->{$urlx}->{related}});
 my $page_iter = iterate( \&call, $url_iter );
 our $out = {abs=>{pdf=>{},related=>{},image=>{},audio=>{}}};
 
-     while ( my ( $index, $value ) = $page_iter->() ) {
-         $out->{$index} = $value;
-    #     addAbs($out->{$index},$out,$_) for(qw(related image pdf audio));
+ while ( my ( $index, $value ) = $page_iter->() ) {
+     $out->{$index} = $value;
+#     addAbs($out->{$index},$out,$_) for(qw(related image pdf audio));
 
-        print "\n";
-     }
+    print "\n";
+ }
 
-   #  delAbs($out,$_) for (qw(related));
+#  delAbs($out,$_) for (qw(related));
 
-        print "\n";
+    print "\n";
 
-   }
+}
 
 }
 
 
 sub createJsonFile{
 
-  my $json = shift;
+my $json = shift;
 
 
-  open (MYFILE, '>'.$config->{db});
-  print MYFILE $json;
-  close (MYFILE);
-   p $json;
-  }
+open (MYFILE, '>'.$config->{db});
+print MYFILE $json;
+close (MYFILE);
+p $json;
+}
 
 
 BEGIN{
 #    `IFS_BAK=\$IFS;
- #      IFS=\$'\n';`;
+#      IFS=\$'\n';`;
 
 
 }
 END{
- #   `IFS=\$IFS_BAK;`;
+#   `IFS=\$IFS_BAK;`;
 #
-     if($config->{out}=~/json/) {
+ if($config->{out}=~/json/) {
 
 
 
-  my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
-                                                "responce" =>[$config->{"abs"}==1 ? $out->{abs}:$out]});
+my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
+                                            "responce" =>[$config->{"abs"}==1 ? $out->{abs}:$out]});
 
-    createJsonFile($json);
-    $config->{buff} = $json;
-    p $config;
-  }
+createJsonFile($json);
+$config->{buff} = $json;
+p $config;
+}
 
-  exit(0);
+exit(0);
 
 }
 
@@ -697,41 +728,41 @@ END{
 __END__
 
 
-  if($config->{download}==1){
-    `mkdir -p $config->{tempdir}`;
-    `cd $config->{tempdir}`;
-     `mkdir -p $config->{tempdir}"/$_";` for(qw(json image audio pdf));
-     `cd $config->{tempdir}"/pdf"`;
+if($config->{download}==1){
+`mkdir -p $config->{tempdir}`;
+`cd $config->{tempdir}`;
+ `mkdir -p $config->{tempdir}"/$_";` for(qw(json image audio pdf));
+ `cd $config->{tempdir}"/pdf"`;
 
 
 
-     my @pdfs = keys %{$out->{abs}->{pdf}};
-     foreach (sort @pdfs){
-      my @f = split("/",$_);
-       my $f = pop  @f;
+ my @pdfs = keys %{$out->{abs}->{pdf}};
+ foreach (sort @pdfs){
+  my @f = split("/",$_);
+   my $f = pop  @f;
 
-      system(sprintf("wget %s -T 60 -O  %s/pdf/%s &",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/pdf/%s",$config->{tempdir},$f));
-      }
+  system(sprintf("wget %s -T 60 -O  %s/pdf/%s &",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/pdf/%s",$config->{tempdir},$f));
+  }
 
-    `cd $config->{tempdir}/audio`;
-      my @oggs = keys %{$out->{abs}->{audio}};
-     foreach (sort @oggs){
-      my @f = split("/",$_);
-       my $f = pop  @f;
+`cd $config->{tempdir}/audio`;
+  my @oggs = keys %{$out->{abs}->{audio}};
+ foreach (sort @oggs){
+  my @f = split("/",$_);
+   my $f = pop  @f;
 
-      system(sprintf("wget %s -T 60 -O  %s/audio/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/audio/%s",$config->{tempdir},$f));
+  system(sprintf("wget %s -T 60 -O  %s/audio/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/audio/%s",$config->{tempdir},$f));
 
-     }
+ }
 
-    `cd $config->{tempdir}/image`;
-      my @images = keys %{$out->{abs}->{image}};
-     foreach (sort @images){
-      my @f = split("/",$_);
-       my $f = pop  @f;
+`cd $config->{tempdir}/image`;
+  my @images = keys %{$out->{abs}->{image}};
+ foreach (sort @images){
+  my @f = split("/",$_);
+   my $f = pop  @f;
 
-      system(sprintf("wget %s -T 60 -O  %s/image/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/image/%s",$config->{tempdir},$f));
+  system(sprintf("wget %s -T 60 -O  %s/image/%s;",$_,$config->{tempdir},$f)) unless(-f sprintf("%s/image/%s",$config->{tempdir},$f));
 
-     }
+ }
 
 #      @pdfs = keys %{$out->{abs}->{pdf}};
 #      foreach (sort @pdfs){
@@ -743,35 +774,35 @@ __END__
 #     }
 #      }
 
-    my $x = sprintf("%s %s/json",$config->{db} ,$config->{tempdir});
-    `cp $x`;
+my $x = sprintf("%s %s/json",$config->{db} ,$config->{tempdir});
+`cp $x`;
 
-    `cd $config->{tempdir}/pdf;  micro-rename ;  micro-steemer`;
-    #  my $pdfd = $config->{tempdir}."/pdf";
-    #  `cd $pdfd`;
-    # `for i in $(ls *.pdf); do pdftotext $i ../text/$i;  done;`;
-
-
+`cd $config->{tempdir}/pdf;  micro-rename ;  micro-steemer`;
+#  my $pdfd = $config->{tempdir}."/pdf";
+#  `cd $pdfd`;
+# `for i in $(ls *.pdf); do pdftotext $i ../text/$i;  done;`;
 
 
-         foreach(@{$value->{related}}) {
 
-         $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
 
-         }
+     foreach(@{$value->{related}}) {
 
-         foreach(@{$value->{pdf}}) {
+     $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
 
-         $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
+     }
 
-         }
-         foreach(@{$value->{image}}) {
+     foreach(@{$value->{pdf}}) {
 
-         $out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
+     $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
 
-         }
-         foreach(@{$value->{audio}}) {
+     }
+     foreach(@{$value->{image}}) {
 
-         $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
+     $out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
 
-         }
+     }
+     foreach(@{$value->{audio}}) {
+
+     $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
+
+     }
