@@ -181,14 +181,14 @@ $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
       my $e = HTML::SimpleLinkExtor->new($response->base);
       $e->parse($response->decoded_content);
       my @all_links = $e->links;
-      @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}map{$_="$_"}@all_links;
+      @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.mkv|.mp4|.avi|.wav|.gif|.jpeg|.jpg|.png|.svg|.tif|.tiff|.bmp/i}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}map{$_="$_"}@all_links;
 
 
       $linkdata->{pdf}=[grep{/^http.*.[\.](pdf)$/i}@links];
 
-      $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif)$/i}@links];
+      $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif|tif|tiff|bmp)$/i}@links];
 
-      $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|ogg)$/i}@links];
+      $linkdata->{audio}=[grep{/^http.*.[\.](mp3|mpg|wav|ogg|avi|mkv|mp4)$/i}@links];
 
     my $url_iter = down_iter( @{$linkdata->{image}});
     my $page_iter = iterate( \&imgTranslate, $url_iter );
