@@ -1,21 +1,5 @@
 #!/usr/bin/perl -w
 use utf8;
-<<<<<<< Updated upstream
-  use File::Basename;
-  use Data::Printer;
-  use Data::Dumper;
-  use Parallel::Iterator qw( iterate );
-  use URI::Escape qw( uri_unescape );
-  use Env qw/PWD/;
-  use JSON::XS;
-  use HTML::Strip;
-  use AI::MicroStructure::util;
-  use WWW::Wikipedia;
-  use Storable::CouchDB;
-  use LWP::UserAgent;
-  use HTML::SimpleLinkExtor;
-  our $e = HTML::SimpleLinkExtor->new;
-=======
 use File::Basename;
 use Data::Printer;
 use Data::Dumper;
@@ -28,8 +12,8 @@ use WWW::Wikipedia;
 use Storable::CouchDB;
 use LWP::UserAgent;
 use HTML::SimpleLinkExtor;
+use URI::Escape qw( uri_unescape );
 our $e = HTML::SimpleLinkExtor->new;
->>>>>>> Stashed changes
 
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
@@ -204,11 +188,7 @@ $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
 
       $linkdata->{image}=[grep{/http.*.[\.](svg|jpeg|jpg|png|gif)$/i}@links];
 
-<<<<<<< Updated upstream
-          $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|ogg)$/i}@links];
-=======
-      $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|og)$/i}@links];
->>>>>>> Stashed changes
+      $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wav|ogg)$/i}@links];
 
     my $url_iter = down_iter( @{$linkdata->{image}});
     my $page_iter = iterate( \&imgTranslate, $url_iter );
@@ -278,13 +258,8 @@ $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
             $doc->{size} = length sprintf($doc);
 
 
-<<<<<<< Updated upstream
         eval '$couchdb->store("$url" ,$doc)' or warn "error: $@\n";
         createJsonFile($url,$doc);
-=======
-    $couchdb->store("$url" ,$doc) ;
-    createJsonFile($url,$doc);
->>>>>>> Stashed changes
 
 
     return $doc;
@@ -309,15 +284,9 @@ if(defined($result->{$urlx}) && @{$result->{$urlx}->{related}}){
 
   my $page_iter = iterate( \&call, $url_iter );
 
-<<<<<<< Updated upstream
       while ( my ( $index, $value ) = $page_iter->() ) {
          $out[$index] = $value;
          print "$index\n";
-=======
-  while ( my ( $index, $value ) = $page_iter->() ) {
-     $out[$index] = $value;
-     print $index."\n"
->>>>>>> Stashed changes
 
 
   }
