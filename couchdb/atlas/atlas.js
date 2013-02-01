@@ -47,7 +47,7 @@ window.LEVEL = 4;
                 weight = edge.data.dens;
 //           if (!color || (""+color).match(/^[ \t]*$/)) color = null
             if (!color && edge.data.fuz!==undefined)
-                color = "rgb(255,0,"+(255*edge.data.fuz)+")";
+                color = "rgb("+(255*(1-edge.data.fuz))+",0,"+(255*edge.data.fuz)+")";
 
           if (color!==null || weight!==null){
             ctx.stroke()
@@ -111,6 +111,9 @@ window.LEVEL = 4;
             // if (node.data.region) ctx.fillStyle = palette[node.data.region]
             // else ctx.fillStyle = "#888888"
             ctx.fillStyle = node.data.node ? "#000000" : "#888888";
+
+            if (node.data.fuz!==undefined)
+                ctx.fillStyle = "rgb("+(255*(1-node.data.fuz))+",0,"+(255*node.data.fuz)+")";
 
             // ctx.fillText(label||"", pt.x, pt.y+4)
             ctx.fillText(label||"", pt.x, pt.y+4)
@@ -262,60 +265,90 @@ window.LEVEL = 4;
 if (FETCH == "articles") {
             data.rows.forEach(function (row) {
                 var relations = {};
-                row.value[1].node = true;
-                row.value[1].label  = row.value[0];
-                nodes[row.value[0]] = row.value[1];
-                edges[row.value[0]] = relations;
+                var key = (""+row.value[0]).toLowerCase();
+                row.value[1].label = row.value[0];
+                row.value[1].node  = true;
+                nodes[key] = row.value[1];
+                edges[key] = relations;
                 var related =  row.value[3].related;
                 var len = Math.min(LIMIT.rel, related.length);
                 for (var rel, i = 0 ; i < len ; i++) {
-                    rel = related[i];
-                    if (!nodes[rel]) nodes[rel] = {label:rel};
+                    rel = (""+related[i]).toLowerCase();
+                    if (!nodes[rel]) nodes[rel] = {label:related[i]};
                     relations[rel] = {};
                 };
             });
 } else if (FETCH == "scores") {
             data.rows.forEach(function (row) {
                 var instances = {}; // sorted with density
-                nodes[row.id] = {label:row.id, node:true};
-                edges[row.id] = instances;
+                var key = (""+row.id).toLowerCase();
+                nodes[key] = {label:row.id, node:true};
+                edges[key] = instances;
                 var len = Math.min(LIMIT.rel, row.key.length);
                 for (var inst, i = 0 ; i < len ; i++) {
-                    inst = row.key[i];
-                    if (!nodes[inst]) nodes[inst] = {label:inst};
-                    instances[inst] = {};
+                    inst = (""+row.key[i]).toLowerCase();
+                    if (!nodes[inst]) nodes[inst] = {label:row.key[i]};
+                    instances[inst] = instances[inst] || {};
                 };
                 row.value.forEach(function (match) {
-                    var inst = match[1];
-                    if (!nodes[inst]) nodes[inst] = {label:inst};
-                    if (!instances[inst]) instances[inst] = {};
-                    instances[inst].fuz = match[0];
+                    var inst = (""+match[1]).toLowerCase();
+                    if (!nodes[inst]) nodes[inst] = {label:match[1]};
+                    if (inst == key) {
+                        nodes[inst].fuz = match[0];
+                    } else {
+                        if (!instances[inst]) instances[inst] = {};
+                        instances[inst].fuz = match[0];
+                    }
                 });
             });
 }
             var keys = Object.keys(nodes);
-            var counter = keys.length + 1;
+            var counter = keys.length;
 
+        var done = function () {
+            if (--counter == 0) {
+                    console.log("done", nodes, edges);
+//                 load the raw data into the particle system as is (since it's already formatted correctly for .merge)
+//                 var nodes = data.nodes
+//                 $.each(nodes, function(name, info){
+//                     info.label=name.replace(/(people's )?republic of /i,'').replace(/ and /g,' & ')
+//                 })
+
+                sys.merge({nodes:nodes, edges:edges})
+//                 sys.merge({nodes:{}, edges:{}})
+                sys.parameters(_maps[map_id].p)
+
+            }
+        };
+
+        var dense = function (id) { counter++;
             var url = COUCHDB + "/_design/base/_view/scores?"
-            + "start_key=[%22"+map_id+"%22]&"
-            + "end_key=[%22"+map_id+"ZZ%22]&"
-            + "group=true&group_level=" + LEVEL;
+                + "start_key=[%22"+id+"%22]&"
+                + "end_key=[%22"+id+"ZZ%22]&"
+                + "group=true&group_level=" + LEVEL;
             $.getJSON(url,function(data){
-                console.log("DENSE", data)
+                console.log("DENSE "+id, data)
                 data.rows.forEach(function (row) {
                     row.key.forEach(function (key) {
-                        if (edges[key]) Object.keys(row.value||{}).forEach(function (v) {
-                            if (edges[key][v])
-                                edges[key][v].dens = (edges[key][v].dens||0) + row.value[v];
-                            if (edges[v] && edges[v][key])
-                                edges[v][key].dens = (edges[v][key].dens||0) + row.value[v];
+                        Object.keys(row.value||{}).forEach(function (k) {
+                            if (edges[key] && edges[key][k])
+                                edges[key][k].dens = (edges[key][k].dens||0) + row.value[k];
+                            if (edges[k] && edges[k][key])
+                                edges[k][key].dens = (edges[k][key].dens||0) + row.value[k];
                         });
                     });
                 });
-                counter--
+                done()
+            });
+        };
+            dense(map_id);
+        if (FETCH == "articles")
+            data.rows.forEach(function (row) {
+                dense((""+row.id).toLowerCase());
             });
 
-            console.log("current nodes", nodes, counter)
+
+            console.log("current nodes", counter)
             keys.forEach(function (node_id) {
                 var url = COUCHDB + "/_design/base/_view/linkcount?"
                     + "start_key=%22"+node_id+"%22&"
@@ -324,19 +357,7 @@ if (FETCH == "articles") {
                 $.getJSON(url,function(data){
                     if (data.rows[0])
                         nodes[node_id].linkcount = data.rows[0].value;
-                    if (--counter == 0) {
-                            console.log("done", nodes, edges);
-//                         load the raw data into the particle system as is (since it's already formatted correctly for .merge)
-// //                         var nodes = data.nodes
-//                         $.each(nodes, function(name, info){
-//                             info.label=name.replace(/(people's )?republic of /i,'').replace(/ and /g,' & ')
-//                         })
-
-                        sys.merge({nodes:nodes, edges:edges})
-//                         sys.merge({nodes:{}, edges:{}})
-                        sys.parameters(_maps[map_id].p)
-
-                    }
+                    done()
                 });
             });
           $("#dataset").html(_maps[map_id].source)
