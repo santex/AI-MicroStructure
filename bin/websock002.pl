@@ -7,7 +7,7 @@ use Config::Auto;
 use Data::Dumper;
 use Data::Printer;
 use AI::MicroStructure;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 use Storable::CouchDB;
 use IO::Async::Loop;
 use Digest::MD5;
@@ -66,7 +66,7 @@ foreach(@{$content->{rows}}){
 }
 
 my $cont = {};
-	$res = $ua->get(sprintf('%s/%s/_design/base/_view/pdf?start_key="%s"&end_key="%sZZZ"',
+  $res = $ua->get(sprintf('%s/%s/_design/base/_view/pdf?start_key="%s"&end_key="%sZZZ"',
                               $server,
                               $db,
                               $key,
@@ -77,15 +77,15 @@ my $cont = {};
 
 
  foreach(@{$pdf->{rows}}) {
-	 foreach my $l(@{$_->{value}}){
+   foreach my $l(@{$_->{value}}){
 
 
-		$cc->{$l} = 1 unless($l!~ m/^http.*.pdf$/i);
-	}
+    $cc->{$l} = 1 unless($l!~ m/^http.*.pdf$/i);
+  }
 }
 
 
-	$res = $ua->get(sprintf('%s/%s/_design/base/_view/image?reduce=false&start_key="%s"&end_key="%sZZZ"',
+  $res = $ua->get(sprintf('%s/%s/_design/base/_view/image?reduce=false&start_key="%s"&end_key="%sZZZ"',
                               $server,
                               $db,
                               $key,
@@ -96,9 +96,9 @@ my $cont = {};
 
 
  foreach(@{$img->{rows}}) {
-	 foreach my $l(@{$_->{value}}){
-		$cc->{$l} = 1 unless($l!~ m/upload.*.(png|jpg|gif|svg|jpeg)$/i);
-	}
+   foreach my $l(@{$_->{value}}){
+    $cc->{$l} = 1 unless($l!~ m/upload.*.(png|jpg|gif|svg|jpeg)$/i);
+  }
 }
 
 
@@ -112,9 +112,9 @@ $res = $ua->get(sprintf('%s/%s/_design/base/_view/audio?reduce=false&start_key="
  my $media  = decode_json($res->content);
 
  foreach(@{$media->{rows}}) {
-	 foreach my  $l  (@{$_->{value}}){
-		$cc->{$l} = 1 unless($l!~ m/upload.*.(ogg|avi|mpg)$/i);
-	}
+   foreach my  $l  (@{$_->{value}}){
+    $cc->{$l} = 1 unless($l!~ m/upload.*.(ogg|avi|mpg)$/i);
+  }
 }
 
 
@@ -152,7 +152,7 @@ sub printer {
 
      my @data = getAll($msg);
 
-	my $plus = pop @data;
+  my $plus = pop @data;
 
 
 

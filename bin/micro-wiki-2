@@ -7,7 +7,7 @@ use Parallel::Iterator qw( iterate );
 use Env qw/PWD/;
 use JSON::XS;
 use HTML::Strip;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 use WWW::Wikipedia;
 use Storable::CouchDB;
 use LWP::UserAgent;
@@ -19,7 +19,7 @@ binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
 
-my $state  = AI::MicroStructure::util::config();
+my $state  = AI::MicroStructure::Util::config();
 
 my @CWD    = $state->{cwd};
 our $config = $state->{cfg};

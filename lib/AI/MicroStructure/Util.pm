@@ -1,4 +1,4 @@
-package AI::MicroStructure::util;
+package AI::MicroStructure::Util;
 
 use strict;
 use Cwd;
@@ -16,7 +16,7 @@ sub get_cwd {
 
 sub load_config {
 
-    my @CWD = AI::MicroStructure::util::get_cwd();
+    my @CWD = AI::MicroStructure::Util::get_cwd();
     my $config = Config::Auto::parse(".micro", path => @CWD) || {};
     if (-e ".micro" && -e $ENV{HOME}."/.micro") {
         my $c = Config::Auto::parse("$ENV{HOME}/.micro");
@@ -44,7 +44,7 @@ sub load_config {
 
 sub config {
 
-    my $state = AI::MicroStructure::util::load_config(); my @CWD = $state->{cwd};
+    my $state = AI::MicroStructure::Util::load_config(); my @CWD = $state->{cwd};
     $state->{cfg}->{query}      ||= "micro";
     $state->{cfg}->{tempdir}    ||= "/tmp/micro-temp/";
     $state->{cfg}->{couchdb}    ||= "http://localhost:5984/";

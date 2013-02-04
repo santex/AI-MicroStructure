@@ -4,7 +4,7 @@ use warnings;
 use JSON::XS;
 use Data::Printer;
 use AI::MicroStructure;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 #use AI::MicroStructure::Fitnes;
 #use AI::MicroStructure::Categorizer;
 #use AI::MicroStructure::Memorizer;
@@ -12,7 +12,7 @@ use AI::MicroStructure::util;
 #use AI::MicroStructure::Collection;
 use Storable::CouchDB;
 
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 
 
 
@@ -58,7 +58,7 @@ push @ARGV,"movie";
 push @ARGV,"rapstar";
 push @ARGV,"artist";
 push @ARGV,"actor";
-push @ARGV,"movie"; 
+push @ARGV,"movie";
 push @ARGV,"rock";
 push @ARGV,"pop";
 push @ARGV,"song";
@@ -71,11 +71,11 @@ my @set = checkIsThere($cat);
 print  map{  push @q,$_->{id} unless(!$_->{id});}@set;
 print join "\n",@q;
 map{ $x->delete($_); }@q;
-} 
+}
 
 
 deleteByCategory($_) for(@ARGV);
- 
+
 
   1;
 

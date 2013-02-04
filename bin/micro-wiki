@@ -8,7 +8,7 @@ use JSON::XS;
 use HTML::Strip;
 use Digest::MD5 qw(md5_hex);
 use AI::MicroStructure::WordBlacklist;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 use JSON::XS;
 use WWW::Wikipedia;
 use Storable::CouchDB;
@@ -21,7 +21,7 @@ push @ARGV, 'utf8';
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 $config->{buffer} = "";
 
 

@@ -4,7 +4,7 @@ use warnings;
 use JSON::XS;
 use Data::Dumper;
 use AI::MicroStructure;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 use Storable::CouchDB;
 my @ARGVX = ();
 

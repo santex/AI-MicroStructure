@@ -9,7 +9,7 @@ use File::Basename;
 use File::Spec;
 use File::Glob;
 use Data::Dumper;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 
 
 our $absstructdir = "";
@@ -48,15 +48,19 @@ sub cleanArgs{
 # private class method
 sub find_structures {
    my ( $class, @dirs ) = @_;
+
+
+
    $ALIEN{"base"} =  [map  @$_,
    map  { [ ( fileparse( $_, qr/\.pm$/ ) )[0] => $_ ] }
    map  { File::Glob::bsd_glob(
 
 
-   File::Spec->catfile( $_, ($class->{state}->{path}->{structdir},"*.pm") ) ) } @dirs];
+   File::Spec->catfile( $_, "*.pm" ) ) } @dirs];
 
    $ALIEN{"store"}=[];
 
+  print Dumper [@INC,%ALIEN];
 
    return @{$ALIEN{"base"}};
 }
@@ -84,6 +88,14 @@ sub find_modules {
 }
 
 
+our $micro = AI::MicroStructure->new($Structure);
+$absstructdir = $micro->{state}->{path}->{"cwd/structures"};
+
+
+push @CWD,$absstructdir;
+#push @CWD,$_ for @INC;
+
+
 
 $MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@CWD)} };
 $MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
@@ -103,8 +115,6 @@ sub getComponents(){
 
 
 # the functions actually hide an instance
-our $micro = AI::MicroStructure->new($Structure);
-$absstructdir = $micro->{state}->{path}->{"cwd/structures"};
 # END OF INITIALISATION
 
 # support for use AI::MicroStructure 'stars'
@@ -118,7 +128,7 @@ sub import {
 
    $Structure = $structures[0] if @structures;
    $micro = AI::MicroStructure->new( $Structure );
-
+   $absstructdir = $micro->{state}->{path}->{"cwd/structures"};
 
    # export the microname() function
    no strict 'refs';
@@ -147,7 +157,7 @@ sub new {
                      tools => { @tools }, micro => {}}, $class;
 
 
-    $self->{state}  =   AI::MicroStructure::util::load_config();
+    $self->{state}  =   AI::MicroStructure::Util::load_config();
     $absstructdir = $self->{state}->{path}->{"cwd/structures"};
 
 #    print Dumper $self;
@@ -255,7 +265,7 @@ sub microname { $micro->name( @_ ) };
 sub name {
    my $self = shift;
    my ( $structure, $count ) = ("any",1);
-
+   $absstructdir = $self->{state}->{path}->{"cwd/structures"};
    if (@_) {
    ( $structure, $count ) = @_;
    ( $structure, $count ) = ( $self->{structure}, $structure )
@@ -267,6 +277,8 @@ sub name {
 
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
+
+
    eval "require '$absstructdir/$structure.pm';";
    croak "MicroStructure list $structure does not exist!" if $@;
    $MICRO{$structure} = 1; # loaded
@@ -318,11 +330,17 @@ sub getBundle {
 
    my $self = shift;
 
+    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
 
 
 my @structures = grep { !/^(?:any)/ } AI::MicroStructure->structures;
 my @micros;
 my @search=[];
+
+
+
+
+
 for my $structure (@structures) {
    no strict 'refs';
    eval "require '$absstructdir/$structure.pm';";
@@ -563,7 +581,7 @@ my $self = shift;
 my $StructureName = shift;
 my $data = shift;
 
-
+    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
     $StructureName = lc $self->trim(`micro`) unless($StructureName);
     my $file = "$absstructdir/$StructureName.pm";
     print `mkdir $absstructdir` unless(-d $absstructdir);
@@ -585,9 +603,9 @@ sub drop {
 
 my $self = shift;
 my $StructureName = shift;
-
+$absstructdir = $self->{state}->{path}->{"cwd/structures"};
 my @file = grep{/$StructureName.pm/}map{File::Glob::bsd_glob(
-File::Spec->catfile( $_, ($structdir,"*.pm") ) )}@CWD;
+File::Spec->catfile( $_, ($absstructdir,"*.pm") ) )}@CWD;
 my $fh = shift @file;
 if(`ls $fh`)
 {

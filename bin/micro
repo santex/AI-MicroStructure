@@ -1,7 +1,7 @@
 #!/usr/bin/perl -X
 use strict;
 use warnings;
-use AI::MicroStructure::util;
+use AI::MicroStructure::Util;
 
 my %conf = ( );
 GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
@@ -79,10 +79,10 @@ my $usage = << 'EOT';
   $ done
 
   #!!!!!###Hard cpu to expect ### make sure couch is on   ######  or disable the store methode in micro-wiki and print $doc or consume otherweise
-  # test as single before you loope 
-  
+  # test as single before you loope
+
   $ micro-wiki ufo
-  
+
   # proceed
 
   $ for i in `micro structures`; do
@@ -119,7 +119,7 @@ if($conf{"init"}) {
     }
 }
 
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 our $structdir = "structures";
 our $absstructdir = "$CWD[0]/$structdir";
 
