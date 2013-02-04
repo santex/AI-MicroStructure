@@ -616,16 +616,20 @@ sub drop {
 
 my $self = shift;
 my $StructureName = shift;
-$absstructdir = $self->{state}->{path}->{"cwd/structures"};
-my @file = grep{/$StructureName.pm/}map{File::Glob::bsd_glob(
-File::Spec->catfile( $_, ($absstructdir,"*.pm") ) )}@CWD;
-my $fh = shift @file;
-if(`ls $fh`)
-{
 
-print  `rm $fh`;
-}
-  #push @CWD,$file[1];
+my @fh = grep{/$StructureName.pm/}__PACKAGE__->find_structures(@CWD);
+
+
+  if(defined($fh[0]) &&  `ls $fh[0]`)
+  {
+    print  `rm $fh[0]`;
+
+  }else{
+
+   croak "The structure $StructureName does not exist!";
+
+  }
+
 
   return 1;
 }
@@ -637,6 +641,7 @@ END{
 
 if($drop == 1) {
    $micro->drop($StructureName);
+   exit 0;
 }
 
 if($new==1){
