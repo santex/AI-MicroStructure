@@ -3,7 +3,7 @@
 use strict;
 use utf8;
 use File::Spec;
-#use AI::MicroStructure;
+use AI::MicroStructure;
 use JSON::XS;
 use Data::Printer;
 use Data::Dumper;
@@ -40,7 +40,7 @@ eval q/
 /;
 die $@ if $@;
 
-
+w
 my $cache = {};
 my $new = AI::MicroStructure::Relations->new();
 $new->{scale} = 0.1;

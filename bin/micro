@@ -143,7 +143,7 @@ my $j = $main->structures();
 if($j == 0 || $j eq "any"){
 
 print $usage;
-exit;
+exit(0);
 }
 
 

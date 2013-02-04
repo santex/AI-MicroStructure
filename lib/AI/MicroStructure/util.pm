@@ -31,7 +31,13 @@ sub load_config {
             $config = $c;
         }
     }
-    return { "cwd" => @CWD, "cfg" => $config };
+    my $structdir = "structures";
+    my $path = {
+      "structures" => $structdir,
+      "cwd/structures" => "$CWD[0]/$structdir",
+    };
+
+    return { "cwd" => @CWD, "path" => $path, "cfg" => $config };
 
 }
 

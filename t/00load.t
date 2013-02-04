@@ -1,8 +1,16 @@
-use Test::More;
-use AI::MicroStructure ();
+#!/usr/bin/perl -w
+
+
 use strict;
+use Test;
+BEGIN {
+  require "00load.t";
+  need_module('AI::MicroStructure');
+  plan tests => 1 + num_standard_tests();
+}
 
-my @modules = map { "AI::MicroStructure::$_" } AI::MicroStructure->structures;
+ok(1);
 
-plan tests => scalar @modules;
-use_ok( $_ ) for sort @modules;
+#########################
+
+perform_standard_tests(learner_class => 'AI::Categorizer::Learner::DecisionTree');

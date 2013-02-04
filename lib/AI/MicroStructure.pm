@@ -1,4 +1,4 @@
-#!/usr/bin/perl -X
+#!/usr/bin/perl -W
 package AI::MicroStructure;
 use strict;
 use warnings;
@@ -29,10 +29,6 @@ our @a=();
 
 our ($new, $write,$drop) =(0,0,0);
 
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
-our $structdir = "structures";
-our $absstructdir = "$CWD[0]/$structdir";
-
 if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
 if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  };
 if( grep{/\bdrop\b/} @ARGV ){ $drop = 1; cleanArgs("drop");  };
@@ -52,7 +48,9 @@ sub find_structures {
    $ALIEN{"base"} =  [map  @$_,
    map  { [ ( fileparse( $_, qr/\.pm$/ ) )[0] => $_ ] }
    map  { File::Glob::bsd_glob(
-   File::Spec->catfile( $_, ($structdir,"*.pm") ) ) } @dirs];
+
+
+   File::Spec->catfile( $_, ($class->{state}->{path}->{structdir},"*.pm") ) ) } @dirs];
 
    $ALIEN{"store"}=[];
 
@@ -143,8 +141,12 @@ sub new {
    # defer croaking until name() is actually called
    my $self = bless { structure => $structure,
                      tools => { @tools }, micro => {}}, $class;
-	return $self;
-   #if(defined($driverarg) && join("" ,@_)  =~/couch|cache|berkeley/){
+
+
+    $self->{state}  =   AI::MicroStructure::util::load_config();
+
+    return $self;
+
 }
 
 sub _rearrange{

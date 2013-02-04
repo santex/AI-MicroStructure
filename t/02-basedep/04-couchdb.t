@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Storable::CouchDB;
-use Test::More tests =>8;
+use Test::More tests =>10;
 
 BEGIN {
 
