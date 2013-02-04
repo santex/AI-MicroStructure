@@ -50,7 +50,6 @@ sub find_structures {
    my ( $class, @dirs ) = @_;
 
 
-
    $ALIEN{"base"} =  [map  @$_,
    map  { [ ( fileparse( $_, qr/\.pm$/ ) )[0] => $_ ] }
    map  { File::Glob::bsd_glob(
@@ -60,7 +59,7 @@ sub find_structures {
 
    $ALIEN{"store"}=[];
 
-  print Dumper [@INC,%ALIEN];
+
 
    return @{$ALIEN{"base"}};
 }
@@ -265,9 +264,19 @@ sub microname { $micro->name( @_ ) };
 sub name {
    my $self = shift;
    my ( $structure, $count ) = ("any",1);
+   my @any;
    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
    if (@_) {
    ( $structure, $count ) = @_;
+
+
+   if($structure=~/any/){
+   @any = grep{/any.pm/}$self->find_modules();
+
+
+   }
+
+
    ( $structure, $count ) = ( $self->{structure}, $structure )
    if defined($structure) && $structure =~ /^(?:0|[1-9]\d*)$/;
    }
@@ -278,9 +287,13 @@ sub name {
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
 
-
+   if($structure=~/any/){
+      use AI::MicroStructure::any;
+   }else{
    eval "require '$absstructdir/$structure.pm';";
-   croak "MicroStructure list $structure does not exist!" if $@;
+   }
+
+   warn "MicroStructure list $structure does not exist!" if $@;
    $MICRO{$structure} = 1; # loaded
    }
    $self->{micro}{$structure} =
