@@ -11,6 +11,9 @@ use File::Glob;
 use Data::Dumper;
 use AI::MicroStructure::util;
 
+
+our $absstructdir = "";
+our $structdir = "";
 our @CWD=();
 our $VERSION = '0.014';
 our $Structure = 'any'; # default structure
@@ -101,7 +104,7 @@ sub getComponents(){
 
 # the functions actually hide an instance
 our $micro = AI::MicroStructure->new($Structure);
-
+$absstructdir = $micro->{state}->{path}->{"cwd/structures"};
 # END OF INITIALISATION
 
 # support for use AI::MicroStructure 'stars'
@@ -115,6 +118,7 @@ sub import {
 
    $Structure = $structures[0] if @structures;
    $micro = AI::MicroStructure->new( $Structure );
+
 
    # export the microname() function
    no strict 'refs';
@@ -144,6 +148,9 @@ sub new {
 
 
     $self->{state}  =   AI::MicroStructure::util::load_config();
+    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
+
+#    print Dumper $self;
 
     return $self;
 
