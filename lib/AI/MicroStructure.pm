@@ -11,7 +11,7 @@ use File::Glob;
 use Data::Dumper;
 use AI::MicroStructure::util;
 
-
+our @CWD=();
 our $VERSION = '0.014';
 our $Structure = 'any'; # default structure
 our $CODESET = 'utf8';
