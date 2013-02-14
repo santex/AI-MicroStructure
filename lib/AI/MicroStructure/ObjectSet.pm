@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -W
+$|++;
 
- my $TOP = "/home/santex/data-hub/book";
+
 
 BEGIN {
 
@@ -124,13 +125,19 @@ BEGIN {
 
 package main;
 
-$|++;
 use strict;
-
 use File::Find;
 use Data::Dumper;
 use Storable qw(lock_store lock_retrieve);
 use Getopt::Long;
+use Digest::MD5 qw(md5_hex);
+use Data::Printer;
+
+my $TOP = "/home/santex/data-hub/book";
+
+#mkpath dirname($TOP),1;
+
+
 our $curSysDate = `date +"%F"`;
     $curSysDate=~ s/\n//g;
 
@@ -157,7 +164,7 @@ eval {
 
 END{
 
-  lock_store($cache,$opts{cache_file});
+  lock_store($set,$opts{cache_file});
 
   print Dumper [$set->size,$set->members];
 
@@ -165,20 +172,30 @@ END{
   }
 
 
+our $files={};
 
-
-find(\&translate, "$TOP/./");
-
+find(\&translate, "$TOP");
+p $set;
 sub translate {
+
   return unless -f;
   (my $rel_name = $File::Find::name) =~ s{.*/}{}xs;
+
+  my $name = md5_hex($rel_name);
+
+  if (/\.(html|htm)$/) {
+    $files->{html}->{$name}=$rel_name;
+  }
+  elsif (/\.pdf$/) {
+    $files->{pdf}->{$name}=$rel_name;
+  }elsif (/\.ltx$/) {
+    $files->{latex}->{$name}=$rel_name;
+  }elsif (/\.(flv|mpg4|ogg)$/) {
+    $files->{media}->{$name}=$rel_name;
+  }elsif (/\.json$/) {
+    $files->{text}->{$name}=$rel_name;
+  }
 
   $set->insert(AI::MicroStructure::Object->new($rel_name));
 
 }
-
-
-
-
-
-__END__

@@ -27,7 +27,6 @@ my $pwd = $PWD;
 
 my @ARGVX = ();
 
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};
 
@@ -38,14 +37,15 @@ our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]}
 
 
 
-my $x = AI::MicroStructure->new;
+our $x = AI::MicroStructure->new;
+
 
 sub getAll {
   my $key =shift;
 
   require LWP::UserAgent;
   my $ua = LWP::UserAgent->new;
-  my ($server,$db) = ($config->{couchdb},"table");
+  my ($server,$db) = ($x->{state}->{cfg}->{couchdb},"table");
   my $res = $ua->get(sprintf('%s/%s/_design/base/_view/instances?reduce=false&start_key=["%s"]&end_key=["%sZZZ"]',
                               $server,
                               $db,
@@ -119,9 +119,9 @@ $res = $ua->get(sprintf('%s/%s/_design/base/_view/audio?reduce=false&start_key="
 
 
 
-push @all,[keys %$cc];
+return  {set=>\@all,kv=>keys %$cc};
 
-return @all;
+#return @all;
 
 
 }
@@ -150,15 +150,14 @@ sub printer {
 
      $msg = "space" unless($msg);
 
-     my @data = getAll($msg);
+     my $data = getAll($msg);
 
-  my $plus = pop @data;
+    my @data = @{$data->{set}};
+     
 
+     $cmd->{q} = join(" ",@{$data->{set}});
 
-
-     $cmd->{q} = join(" ",@data);
-
-     $cmd->{action} = [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g; $_={neighbour => $a[0][1], spawn => $a[0][0]}} split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq | egrep "[2-9][0-9]"`)];
+     $cmd->{action} = [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g; $_={neighbour => $a[0][1], spawn => $a[0][0]}} split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq`)];
 
 
 
@@ -166,7 +165,8 @@ sub printer {
                                                       "callback" => "makeList",
                                                       "responce" =>
                                                       [$cmd->{action},
-                                                      sort values %$plus]});
+                                                      $data]});
+
 
       return $cmd->{json};
 
@@ -190,7 +190,7 @@ my $server = Net::Async::WebSocket::Server->new(
    }
 );
 
-my $loop = IO::Async::Loop->new(max_payload_size=>0);
+my $loop = IO::Async::Loop->new(max_payload_size=>11110);
 
 $loop->add( $server );
 

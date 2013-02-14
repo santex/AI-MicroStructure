@@ -1,4 +1,4 @@
-#!/usr/bin/perl -W
+#!/usr/bin/perl
 package AI::MicroStructure;
 use strict;
 use warnings;
@@ -30,7 +30,14 @@ our $item="";
 our @items;
 our @a=();
 
-our ($new, $write,$drop) =(0,0,0);
+
+our ($init,$new,$drop,$available,$lib,
+     $list,$use,$off,$switch,$mirror,
+     $version,$help,$write)  = (0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+eval "\$$_=1; " for @ARGV;
+
+
 
 if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
 if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  };
@@ -38,13 +45,22 @@ if( grep{/\bdrop\b/} @ARGV ){ $drop = 1; cleanArgs("drop");  };
 
 our $StructureName = $ARGV[0]; # default structure
 our $structure = $ARGV[0]; # default structure
+
+
+
+
+
+
 sub cleanArgs{
-   my ($key) = @_;
-   my @tmp=();
-   foreach(@ARGV){
-   push @tmp,$_ unless($_=~/$key/);}
-   @ARGV=@tmp;
+    my ($key) = @_;
+    my @tmp=();
+    foreach(@ARGV){
+    push @tmp,$_ unless($_=~/$key/);}
+
+    @ARGV=@tmp;
 }
+
+
 # private class method
 sub find_structures {
    my ( $class, @dirs ) = @_;
@@ -126,7 +142,8 @@ sub import {
    : @_;
 
    $Structure = $structures[0] if @structures;
-   $micro = AI::MicroStructure->new( $Structure );
+   my $micro = AI::MicroStructure->new( $Structure );
+
    $absstructdir = $micro->{state}->{path}->{"cwd/structures"};
 
    # export the microname() function
@@ -264,19 +281,9 @@ sub microname { $micro->name( @_ ) };
 sub name {
    my $self = shift;
    my ( $structure, $count ) = ("any",1);
-   my @any;
-   $absstructdir = $self->{state}->{path}->{"cwd/structures"};
+
    if (@_) {
    ( $structure, $count ) = @_;
-
-
-   if($structure=~/any/){
-   @any = grep{/any.pm/}$self->find_modules();
-
-
-   }
-
-
    ( $structure, $count ) = ( $self->{structure}, $structure )
    if defined($structure) && $structure =~ /^(?:0|[1-9]\d*)$/;
    }
@@ -286,14 +293,10 @@ sub name {
 
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
-
-   if($structure=~/any/){
-      use AI::MicroStructure::any;
-   }else{
    eval "require '$absstructdir/$structure.pm';";
-   }
+   #croak "MicroStructure list $structure does not exist!" if $@;
 
-   warn "MicroStructure list $structure does not exist!" if $@;
+   use AI::MicroStructure::any;
    $MICRO{$structure} = 1; # loaded
    }
    $self->{micro}{$structure} =
@@ -302,6 +305,8 @@ sub name {
 
    $self->{micro}{$structure}->name( $count );
 }
+
+
 
 # other methods
 sub structures { wantarray ? ( sort keys %MICRO ) : scalar keys %MICRO }
@@ -634,10 +639,123 @@ my @fh = grep{/$StructureName.pm/}__PACKAGE__->find_structures(@CWD);
   return 1;
 }
 
+sub help {
+
+my $self = shift;
+my $usage = << 'EOT';
+
+  #current status
+  #did you create a micro structure yet ?
+  #try something like this
+
+  $ micro new ufo;      # creates a structure called ufo
+
+  $ micro drop ufo;     # deletes the structure called ufo
+
+  $ micro structures;   # shows all structure's you currently have
+
+  #after creation of a structure you can access it in lots of ways
 
 
+
+  $ micro;             # one word of a random structure
+
+  $ micro ufo;         # one word of the ufo structure
+
+  $ micro ufo all;     # all words of the ufo structure
+
+  $ micro ufo 5;       # 5 random words of the ufo structure
+
+  $ micro any 10;      # 10 random words of any structure you have created
+
+
+  $ micro --init        # initializes active memory
+
+  $ micro --export      # export relations from couchdb into git repo and tag data
+
+
+  # oneliners i like to use
+
+  $  for i in `micro structures`; do echo $i; done;       # echos all the structures
+
+  $  for i in `micro ufo all`;   do echo $i; done;       # echos all words in ufo
+
+  $  for i in `micro structures`; do micro all $i; done;  # echos all stuctures all words
+
+  $  for i in `micro ufo all`;   do micro new $i; done;  # new structure for all words in ufo
+
+  $  for i in `micro ufo all`;   do micro-wiki $i; done; # push all words against the wiki plugin dont forget setting user & password in /usr/local/bin/micro-wiki
+
+  ###################################################################################
+  # try to follow the logic combine
+  # your-word=micro new ? ->concept->concepts->relations->node
+
+
+  $ micro new biology
+  $ micro new biological_process
+
+  $ for i in `micro structures`; do
+  $ for y in `micro all $i `; do
+  $ echo "$i=$y";
+  $ micro new $y;
+  $ done
+  $ done
+
+  #!!!!!###Hard cpu to expect ### make sure couch is on   ######  or disable the store methode in micro-wiki and print $doc or consume otherweise
+  # test as single before you loope
+
+  $ micro-wiki ufo
+
+  # proceed
+
+  $ for i in `micro structures`; do
+  $ for y in `micro all $i `; do
+  $ echo "$i=$y";
+  $ micro-wiki $y;
+  $ done
+  $ done
+
+
+EOT
+
+
+
+return $usage;
+
+}
+
+
+BEGIN {
+
+
+}
 
 END{
+
+if($init){}
+if($available){}
+if($lib){}
+if($list){}
+if($use){}
+if($off){}
+if($switch){}
+if($mirror){}
+if($version){
+    printf($VERSION);
+    exit(0);
+}
+
+
+
+if($help) {
+    printf($micro->help());
+    exit(0);
+
+}
+
+
+
+
 
 if($drop == 1) {
    $micro->drop($StructureName);
@@ -845,7 +963,4 @@ __END__
   AI-MicroStructure-Plugin-Twitter
   AI-MicroStructure-Plugin-Wiki
 
-
-
-__DATA__
 

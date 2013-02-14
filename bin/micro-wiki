@@ -1,6 +1,4 @@
-#!/usr/bin/perl -X
-use utf8;
-use File::Spec;
+#!/usr/bin/perl
 use Data::Printer;
 use Parallel::Iterator qw( iterate );
 use Env qw/PWD/;
@@ -17,7 +15,6 @@ use LWP::UserAgent;
 
 
 
-push @ARGV, 'utf8';
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
@@ -40,9 +37,6 @@ my @test;
 my $search="";
 my $TOP="";
 
-    my $s=AI::MicroStructure::WordBlacklist::getStopWords('en');
-    our @s = keys %$s;
-    #print join('|',@s);
 
 
 
@@ -79,7 +73,7 @@ my $TOP="";
     my $ua = LWP::UserAgent->new;
     my ($server,$db) = ($config->{couchdb},$config->{db});
 
-    my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"',
+    my $res = $ua->get(sprintf('%s/%s/_all_docs?key="%s"&limit=1',
                                 $server,
                                 $db,
                                 $key));
@@ -181,12 +175,9 @@ sub call  {
           $e->parse($response->decoded_content);
           @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}$e->links;
 
-          foreach(@links){
+          $doc->{linknr}=$#links;
 
-            $linkdata->{base}->{$_} = 1 unless($linkdata->{base}->{$_});
-
-          }
-          @links = keys %{$linkdata->{base}};
+#          @links = keys %{$linkdata->{base}};
           $linkdata->{pdf}=[grep{/^http.*.[\.](pdf|PDF)$/}@links];
 
           $linkdata->{audio}=[grep{/^http.*.[\.](mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
@@ -195,7 +186,7 @@ sub call  {
           $linkdata->{image}=[grep{/^http.*.[\.](JPG|GIF|PNG|svg|jpg|png|gif)$/}@links];
 
 
-        @{$doc->{audio}} = map{$_=shift @{(imgTranslate($_)  || [])} } @{$doc->{audio}};
+       @{$doc->{audio}} = map{$_=shift @{(imgTranslate($_)  || [])} } @{$doc->{audio}};
 
         @{$doc->{audio}} = grep{ defined }@{$doc->{audio}};
 
@@ -219,7 +210,7 @@ my $hs = HTML::Strip->new();
 
   #            print "\n"x10,$clean_text;
 
-               $doc->{linknr}=$#links;
+
                $doc->{url}=$url;
                $doc->{tags}=[map{$_=lc($_); $_=~s/\)//g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/[(].+?[)]/} $result->related()];
                $doc->{instances}= {};
@@ -282,16 +273,17 @@ my $hs = HTML::Strip->new();
 
        $x->store("$url" ,$doc) ;
 
-
+  #      return $url;
         return $doc;
-
   }
 
 
 }
 
 foreach my $urlx (@ARGV) {
-if($urlx) { $result->{$urlx} = call(0,$urlx); }
+#if($urlx) {
+  $result->{$urlx} = call(0,$urlx);
+  #}
 
 
 
@@ -302,67 +294,74 @@ my $url_iter = list_iter( @{$result->{$urlx}->{related}});
 
 my $page_iter = iterate( \&call, $url_iter );
 
-  our $out = {abs=>{pdf=>{},related=>{},image=>{},ogg=>{}}};
-
-     while ( my ( $index, $value ) = $page_iter->() ) {
-         $out->{$index} = $value;
-
-
-         foreach(@{$value->{related}}) {
-
-         $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
-
-         }
-
-         foreach(@{$value->{pdf}}) {
-
-         $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
-
-         }
-         foreach(@{$value->{image}}) {
-
-         $out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
-
-         }
-         foreach(@{$value->{audio}}) {
-
-         $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
-
-         }
-     }
-    p $out;
-    exit;
+  while ( my ( $index, $value ) = $page_iter->() ) {
+  printf("\n%s", $index);
+  }
 
 }
+ # our $out = {abs=>{pdf=>{},related=>{},image=>{},ogg=>{}}};
+
+  #   while ( my ( $index, $value ) = $page_iter->() ) {
+   #      $out->{$index} = $value;
+
+
+    #     foreach(@{$value->{related}}) {
+
+     #    $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
+
+      #   }
+
+       #  foreach(@{$value->{pdf}}) {
+
+        # $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
+
+       #  }
+        # foreach(@{$value->{image}}) {
+
+         #$out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
+
+    #     }
+     #    foreach(@{$value->{audio}}) {
+
+      #   $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
+
+       #  }
+    # }
+#    p $out;
+ #   exit(0);
+
+
+
+#}
 
 
 }
 
 
 BEGIN{
-    `IFS_BAK=\$IFS;
-       IFS=\$'\n';`;
+    #`IFS_BAK=\$IFS;
+     #  IFS=\$'\n';`;
 
 
 }
 END{
-    `IFS=\$IFS_BAK;`;
+    #`IFS=\$IFS_BAK;`;
 
-     if($config->{out}=~/json/) {
-
-
-    my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
-                                                  "responce" =>[$conf->{abs} ? $out->{abs}:$out]});
+     #if($config->{out}=~/json/) {
 
 
-      open (MYFILE, '>>'.$config->{jsonout});
-        print MYFILE $json;
-        close (MYFILE);
+   # my $json = JSON::XS->new->pretty(1)->encode({ "query" => [@ARGV],
+    #                                              "responce" =>[$conf->{abs} ? $out->{abs}:$out]});
 
 
-    }
+#      open (MYFILE, '>>'.$config->{jsonout});
+ #       print MYFILE $json;
+  #      close (MYFILE);
 
-     exit(0);
+
+    #}
+
+     #exit(0);
 
 }
 

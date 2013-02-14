@@ -11,7 +11,7 @@ binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
 our $buff = {};
-BEGIN 
+BEGIN
 {
 `IFS_BAK=\$IFS;
 IFS=\$'\n'`;
@@ -22,12 +22,12 @@ IFS=\$'\n'`;
 # Library path bootstrap
 my @path;
 if (defined $ENV{PAR_TEMP}) { # See PAR.pm
-	@path = ($ENV{PAR_TEMP}, 'inc');
+  @path = ($ENV{PAR_TEMP}, 'inc');
 }
 else {
-	my $binary = File::Spec->rel2abs($0);
-	my ($vol, $dirs, undef) = File::Spec->splitpath($binary);
-	@path = ($vol, $dirs, File::Spec->updir);
+  my $binary = File::Spec->rel2abs($0);
+  my ($vol, $dirs, undef) = File::Spec->splitpath($binary);
+  @path = ($vol, $dirs, File::Spec->updir);
 }
 my $libdir = File::Spec->catdir(@path, 'lib');
 unshift @INC, $libdir if -d $libdir;
@@ -35,12 +35,12 @@ unshift @INC, $libdir if -d $libdir;
 # Load modules needed in this script
 
 eval q/
-	use AI::MicroStructure::Cache;
-	use AI::MicroStructure::Relations;
+  use AI::MicroStructure::Cache;
+  use AI::MicroStructure::Relations;
 /;
 die $@ if $@;
 
-w
+
 my $cache = {};
 my $new = AI::MicroStructure::Relations->new();
 $new->{scale} = 0.1;
@@ -76,9 +76,9 @@ $buff->{out} .= sprintf(p $new->{storage}->{data});
 
 
 END{
-  print $buff->{out};	
-	
-	}
+  print $buff->{out};
+
+  }
 
 1;
 __END__
@@ -94,10 +94,10 @@ __END__
 
   Creates a session to work relations
 
-=head1 SYNOPSIS    
-  
+=head1 SYNOPSIS
+
   perl Deamon.pm ufo secret
-  
+
 =head1 AUTHOR
 
   Hagen Geissler <santex@cpan.org>
