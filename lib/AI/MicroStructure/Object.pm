@@ -9,13 +9,36 @@
   sub new {
     my $pkg = shift;
     my $self = bless {}, $pkg;
-    $self->{name} = md5_hex(@_);
+
+    $self->{name} = sprintf(@_);
+    $self->{md5} = md5_hex(@_);
+    $self->{soundex} = $self->soundex(@_);
+
+
     foreach my $element (@_) {
   #    warn "types are ", @_;
-      $self->{ $element } = $element;
+      $self->{ $element }->{name} = $element;
+      $self->{ $element }->{md5} = md5_hex($element );
+      $self->{ $element }->{soundex} = $self->soundex($element);
+
     }
     return $self;
   }
+
+  sub soundex
+  {
+      my $self = shift;
+
+      my ( @res ) = @_;
+      my ($i, $t, $_);
+      for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
+          ($i,$t) = /(.)(.*)/;
+         $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
+         $_ = substr(($i||'Z').$t.'000', 0, 4 );
+      }
+      wantarray ? @res : $res[0];
+  }
+
   sub name {
 
       my $self = shift;

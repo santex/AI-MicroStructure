@@ -1,0 +1,406 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Dissection -- from Wolfram MathWorld</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="DC.Creator" content="Weisstein, Eric W." />
+<meta name="DC.Description" content="" />
+<meta name="DC.Subject" scheme="MathWorld" content="Mathematics:Algebra" />
+<meta name="DC.Rights" content="Copyright 1999-2013 Wolfram Research, Inc.  See http://mathworld.wolfram.com/about/terms.html for a full terms of use statement." />
+<meta name="DC.Format" scheme="IMT" content="text/html" />
+<meta name="DC.Identifier" scheme="URI" content="http://mathworld.wolfram.com/Dissection.html" />
+<meta name="DC.Language" scheme="RFC3066" content="en" />
+<meta name="DC.Publisher" content="Wolfram Research, Inc." />
+<meta name="DC.Relation.IsPartOf" scheme="URI" content="http://mathworld.wolfram.com" />
+<meta name="DC.Type" scheme="DCMIType" content="Text" />
+<meta name="googlebot" content="noarchive" />
+<meta name="robots" content="noindex,follow" />
+<link rel="alternate" type="application/rss+xml" title="MathWorld Headline News" href="http://mathworld.wolfram.com/news/rss.xml" />
+<link rel="stylesheet" type="text/css" href="/css/mathworldv2.css" />
+<link rel="shortcut icon" href="/favicon_mathworld.png" type="image/png" />
+<script language="JavaScript" type="text/javascript" src="/common/javascript/menu.js"></script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-5677369-3']);
+  _gaq.push(['_setDomainName', 'none']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body>
+<table summary="" id="headerTable" width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td>
+				<div id="logo">
+<img src="/images/topbar/logo.png" alt="" usemap="#mwlogomap" />
+
+<map name="mwlogomap" id="mwlogomap">
+  <area shape="rect" coords="0,30,200,47" href="http://www.wolfram.com/mathematica/" alt="Built with Mathematica Technology" title="Built with Mathematica Technology" />
+  <area shape="rect" coords="0,0,617,30" href="/" alt="Wolfram MathWorld" title="Wolfram MathWorld" />
+</map>
+</div>
+			</td>
+			<td>
+				<div id="searchWrapper">
+					<form name="NavBarSearch" action="/search/" method="get" accept-charset="UTF-8" onsubmit=" if (checkForDefaultInput('query_1', 'Search MathWorld')) { return false; }">
+						<input id="search" class="searchboxsub" name="query" type="text" value="Search MathWorld" onfocus="initTextInput(this,'clear','Search MathWorld')" onblur="initTextInput(this,'setDefault','Search MathWorld')" />
+						<input type="image" src="/images/topbar/search-icon.png" id="search-icon" alt="Search" onclick="if (checkForDefaultInput('query_1', 'Search MathWorld')) { return false;} else {document.NavBarSearch.submit(); }" />
+					</form>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table summary="" id="pageTable" width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td class="leftcolumn">
+			<!--Start nav content -->
+<!-- Sidebar -->
+
+				<div id="navigation">
+					<div><a href="/topics/Algebra.html">Algebra</a></div>
+					<div><a href="/topics/AppliedMathematics.html">Applied Mathematics</a></div>
+					<div><a href="/topics/CalculusandAnalysis.html">Calculus and Analysis</a></div>
+					<div><a href="/topics/DiscreteMathematics.html">Discrete Mathematics</a></div>
+					<div><a href="/topics/FoundationsofMathematics.html">Foundations of Mathematics</a></div>
+					<div><a href="/topics/Geometry.html">Geometry</a></div>
+					<div><a href="/topics/HistoryandTerminology.html">History and Terminology</a></div>
+					<div><a href="/topics/NumberTheory.html">Number Theory</a></div>
+					<div><a href="/topics/ProbabilityandStatistics.html">Probability and Statistics</a></div>
+					<div><a href="/topics/RecreationalMathematics.html">Recreational Mathematics</a></div>
+					<div><a href="/topics/Topology.html">Topology</a></div>
+					<div class="subnav">
+						<div class="subnav-item">
+							<a href="/letters/">Alphabetical Index</a><br />
+							<a href="/topics/InteractiveEntries.html">Interactive Entries</a><br />
+							<a href="/cgi-bin/random.cgi">Random Entry</a><br />
+							<a href="/whatsnew/">New in <em>MathWorld</em></a>
+						</div>
+						<div class="subnav-item">
+							<a href="/classroom/"><em>MathWorld</em> Classroom</a>
+						</div>			
+						<div class="subnav-item">
+							<a href="/about/">About <em>MathWorld</em></a><br />
+							<a href="/contact/contribute.html">Contribute to <em>MathWorld</em></a><br />
+							<a href="/contact/">Send a Message to the Team</a>
+						</div>
+						<div class="subnav-item last">
+							<a href="http://www.amazon.com/exec/obidos/ASIN/1584883472/ref=nosim/weisstein-20" target="_blank"><em>MathWorld</em> Book</a>
+						</div>
+					</div>
+				</div>
+				<div id="credits">
+					<div class="links"><a href="http://www.wolfram.com/webresources.html" target="_blank" title="Wolfram Web Resources">Wolfram Web Resources&nbsp;&raquo;</a></div>
+					<div class="lastupdated">
+						<a href="/whatsnew/">13,134 entries</a><br />
+						<a href="/whatsnew/">Last updated: Sat Feb 16 2013</a>
+					</div>
+					<div class="author">Created, developed, and nurtured&nbsp;by&nbsp;<a href="http://mathworld.wolfram.com/about/author.html" class="authorlink" title="Created, developed, and nurtured by Eric Weisstein">Eric&nbsp;Weisstein</a> at <a href="http://www.wolfram.com/" target="_blank" class="companylink" title="Wolfram Research">Wolfram&nbsp;Research</a></div>
+				</div>
+
+<!-- End Sidebar -->
+
+				<!--End nav content -->
+			</td>
+			<td class="mainCell no-sidebar">
+				<div id="mainContent">
+
+<img src="/images/spacer.gif" width="700" height="1" alt="" />			
+<!--Start main content -->
+<div class="linktrail"><a href="/topics/RecreationalMathematics.html">Recreational Mathematics</a>&nbsp;&gt;&nbsp;<br /></div>
+<br />
+<h1>Dissection</h1>
+<!-- Begin Body -->
+<table summary=""
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    border="0"
+    id="directory">
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AmbiguousRectangle.html"
+ class="Hyperlink">Ambiguous Rectangle</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Fault-FreeRectangle.html"
+ class="Hyperlink">Fault-Free Rectangle</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PythagoreanSquarePuzzle.html"
+ class="Hyperlink">Pythagorean Square Puzzle</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ArchimedesBox.html"
+ class="Hyperlink">Archimedes' Box</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HaberdashersProblem.html"
+ class="Hyperlink">Haberdasher's Problem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Rep-Tile.html"
+ class="Hyperlink">Rep-Tile</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Banach-TarskiParadox.html"
+ class="Hyperlink">Banach-Tarski Paradox</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HadwigerProblem.html"
+ class="Hyperlink">Hadwiger Problem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Slothouber-GraatsmaPuzzle.html"
+ class="Hyperlink">Slothouber-Graatsma Pu...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BlanchesDissection.html"
+ class="Hyperlink">Blanche's Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/IntegerTriangle.html"
+ class="Hyperlink">Integer Triangle</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SomaCube.html"
+ class="Hyperlink">Soma Cube</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BorsuksConjecture.html"
+ class="Hyperlink">Borsuk's Conjecture</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/KleinBottleDissection.html"
+ class="Hyperlink">Klein Bottle Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SpernersLemma.html"
+ class="Hyperlink">Sperner's Lemma</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConwayPuzzle.html"
+ class="Hyperlink">Conway Puzzle</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Loculus.html"
+ class="Hyperlink">Loculus</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SquareDissection.html"
+ class="Hyperlink">Square Dissection</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CubeDissection.html"
+ class="Hyperlink">Cube Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LoculusofArchimedes.html"
+ class="Hyperlink">Loculus of Archimedes</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Stomachion.html"
+ class="Hyperlink">Stomachion</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CurryTriangle.html"
+ class="Hyperlink">Curry Triangle</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MoebiusStripDissection.html"
+ class="Hyperlink">M&#246;bius Strip Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Syntemachion.html"
+ class="Hyperlink">Syntemachion</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CylinderDissection.html"
+ class="Hyperlink">Cylinder Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MrsPerkinssQuilt.html"
+ class="Hyperlink">Mrs. Perkins's Quilt</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/T-Puzzle.html"
+ class="Hyperlink">T-Puzzle</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DehnInvariant.html"
+ class="Hyperlink">Dehn Invariant</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/No-TouchDissection.html"
+ class="Hyperlink">No-Touch Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Tangram.html"
+ class="Hyperlink">Tangram</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DiabolicalCube.html"
+ class="Hyperlink">Diabolical Cube</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Nowhere-NeatDissection.html"
+ class="Hyperlink">Nowhere-Neat Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TangramParadox.html"
+ class="Hyperlink">Tangram Paradox</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Dissection.html"
+ class="Hyperlink">Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Ostomachion.html"
+ class="Hyperlink">Ostomachion</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TorusDissection.html"
+ class="Hyperlink">Torus Dissection</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DissectionFallacy.html"
+ class="Hyperlink">Dissection Fallacy</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PerfectSquare.html"
+ class="Hyperlink">Perfect Square</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TriangleDissection.html"
+ class="Hyperlink">Triangle Dissection</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DissectionPuzzles.html"
+ class="Hyperlink">Dissection Puzzles</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PerfectSquareDissection.html"
+ class="Hyperlink">Perfect Square Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TriangleDissectionParadox.html"
+ class="Hyperlink">Triangle Dissection Pa...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Equidecomposable.html"
+ class="Hyperlink">Equidecomposable</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolyhedronDissection.html"
+ class="Hyperlink">Polyhedron Dissection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Wallace-Bolyai-GerwienTheorem.html"
+ class="Hyperlink">Wallace-Bolyai-Gerwien...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Eternity.html"
+ class="Hyperlink">Eternity</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ProjectivePlaneDissection.html"
+ class="Hyperlink">Projective Plane Disse...</a>
+  </td>
+  <td />
+ </tr>
+</table>
+
+<!-- End Body -->
+
+</div>
+<!--End main content -->
+												
+<!--Start resources content -->
+				<div id="resourcesContent">
+					<h1>Wolfram Web Resources</h1>
+					<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/mathematica/" target="_blank"><em>Mathematica</em>&nbsp;&raquo;</a></span>
+								<p>The #1 tool for creating Demonstrations and anything technical.</p>
+							</td>
+							<td>
+								<span class="title"><a href="http://www.wolframalpha.com/" target="_blank">Wolfram|Alpha&nbsp;&raquo;</a></span>
+								<p>Explore anything with the first computational knowledge engine.</p>
+							</td>
+							<td class="last">
+								<span class="title"><a href="http://demonstrations.wolfram.com/" target="_blank">Wolfram Demonstrations Project&nbsp;&raquo;</a></span>
+								<p>Explore thousands of free applications across science, mathematics, engineering, technology, business, art, finance, social sciences, and more.</p>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/cdf" target="_blank">Computable Document Format&nbsp;&raquo;</a></span>
+								<p>The format that makes Demonstrations (and any information) easy to share and interact with.</p>
+							</td>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/solutions/stem/" target="_blank">STEM initiative&nbsp;&raquo;</a></span>
+								<p>Programs &amp; resources for educators, schools &amp; students.</p>
+							</td>
+							<td class="last">
+								<span class="title"><a href="http://www.computerbasedmath.org/" target="_blank">Computerbasedmath.org&nbsp;&raquo;</a></span>
+								<p>Join the initiative for modernizing math education. </p>
+							</td>
+						</tr>
+					</table>
+				</div>	
+<!--End resources content -->
+
+<!--Start footer content -->
+				<div id="footer">
+					<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>	
+							<td><a href="/contact/"><img src="/images/footer/contact-icon.gif" alt="" title="" border="0" /> Contact the <em>MathWorld</em> Team</a></td>
+							<td class="copyright">&copy; 1999-2013 <a href="http://www.wolfram.com/" target="_blank">Wolfram Research, Inc.</a> | <a href="/about/terms.html">Terms of Use</a></td>
+						</tr>
+					</table>
+				</div>
+<!--End footer content -->
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,935 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Point-Set Topology -- from Wolfram MathWorld</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="DC.Creator" content="Weisstein, Eric W." />
+<meta name="DC.Description" content="" />
+<meta name="DC.Subject" scheme="MathWorld" content="Mathematics:Algebra" />
+<meta name="DC.Rights" content="Copyright 1999-2013 Wolfram Research, Inc.  See http://mathworld.wolfram.com/about/terms.html for a full terms of use statement." />
+<meta name="DC.Format" scheme="IMT" content="text/html" />
+<meta name="DC.Identifier" scheme="URI" content="http://mathworld.wolfram.com/Point-SetTopology.html" />
+<meta name="DC.Language" scheme="RFC3066" content="en" />
+<meta name="DC.Publisher" content="Wolfram Research, Inc." />
+<meta name="DC.Relation.IsPartOf" scheme="URI" content="http://mathworld.wolfram.com" />
+<meta name="DC.Type" scheme="DCMIType" content="Text" />
+<meta name="googlebot" content="noarchive" />
+<meta name="robots" content="noindex,follow" />
+<link rel="alternate" type="application/rss+xml" title="MathWorld Headline News" href="http://mathworld.wolfram.com/news/rss.xml" />
+<link rel="stylesheet" type="text/css" href="/css/mathworldv2.css" />
+<link rel="shortcut icon" href="/favicon_mathworld.png" type="image/png" />
+<script language="JavaScript" type="text/javascript" src="/common/javascript/menu.js"></script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-5677369-3']);
+  _gaq.push(['_setDomainName', 'none']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body>
+<table summary="" id="headerTable" width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td>
+				<div id="logo">
+<img src="/images/topbar/logo.png" alt="" usemap="#mwlogomap" />
+
+<map name="mwlogomap" id="mwlogomap">
+  <area shape="rect" coords="0,30,200,47" href="http://www.wolfram.com/mathematica/" alt="Built with Mathematica Technology" title="Built with Mathematica Technology" />
+  <area shape="rect" coords="0,0,617,30" href="/" alt="Wolfram MathWorld" title="Wolfram MathWorld" />
+</map>
+</div>
+			</td>
+			<td>
+				<div id="searchWrapper">
+					<form name="NavBarSearch" action="/search/" method="get" accept-charset="UTF-8" onsubmit=" if (checkForDefaultInput('query_1', 'Search MathWorld')) { return false; }">
+						<input id="search" class="searchboxsub" name="query" type="text" value="Search MathWorld" onfocus="initTextInput(this,'clear','Search MathWorld')" onblur="initTextInput(this,'setDefault','Search MathWorld')" />
+						<input type="image" src="/images/topbar/search-icon.png" id="search-icon" alt="Search" onclick="if (checkForDefaultInput('query_1', 'Search MathWorld')) { return false;} else {document.NavBarSearch.submit(); }" />
+					</form>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table summary="" id="pageTable" width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td class="leftcolumn">
+			<!--Start nav content -->
+<!-- Sidebar -->
+
+				<div id="navigation">
+					<div><a href="/topics/Algebra.html">Algebra</a></div>
+					<div><a href="/topics/AppliedMathematics.html">Applied Mathematics</a></div>
+					<div><a href="/topics/CalculusandAnalysis.html">Calculus and Analysis</a></div>
+					<div><a href="/topics/DiscreteMathematics.html">Discrete Mathematics</a></div>
+					<div><a href="/topics/FoundationsofMathematics.html">Foundations of Mathematics</a></div>
+					<div><a href="/topics/Geometry.html">Geometry</a></div>
+					<div><a href="/topics/HistoryandTerminology.html">History and Terminology</a></div>
+					<div><a href="/topics/NumberTheory.html">Number Theory</a></div>
+					<div><a href="/topics/ProbabilityandStatistics.html">Probability and Statistics</a></div>
+					<div><a href="/topics/RecreationalMathematics.html">Recreational Mathematics</a></div>
+					<div><a href="/topics/Topology.html">Topology</a></div>
+					<div class="subnav">
+						<div class="subnav-item">
+							<a href="/letters/">Alphabetical Index</a><br />
+							<a href="/topics/InteractiveEntries.html">Interactive Entries</a><br />
+							<a href="/cgi-bin/random.cgi">Random Entry</a><br />
+							<a href="/whatsnew/">New in <em>MathWorld</em></a>
+						</div>
+						<div class="subnav-item">
+							<a href="/classroom/"><em>MathWorld</em> Classroom</a>
+						</div>			
+						<div class="subnav-item">
+							<a href="/about/">About <em>MathWorld</em></a><br />
+							<a href="/contact/contribute.html">Contribute to <em>MathWorld</em></a><br />
+							<a href="/contact/">Send a Message to the Team</a>
+						</div>
+						<div class="subnav-item last">
+							<a href="http://www.amazon.com/exec/obidos/ASIN/1584883472/ref=nosim/weisstein-20" target="_blank"><em>MathWorld</em> Book</a>
+						</div>
+					</div>
+				</div>
+				<div id="credits">
+					<div class="links"><a href="http://www.wolfram.com/webresources.html" target="_blank" title="Wolfram Web Resources">Wolfram Web Resources&nbsp;&raquo;</a></div>
+					<div class="lastupdated">
+						<a href="/whatsnew/">13,134 entries</a><br />
+						<a href="/whatsnew/">Last updated: Sat Feb 16 2013</a>
+					</div>
+					<div class="author">Created, developed, and nurtured&nbsp;by&nbsp;<a href="http://mathworld.wolfram.com/about/author.html" class="authorlink" title="Created, developed, and nurtured by Eric Weisstein">Eric&nbsp;Weisstein</a> at <a href="http://www.wolfram.com/" target="_blank" class="companylink" title="Wolfram Research">Wolfram&nbsp;Research</a></div>
+				</div>
+
+<!-- End Sidebar -->
+
+				<!--End nav content -->
+			</td>
+			<td class="mainCell no-sidebar">
+				<div id="mainContent">
+
+<img src="/images/spacer.gif" width="700" height="1" alt="" />			
+<!--Start main content -->
+<div class="linktrail"><a href="/topics/Topology.html">Topology</a>&nbsp;&gt;&nbsp;<br /></div>
+<br />
+<h1>Point-Set Topology</h1>
+<!-- Begin Body -->
+<table summary=""
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    border="0"
+    id="directory">
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/0-Connected.html"
+ class="Hyperlink">0-Connected</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Contractible.html"
+ class="Hyperlink">Contractible</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Neighborhood.html"
+ class="Hyperlink">Neighborhood</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/1-Connected.html"
+ class="Hyperlink">1-Connected</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Convex.html"
+ class="Hyperlink">Convex</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Net.html"
+ class="Hyperlink">Net</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AffineHull.html"
+ class="Hyperlink">Affine Hull</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConvexCone.html"
+ class="Hyperlink">Convex Cone</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/One-PointCompactification.html"
+ class="Hyperlink">One-Point Compactifica...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AlmostEverywhereConvergence.html"
+ class="Hyperlink">Almost Everywhere Conv...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConvexFunction.html"
+ class="Hyperlink">Convex Function</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Open.html"
+ class="Hyperlink">Open</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ArcComponent.html"
+ class="Hyperlink">Arc Component</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConvexSet.html"
+ class="Hyperlink">Convex Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenBall.html"
+ class="Hyperlink">Open Ball</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Arcwise-Connected.html"
+ class="Hyperlink">Arcwise-Connected</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConvexityCoefficient.html"
+ class="Hyperlink">Convexity Coefficient</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenCover.html"
+ class="Hyperlink">Open Cover</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Basepoint.html"
+ class="Hyperlink">Basepoint</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CoveringMap.html"
+ class="Hyperlink">Covering Map</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenDisk.html"
+ class="Hyperlink">Open Disk</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BasisElement.html"
+ class="Hyperlink">Basis Element</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CoveringSpace.html"
+ class="Hyperlink">Covering Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenInterval.html"
+ class="Hyperlink">Open Interval</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Bicollared.html"
+ class="Hyperlink">Bicollared</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Dense.html"
+ class="Hyperlink">Dense</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenMap.html"
+ class="Hyperlink">Open Map</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BorelMeasure.html"
+ class="Hyperlink">Borel Measure</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DerivedSet.html"
+ class="Hyperlink">Derived Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenNeighborhood.html"
+ class="Hyperlink">Open Neighborhood</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BorelSet.html"
+ class="Hyperlink">Borel Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DimensionAxiom.html"
+ class="Hyperlink">Dimension Axiom</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OpenSet.html"
+ class="Hyperlink">Open Set</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BorelSigma-Algebra.html"
+ class="Hyperlink">Borel Sigma-Algebra</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DisconnectedSet.html"
+ class="Hyperlink">Disconnected Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OrderTopology.html"
+ class="Hyperlink">Order Topology</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BorelSpace.html"
+ class="Hyperlink">Borel Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DisconnectedSpace.html"
+ class="Hyperlink">Disconnected Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Path-Connected.html"
+ class="Hyperlink">Path-Connected</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Boundary.html"
+ class="Hyperlink">Boundary</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DiscreteFamily.html"
+ class="Hyperlink">Discrete Family</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Pathwise-Connected.html"
+ class="Hyperlink">Pathwise-Connected</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BoundaryMap.html"
+ class="Hyperlink">Boundary Map</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DiscreteSet.html"
+ class="Hyperlink">Discrete Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Point-SetTopology.html"
+ class="Hyperlink">Point-Set Topology</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BoundaryPoint.html"
+ class="Hyperlink">Boundary Point</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DiscreteTopology.html"
+ class="Hyperlink">Discrete Topology</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Polydisk.html"
+ class="Hyperlink">Polydisk</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BoundarySet.html"
+ class="Hyperlink">Boundary Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Disk.html"
+ class="Hyperlink">Disk</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PuncturedPlane.html"
+ class="Hyperlink">Punctured Plane</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Bounded.html"
+ class="Hyperlink">Bounded</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Domain.html"
+ class="Hyperlink">Domain</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PuncturedSet.html"
+ class="Hyperlink">Punctured Set</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BoundedfromAbove.html"
+ class="Hyperlink">Bounded from Above</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DomainInvarianceTheorem.html"
+ class="Hyperlink">Domain Invariance Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RamificationIndex.html"
+ class="Hyperlink">Ramification Index</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BoundedfromBelow.html"
+ class="Hyperlink">Bounded from Below</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Endpoint.html"
+ class="Hyperlink">Endpoint</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Region.html"
+ class="Hyperlink">Region</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BoundedSet.html"
+ class="Hyperlink">Bounded Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Extremals.html"
+ class="Hyperlink">Extremals</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RegularBorelMeasure.html"
+ class="Hyperlink">Regular Borel Measure</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CantorsDiscontinuum.html"
+ class="Hyperlink">Cantor's Discontinuum</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Fiber.html"
+ class="Hyperlink">Fiber</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ReinhardtDomain.html"
+ class="Hyperlink">Reinhardt Domain</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CaratheodorysFundamentalTheorem.html"
+ class="Hyperlink">Carath&#233;odory's Fundame...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/FirstCategory.html"
+ class="Hyperlink">First Category</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RelativeTopology.html"
+ class="Hyperlink">Relative Topology</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Clopen.html"
+ class="Hyperlink">Clopen</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Foliation.html"
+ class="Hyperlink">Foliation</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ResidualSet.html"
+ class="Hyperlink">Residual Set</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Closed.html"
+ class="Hyperlink">Closed</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/FoliationLeaf.html"
+ class="Hyperlink">Foliation Leaf</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SecondCountableTopology.html"
+ class="Hyperlink">Second Countable Topology</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ClosedBall.html"
+ class="Hyperlink">Closed Ball</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/GeneralizedDiameter.html"
+ class="Hyperlink">Generalized Diameter</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Semilocally1-Connected.html"
+ class="Hyperlink">Semilocally 1-Connected</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ClosedDisk.html"
+ class="Hyperlink">Closed Disk</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Half-ClosedInterval.html"
+ class="Hyperlink">Half-Closed Interval</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SemilocallySimplyConnected.html"
+ class="Hyperlink">Semilocally Simply Con...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ClosedMap.html"
+ class="Hyperlink">Closed Map</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Half-Space.html"
+ class="Hyperlink">Half-Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SeparationAxioms.html"
+ class="Hyperlink">Separation Axioms</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ClosedSet.html"
+ class="Hyperlink">Closed Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HausdorffAxioms.html"
+ class="Hyperlink">Hausdorff Axioms</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SetClosure.html"
+ class="Hyperlink">Set Closure</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Closure.html"
+ class="Hyperlink">Closure</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Heine-BorelTheorem.html"
+ class="Hyperlink">Heine-Borel Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Sigma-CompactTopologicalSpace.html"
+ class="Hyperlink">Sigma-Compact Topologi...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompactClosure.html"
+ class="Hyperlink">Compact Closure</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HellysTheorem.html"
+ class="Hyperlink">Helly's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SimplyConnected.html"
+ class="Hyperlink">Simply Connected</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompactConvergence.html"
+ class="Hyperlink">Compact Convergence</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HereditaryProperty.html"
+ class="Hyperlink">Hereditary Property</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Species.html"
+ class="Hyperlink">Species</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompactSet.html"
+ class="Hyperlink">Compact Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Heredity.html"
+ class="Hyperlink">Heredity</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/StarConvex.html"
+ class="Hyperlink">Star Convex</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompactSubset.html"
+ class="Hyperlink">Compact Subset</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Hopf-RinowTheorem.html"
+ class="Hyperlink">Hopf-Rinow Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Subanalytic.html"
+ class="Hyperlink">Subanalytic</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompactSupport.html"
+ class="Hyperlink">Compact Support</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HurwitzsRootTheorem.html"
+ class="Hyperlink">Hurwitz's Root Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Subbasis.html"
+ class="Hyperlink">Subbasis</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Compactification.html"
+ class="Hyperlink">Compactification</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Injection.html"
+ class="Hyperlink">Injection</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Surjection.html"
+ class="Hyperlink">Surjection</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Compactum.html"
+ class="Hyperlink">Compactum</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Interior.html"
+ class="Hyperlink">Interior</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/T2-SeparationAxiom.html"
+ class="Hyperlink">T_2-Separation Axiom</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompleteMetricSpace.html"
+ class="Hyperlink">Complete Metric Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Interval.html"
+ class="Hyperlink">Interval</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/T2-Space.html"
+ class="Hyperlink">T_2-Space</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompleteSpace.html"
+ class="Hyperlink">Complete Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LandauConstant.html"
+ class="Hyperlink">Landau Constant</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TietzesExtensionTheorem.html"
+ class="Hyperlink">Tietze's Extension The...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CompletelyRegularSpace.html"
+ class="Hyperlink">Completely Regular Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LebesgueCoveringDimension.html"
+ class="Hyperlink">Lebesgue Covering Dime...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TopologicalBasis.html"
+ class="Hyperlink">Topological Basis</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Completion.html"
+ class="Hyperlink">Completion</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LocallyCompact.html"
+ class="Hyperlink">Locally Compact</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TopologicalClosure.html"
+ class="Hyperlink">Topological Closure</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Concave.html"
+ class="Hyperlink">Concave</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LocallyConnected.html"
+ class="Hyperlink">Locally Connected</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TopologicallyTransitive.html"
+ class="Hyperlink">Topologically Transitive</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConeSet.html"
+ class="Hyperlink">Cone Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LocallyFiniteFamily.html"
+ class="Hyperlink">Locally Finite Family</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TopologistsSineCurve.html"
+ class="Hyperlink">Topologist's Sine Curve</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Connected.html"
+ class="Hyperlink">Connected</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LocallyPathwise-Connected.html"
+ class="Hyperlink">Locally Pathwise-Conne...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TrivialLoop.html"
+ class="Hyperlink">Trivial Loop</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConnectedComponent.html"
+ class="Hyperlink">Connected Component</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Lyusternik-SchnirelmannTheorem.html"
+ class="Hyperlink">Lyusternik-Schnirelman...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TrivialTopology.html"
+ class="Hyperlink">Trivial Topology</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConnectedimKleinen.html"
+ class="Hyperlink">Connected im Kleinen</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MackeysTheorem.html"
+ class="Hyperlink">Mackey's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Ultrametric.html"
+ class="Hyperlink">Ultrametric</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConnectedSet.html"
+ class="Hyperlink">Connected Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MagicGeometricConstants.html"
+ class="Hyperlink">Magic Geometric Constants</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Unbounded.html"
+ class="Hyperlink">Unbounded</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConnectedSpace.html"
+ class="Hyperlink">Connected Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MeagerSet.html"
+ class="Hyperlink">Meager Set</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/UnicoherentSpace.html"
+ class="Hyperlink">Unicoherent Space</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConnectedSurface.html"
+ class="Hyperlink">Connected Surface</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MergelyansTheorem.html"
+ class="Hyperlink">Mergelyan's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/UniformConvexity.html"
+ class="Hyperlink">Uniform Convexity</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConnectedTopology.html"
+ class="Hyperlink">Connected Topology</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MetricSpace.html"
+ class="Hyperlink">Metric Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/UnitInterval.html"
+ class="Hyperlink">Unit Interval</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ContinuousFunction.html"
+ class="Hyperlink">Continuous Function</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MetricTopology.html"
+ class="Hyperlink">Metric Topology</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ZariskiTopology.html"
+ class="Hyperlink">Zariski Topology</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ContinuousMap.html"
+ class="Hyperlink">Continuous Map</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MetrizableTopology.html"
+ class="Hyperlink">Metrizable Topology</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ZeroSet.html"
+ class="Hyperlink">Zero Set</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ContinuousSpace.html"
+ class="Hyperlink">Continuous Space</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MultiplyConnected.html"
+ class="Hyperlink">Multiply Connected</a>
+  </td>
+  <td />
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Contractibility.html"
+ class="Hyperlink">Contractibility</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MutuallySingular.html"
+ class="Hyperlink">Mutually Singular</a>
+  </td>
+  <td />
+ </tr>
+</table>
+
+<!-- End Body -->
+
+</div>
+<!--End main content -->
+												
+<!--Start resources content -->
+				<div id="resourcesContent">
+					<h1>Wolfram Web Resources</h1>
+					<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/mathematica/" target="_blank"><em>Mathematica</em>&nbsp;&raquo;</a></span>
+								<p>The #1 tool for creating Demonstrations and anything technical.</p>
+							</td>
+							<td>
+								<span class="title"><a href="http://www.wolframalpha.com/" target="_blank">Wolfram|Alpha&nbsp;&raquo;</a></span>
+								<p>Explore anything with the first computational knowledge engine.</p>
+							</td>
+							<td class="last">
+								<span class="title"><a href="http://demonstrations.wolfram.com/" target="_blank">Wolfram Demonstrations Project&nbsp;&raquo;</a></span>
+								<p>Explore thousands of free applications across science, mathematics, engineering, technology, business, art, finance, social sciences, and more.</p>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/cdf" target="_blank">Computable Document Format&nbsp;&raquo;</a></span>
+								<p>The format that makes Demonstrations (and any information) easy to share and interact with.</p>
+							</td>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/solutions/stem/" target="_blank">STEM initiative&nbsp;&raquo;</a></span>
+								<p>Programs &amp; resources for educators, schools &amp; students.</p>
+							</td>
+							<td class="last">
+								<span class="title"><a href="http://www.computerbasedmath.org/" target="_blank">Computerbasedmath.org&nbsp;&raquo;</a></span>
+								<p>Join the initiative for modernizing math education. </p>
+							</td>
+						</tr>
+					</table>
+				</div>	
+<!--End resources content -->
+
+<!--Start footer content -->
+				<div id="footer">
+					<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>	
+							<td><a href="/contact/"><img src="/images/footer/contact-icon.gif" alt="" title="" border="0" /> Contact the <em>MathWorld</em> Team</a></td>
+							<td class="copyright">&copy; 1999-2013 <a href="http://www.wolfram.com/" target="_blank">Wolfram Research, Inc.</a> | <a href="/about/terms.html">Terms of Use</a></td>
+						</tr>
+					</table>
+				</div>
+<!--End footer content -->
+</td>
+</tr>
+</table>
+</body>
+</html>

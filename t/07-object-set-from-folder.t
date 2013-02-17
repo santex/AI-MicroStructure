@@ -17,6 +17,8 @@ use AI::MicroStructure::ObjectParser;
 use Env qw(PWD);
 
 
+#print Dumper join "-", soundex(("rock'n'roll", 'rock and roll', 'rocknroll'));
+
 our $meta = AI::MicroStructure->new();
 our @t = $meta->structures;
 

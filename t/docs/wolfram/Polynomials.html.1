@@ -1,0 +1,899 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Polynomials -- from Wolfram MathWorld</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="DC.Creator" content="Weisstein, Eric W." />
+<meta name="DC.Description" content="" />
+<meta name="DC.Subject" scheme="MathWorld" content="Mathematics:Algebra" />
+<meta name="DC.Rights" content="Copyright 1999-2013 Wolfram Research, Inc.  See http://mathworld.wolfram.com/about/terms.html for a full terms of use statement." />
+<meta name="DC.Format" scheme="IMT" content="text/html" />
+<meta name="DC.Identifier" scheme="URI" content="http://mathworld.wolfram.com/Polynomials.html" />
+<meta name="DC.Language" scheme="RFC3066" content="en" />
+<meta name="DC.Publisher" content="Wolfram Research, Inc." />
+<meta name="DC.Relation.IsPartOf" scheme="URI" content="http://mathworld.wolfram.com" />
+<meta name="DC.Type" scheme="DCMIType" content="Text" />
+<meta name="googlebot" content="noarchive" />
+<meta name="robots" content="noindex,follow" />
+<link rel="alternate" type="application/rss+xml" title="MathWorld Headline News" href="http://mathworld.wolfram.com/news/rss.xml" />
+<link rel="stylesheet" type="text/css" href="/css/mathworldv2.css" />
+<link rel="shortcut icon" href="/favicon_mathworld.png" type="image/png" />
+<script language="JavaScript" type="text/javascript" src="/common/javascript/menu.js"></script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-5677369-3']);
+  _gaq.push(['_setDomainName', 'none']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body>
+<table summary="" id="headerTable" width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td>
+				<div id="logo">
+<img src="/images/topbar/logo.png" alt="" usemap="#mwlogomap" />
+
+<map name="mwlogomap" id="mwlogomap">
+  <area shape="rect" coords="0,30,200,47" href="http://www.wolfram.com/mathematica/" alt="Built with Mathematica Technology" title="Built with Mathematica Technology" />
+  <area shape="rect" coords="0,0,617,30" href="/" alt="Wolfram MathWorld" title="Wolfram MathWorld" />
+</map>
+</div>
+			</td>
+			<td>
+				<div id="searchWrapper">
+					<form name="NavBarSearch" action="/search/" method="get" accept-charset="UTF-8" onsubmit=" if (checkForDefaultInput('query_1', 'Search MathWorld')) { return false; }">
+						<input id="search" class="searchboxsub" name="query" type="text" value="Search MathWorld" onfocus="initTextInput(this,'clear','Search MathWorld')" onblur="initTextInput(this,'setDefault','Search MathWorld')" />
+						<input type="image" src="/images/topbar/search-icon.png" id="search-icon" alt="Search" onclick="if (checkForDefaultInput('query_1', 'Search MathWorld')) { return false;} else {document.NavBarSearch.submit(); }" />
+					</form>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table summary="" id="pageTable" width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td class="leftcolumn">
+			<!--Start nav content -->
+<!-- Sidebar -->
+
+				<div id="navigation">
+					<div><a href="/topics/Algebra.html">Algebra</a></div>
+					<div><a href="/topics/AppliedMathematics.html">Applied Mathematics</a></div>
+					<div><a href="/topics/CalculusandAnalysis.html">Calculus and Analysis</a></div>
+					<div><a href="/topics/DiscreteMathematics.html">Discrete Mathematics</a></div>
+					<div><a href="/topics/FoundationsofMathematics.html">Foundations of Mathematics</a></div>
+					<div><a href="/topics/Geometry.html">Geometry</a></div>
+					<div><a href="/topics/HistoryandTerminology.html">History and Terminology</a></div>
+					<div><a href="/topics/NumberTheory.html">Number Theory</a></div>
+					<div><a href="/topics/ProbabilityandStatistics.html">Probability and Statistics</a></div>
+					<div><a href="/topics/RecreationalMathematics.html">Recreational Mathematics</a></div>
+					<div><a href="/topics/Topology.html">Topology</a></div>
+					<div class="subnav">
+						<div class="subnav-item">
+							<a href="/letters/">Alphabetical Index</a><br />
+							<a href="/topics/InteractiveEntries.html">Interactive Entries</a><br />
+							<a href="/cgi-bin/random.cgi">Random Entry</a><br />
+							<a href="/whatsnew/">New in <em>MathWorld</em></a>
+						</div>
+						<div class="subnav-item">
+							<a href="/classroom/"><em>MathWorld</em> Classroom</a>
+						</div>			
+						<div class="subnav-item">
+							<a href="/about/">About <em>MathWorld</em></a><br />
+							<a href="/contact/contribute.html">Contribute to <em>MathWorld</em></a><br />
+							<a href="/contact/">Send a Message to the Team</a>
+						</div>
+						<div class="subnav-item last">
+							<a href="http://www.amazon.com/exec/obidos/ASIN/1584883472/ref=nosim/weisstein-20" target="_blank"><em>MathWorld</em> Book</a>
+						</div>
+					</div>
+				</div>
+				<div id="credits">
+					<div class="links"><a href="http://www.wolfram.com/webresources.html" target="_blank" title="Wolfram Web Resources">Wolfram Web Resources&nbsp;&raquo;</a></div>
+					<div class="lastupdated">
+						<a href="/whatsnew/">13,134 entries</a><br />
+						<a href="/whatsnew/">Last updated: Sat Feb 16 2013</a>
+					</div>
+					<div class="author">Created, developed, and nurtured&nbsp;by&nbsp;<a href="http://mathworld.wolfram.com/about/author.html" class="authorlink" title="Created, developed, and nurtured by Eric Weisstein">Eric&nbsp;Weisstein</a> at <a href="http://www.wolfram.com/" target="_blank" class="companylink" title="Wolfram Research">Wolfram&nbsp;Research</a></div>
+				</div>
+
+<!-- End Sidebar -->
+
+				<!--End nav content -->
+			</td>
+			<td class="mainCell no-sidebar">
+				<div id="mainContent">
+
+<img src="/images/spacer.gif" width="700" height="1" alt="" />			
+<!--Start main content -->
+<div class="linktrail"><a href="/topics/Algebra.html">Algebra</a>&nbsp;&gt;&nbsp;<br /></div>
+<br />
+<h1>Polynomials</h1>
+<!-- Begin Body -->
+<table summary=""
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    border="0"
+    id="directory">
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AbelsIrreducibilityTheorem.html"
+ class="Hyperlink">Abel's Irreducibility...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/InvertiblePolynomial.html"
+ class="Hyperlink">Invertible Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialRoots.html"
+ class="Hyperlink">Polynomial Roots</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AbelsLemma.html"
+ class="Hyperlink">Abel's Lemma</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/IrreduciblePolynomial.html"
+ class="Hyperlink">Irreducible Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialSequence.html"
+ class="Hyperlink">Polynomial Sequence</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AbelsTheorem.html"
+ class="Hyperlink">Abel's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/IsobaricPolynomial.html"
+ class="Hyperlink">Isobaric Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialSpan.html"
+ class="Hyperlink">Polynomial Span</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AdditivePolynomial.html"
+ class="Hyperlink">Additive Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/JensenDisk.html"
+ class="Hyperlink">Jensen Disk</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PowerPolynomial.html"
+ class="Hyperlink">Power Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AdomianPolynomial.html"
+ class="Hyperlink">Adomian Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/JensenPolynomial.html"
+ class="Hyperlink">Jensen Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PrimeDivisor.html"
+ class="Hyperlink">Prime Divisor</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/AlgebraicElement.html"
+ class="Hyperlink">Algebraic Element</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/JensensTheorem.html"
+ class="Hyperlink">Jensen's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PrimitivePart.html"
+ class="Hyperlink">Primitive Part</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BeauzamyandDegotsIdentity.html"
+ class="Hyperlink">Beauzamy and D&#233;got's I...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/KacFormula.html"
+ class="Hyperlink">Kac Formula</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PrimitivePolynomial.html"
+ class="Hyperlink">Primitive Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Berlekamp-ZassenhausAlgorithm.html"
+ class="Hyperlink">Berlekamp-Zassenhaus A...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/KernelPolynomial.html"
+ class="Hyperlink">Kernel Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/QuadraticPolynomial.html"
+ class="Hyperlink">Quadratic Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BernsteinsInequality.html"
+ class="Hyperlink">Bernstein's Inequality</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/KroneckersAlgorithm.html"
+ class="Hyperlink">Kronecker's Algorithm</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Quantic.html"
+ class="Hyperlink">Quantic</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BernsteinsPolynomialTheorem.html"
+ class="Hyperlink">Bernstein's Polynomial...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/KroneckersPolynomialTheorem.html"
+ class="Hyperlink">Kronecker's Polynomial...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/QuarticEquation.html"
+ class="Hyperlink">Quartic Equation</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BieberbachConjecture.html"
+ class="Hyperlink">Bieberbach Conjecture</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LagrangeResolvent.html"
+ class="Hyperlink">Lagrange Resolvent</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/QuarticPolynomial.html"
+ class="Hyperlink">Quartic Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Binomial.html"
+ class="Hyperlink">Binomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Landau-MignotteBound.html"
+ class="Hyperlink">Landau-Mignotte Bound</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/QuinticEquation.html"
+ class="Hyperlink">Quintic Equation</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BivariatePolynomial.html"
+ class="Hyperlink">Bivariate Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LaurentPolynomial.html"
+ class="Hyperlink">Laurent Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RandomPolynomial.html"
+ class="Hyperlink">Random Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BouniakowskyConjecture.html"
+ class="Hyperlink">Bouniakowsky Conjecture</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LongMultiplication.html"
+ class="Hyperlink">Long Multiplication</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RationalFunction.html"
+ class="Hyperlink">Rational Function</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Bring-JerrardQuinticForm.html"
+ class="Hyperlink">Bring-Jerrard Quintic...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LucassRootTheorem.html"
+ class="Hyperlink">Lucas's Root Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RationalPolynomial.html"
+ class="Hyperlink">Rational Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BringQuinticForm.html"
+ class="Hyperlink">Bring Quintic Form</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/LukacsTheorem.html"
+ class="Hyperlink">Luk&#225;cs Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RationalPolynomialFunction.html"
+ class="Hyperlink">Rational Polynomial Fu...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/BuchbergersAlgorithm.html"
+ class="Hyperlink">Buchberger's Algorithm</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MacdonaldPolynomial.html"
+ class="Hyperlink">Macdonald Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RationalZeroTheorem.html"
+ class="Hyperlink">Rational Zero Theorem</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ChebyshevDeviation.html"
+ class="Hyperlink">Chebyshev Deviation</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MasonsTheorem.html"
+ class="Hyperlink">Mason's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RealPolynomial.html"
+ class="Hyperlink">Real Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Christoffel-DarbouxFormula.html"
+ class="Hyperlink">Christoffel-Darboux Fo...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Masser-GramainConstant.html"
+ class="Hyperlink">Masser-Gramain Constant</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RealVariable.html"
+ class="Hyperlink">Real Variable</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Christoffel-DarbouxIdentity.html"
+ class="Hyperlink">Christoffel-Darboux Id...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MatrixPolynomial.html"
+ class="Hyperlink">Matrix Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ReciprocalPolynomial.html"
+ class="Hyperlink">Reciprocal Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ChristoffelFormula.html"
+ class="Hyperlink">Christoffel Formula</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MignotteBound.html"
+ class="Hyperlink">Mignotte Bound</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RenyisPolynomial.html"
+ class="Hyperlink">R&#233;nyi's Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Coefficient.html"
+ class="Hyperlink">Coefficient</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MilinConjecture.html"
+ class="Hyperlink">Milin Conjecture</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ResolventCubic.html"
+ class="Hyperlink">Resolvent Cubic</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ComplexPolynomial.html"
+ class="Hyperlink">Complex Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MinimaxPolynomial.html"
+ class="Hyperlink">Minimax Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Resultant.html"
+ class="Hyperlink">Resultant</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ComplexVariable.html"
+ class="Hyperlink">Complex Variable</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MonicPolynomial.html"
+ class="Hyperlink">Monic Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RootDraggingTheorem.html"
+ class="Hyperlink">Root Dragging Theorem</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ConstantPolynomial.html"
+ class="Hyperlink">Constant Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Monomial.html"
+ class="Hyperlink">Monomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/RootSeparation.html"
+ class="Hyperlink">Root Separation</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Content.html"
+ class="Hyperlink">Content</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MonomialOrder.html"
+ class="Hyperlink">Monomial Order</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SchinzelsHypothesis.html"
+ class="Hyperlink">Schinzel's Hypothesis</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CubicEquation.html"
+ class="Hyperlink">Cubic Equation</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Multinomial.html"
+ class="Hyperlink">Multinomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SchoenemannsTheorem.html"
+ class="Hyperlink">Sch&#246;nemann's Theorem</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CubicFormula.html"
+ class="Hyperlink">Cubic Formula</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MultivariatePolynomial.html"
+ class="Hyperlink">Multivariate Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SendovConjecture.html"
+ class="Hyperlink">Sendov Conjecture</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/CubicPolynomial.html"
+ class="Hyperlink">Cubic Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MultivariateResultant.html"
+ class="Hyperlink">Multivariate Resultant</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SexticEquation.html"
+ class="Hyperlink">Sextic Equation</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/deMoivresQuintic.html"
+ class="Hyperlink">de Moivre's Quintic</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/MuentzsTheorem.html"
+ class="Hyperlink">M&#252;ntz's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SparsePolynomialSquare.html"
+ class="Hyperlink">Sparse Polynomial Square</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DescartesSignRule.html"
+ class="Hyperlink">Descartes' Sign Rule</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Newton-GirardFormulas.html"
+ class="Hyperlink">Newton-Girard Formulas</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/StablePolynomial.html"
+ class="Hyperlink">Stable Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/DisconnectedForm.html"
+ class="Hyperlink">Disconnected Form</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/NormalPolynomial.html"
+ class="Hyperlink">Normal Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/StableType.html"
+ class="Hyperlink">Stable Type</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/EisensteinsIrreducibilityCriterion.html"
+ class="Hyperlink">Eisenstein's Irreducib...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OctahedralEquation.html"
+ class="Hyperlink">Octahedral Equation</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Subresultant.html"
+ class="Hyperlink">Subresultant</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Eliminant.html"
+ class="Hyperlink">Eliminant</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/OrthogonalPolynomials.html"
+ class="Hyperlink">Orthogonal Polynomials</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Swinnerton-DyerPolynomial.html"
+ class="Hyperlink">Swinnerton-Dyer Polyno...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Factorization.html"
+ class="Hyperlink">Factorization</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Polynomial.html"
+ class="Hyperlink">Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SylvesterMatrix.html"
+ class="Hyperlink">Sylvester Matrix</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/FundamentalContinuityTheorem.html"
+ class="Hyperlink">Fundamental Continuity...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialDegree.html"
+ class="Hyperlink">Polynomial Degree</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SymmetricPolynomial.html"
+ class="Hyperlink">Symmetric Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/FundamentalTheoremofAlgebra.html"
+ class="Hyperlink">Fundamental Theorem of...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialDiscriminant.html"
+ class="Hyperlink">Polynomial Discriminant</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/SyntheticDivision.html"
+ class="Hyperlink">Synthetic Division</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/GausssPolynomialTheorem.html"
+ class="Hyperlink">Gauss's Polynomial The...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialEquation.html"
+ class="Hyperlink">Polynomial Equation</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Term.html"
+ class="Hyperlink">Term</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/GausssRootTheorem.html"
+ class="Hyperlink">Gauss's Root Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialFactorTheorem.html"
+ class="Hyperlink">Polynomial Factor Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TetrahedralEquation.html"
+ class="Hyperlink">Tetrahedral Equation</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/GroebnerBasis.html"
+ class="Hyperlink">Gr&#246;bner Basis</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialFactorization.html"
+ class="Hyperlink">Polynomial Factorization</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Trinomial.html"
+ class="Hyperlink">Trinomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/GroebnerWalk.html"
+ class="Hyperlink">Gr&#246;bner Walk</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialForm.html"
+ class="Hyperlink">Polynomial Form</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/TschirnhausenTransformation.html"
+ class="Hyperlink">Tschirnhausen Transfor...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HarmonicDecomposition.html"
+ class="Hyperlink">Harmonic Decomposition</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialHeight.html"
+ class="Hyperlink">Polynomial Height</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Ultraradical.html"
+ class="Hyperlink">Ultraradical</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HenselLifting.html"
+ class="Hyperlink">Hensel Lifting</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialIdentity.html"
+ class="Hyperlink">Polynomial Identity</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/UnimodalPolynomial.html"
+ class="Hyperlink">Unimodal Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HilbertsTheorem.html"
+ class="Hyperlink">Hilbert's Theorem</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialMap.html"
+ class="Hyperlink">Polynomial Map</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/UnivariatePolynomial.html"
+ class="Hyperlink">Univariate Polynomial</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HomogeneousPolynomial.html"
+ class="Hyperlink">Homogeneous Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialMatrix.html"
+ class="Hyperlink">Polynomial Matrix</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Unknown.html"
+ class="Hyperlink">Unknown</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HornersRule.html"
+ class="Hyperlink">Horner's Rule</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialNorm.html"
+ class="Hyperlink">Polynomial Norm</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Variable.html"
+ class="Hyperlink">Variable</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/HurwitzPolynomial.html"
+ class="Hyperlink">Hurwitz Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialOrder.html"
+ class="Hyperlink">Polynomial Order</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/VietasFormulas.html"
+ class="Hyperlink">Vieta's Formulas</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/IcosahedralEquation.html"
+ class="Hyperlink">Icosahedral Equation</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialQuotient.html"
+ class="Hyperlink">Polynomial Quotient</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/VietasSubstitution.html"
+ class="Hyperlink">Vieta's Substitution</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Indeterminate.html"
+ class="Hyperlink">Indeterminate</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialRemainder.html"
+ class="Hyperlink">Polynomial Remainder</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/WallissConstant.html"
+ class="Hyperlink">Wallis's Constant</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/IntegerPolynomial.html"
+ class="Hyperlink">Integer Polynomial</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialRemainderTheorem.html"
+ class="Hyperlink">Polynomial Remainder T...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Zassenhaus-BerlekampAlgorithm.html"
+ class="Hyperlink">Zassenhaus-Berlekamp A...</a>
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/Integer-RepresentingPolynomial.html"
+ class="Hyperlink">Integer-Representing P...</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/PolynomialRing.html"
+ class="Hyperlink">Polynomial Ring</a>
+  </td>
+  <td>
+   <img src="/images/entries/file.gif" width="9" height="8" border="0"  alt="" /> <a href="/ZeroPolynomial.html"
+ class="Hyperlink">Zero Polynomial</a>
+  </td>
+ </tr>
+</table>
+
+<!-- End Body -->
+
+</div>
+<!--End main content -->
+												
+<!--Start resources content -->
+				<div id="resourcesContent">
+					<h1>Wolfram Web Resources</h1>
+					<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/mathematica/" target="_blank"><em>Mathematica</em>&nbsp;&raquo;</a></span>
+								<p>The #1 tool for creating Demonstrations and anything technical.</p>
+							</td>
+							<td>
+								<span class="title"><a href="http://www.wolframalpha.com/" target="_blank">Wolfram|Alpha&nbsp;&raquo;</a></span>
+								<p>Explore anything with the first computational knowledge engine.</p>
+							</td>
+							<td class="last">
+								<span class="title"><a href="http://demonstrations.wolfram.com/" target="_blank">Wolfram Demonstrations Project&nbsp;&raquo;</a></span>
+								<p>Explore thousands of free applications across science, mathematics, engineering, technology, business, art, finance, social sciences, and more.</p>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/cdf" target="_blank">Computable Document Format&nbsp;&raquo;</a></span>
+								<p>The format that makes Demonstrations (and any information) easy to share and interact with.</p>
+							</td>
+							<td>
+								<span class="title"><a href="http://www.wolfram.com/solutions/stem/" target="_blank">STEM initiative&nbsp;&raquo;</a></span>
+								<p>Programs &amp; resources for educators, schools &amp; students.</p>
+							</td>
+							<td class="last">
+								<span class="title"><a href="http://www.computerbasedmath.org/" target="_blank">Computerbasedmath.org&nbsp;&raquo;</a></span>
+								<p>Join the initiative for modernizing math education. </p>
+							</td>
+						</tr>
+					</table>
+				</div>	
+<!--End resources content -->
+
+<!--Start footer content -->
+				<div id="footer">
+					<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>	
+							<td><a href="/contact/"><img src="/images/footer/contact-icon.gif" alt="" title="" border="0" /> Contact the <em>MathWorld</em> Team</a></td>
+							<td class="copyright">&copy; 1999-2013 <a href="http://www.wolfram.com/" target="_blank">Wolfram Research, Inc.</a> | <a href="/about/terms.html">Terms of Use</a></td>
+						</tr>
+					</table>
+				</div>
+<!--End footer content -->
+</td>
+</tr>
+</table>
+</body>
+</html>

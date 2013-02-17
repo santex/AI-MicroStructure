@@ -13,25 +13,26 @@
 
 
   our $c = AI::MicroStructure::Context->new(@ARGV);
-      $c->retrieveIndex($PWD."/t/docs"); #"/home/santex/data-hub/data-hub" structures=0 text=1 json=1
+      $c->retrieveIndex();#"home/santex/data-hub/data-hub" structures=0 text=1 json=1
 
 
 
      my $style = {};
-        $style->{explicit}  = 0;
+        $style->{explicit}  = 1;
   printf("\ndoing %s\n\n",$_) && ok($c->simpleMixedSearch($style,$_)) && ok($c->play($style,$_))   for
-   qw(ion planet matter atom tan log algebra mathematics );
+   qw(point vector polar symbol algebra math);
 
 
   $style->{explicit}  = 1;
 
-  foreach my $aret (qw(planet matter antimatter)){
+  foreach my $aret (qw(point vector polar symbol)){
   printf("\ndoing %s\n\n",$aret) && ok(print Dumper $c->intersect($style,$aret));
   # for
    #qw(tan log number mathematics exponent exponential quad);
   }
-  #printf("\ndoing %s\n\n",$_) && ok(print Dumper $c->similar($style,$_)) for
-  # qw(Algebra Tan Log);
+  $style->{explicit}  = 1;
+  printf("\ndoing %s\n\n",$_) && ok(print Dumper $c->similar($style,$_)) for
+   qw(point vector polar symbol);
 
   #p @out;
 
