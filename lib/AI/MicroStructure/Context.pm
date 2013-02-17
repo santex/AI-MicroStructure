@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 package AI::MicroStructure::Context;
 use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
@@ -6,6 +7,10 @@ require Carp;
 require Symbol;
 require Exporter;
 require DynaLoader;
+use Data::Printer;
+use Data::Dumper;
+use Search::ContextGraph;
+use Statistics::Basic qw(:all);
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -26,10 +31,6 @@ my $Table = $Class . '::';  ##  This class's symbol table
 my $Count = 0;  ##  Counter for generating unique names for all locations
 my $Alive = 1;  ##  Flag for disabling auto-dump during global destruction
 
-  *print  = \&PRINT;        ##  Define public aliases for internal methods
-  *printf = \&PRINTF;
-  *read   = \&READLINE;
-
 sub _usage_
 {
     my($text) = @_;
@@ -37,20 +38,232 @@ sub _usage_
     Carp::croak("Usage: $text");
 }
 
-sub tie
-{
 
-    my($location,$filehandle) = @_;
+sub new {
+   my ( $class, @tools ) = ( @_ );
 
-    &_usage_('$location->tie( [ "FH" | *FH | \*FH | *{FH} | \*{FH} | $fh ] );')
-      if ((@_ != 2) || !ref($_[0]));
 
-    $filehandle =~ s/^\*//;
-    $filehandle = Symbol::qualify($filehandle, caller);
-    no strict "refs";
-    tie(*{$filehandle}, $Class, $location);
-    use strict "refs";
+  my $self = bless {tools => @_ ,
+                    micro => AI::MicroStructure->new(),
+                    graph => {content=>Search::ContextGraph->new()}}, $class;
+
+    $self->{structures} = [$self->{micro}->structures];
+
+    return $self;
+
 }
 
+
+
+sub retrieveIndex {
+
+    my $self = shift;
+    my $in = shift;
+
+    if(!$in) {
+
+    Carp::croak("Usage: provide path") unless($self->{micro}->{state}->{path}->{"cwd/structures"});
+
+    $in = $self->{micro}->{state}->{path}->{"cwd/structures"}  unless($in);
+    }
+
+    $self->{graph}->{content}  =$self->{graph}->{content}->load_from_dir($in);
+
+#    $self->{graph}->{content}  = $self->retrieve($in);
+   #$g->retrieve($in);
+
+
+  }
+
+sub storeIndex {
+
+    my $self = shift;
+    my $in = shift;
+    $in = "stored.cng"  unless($in);
+
+    $self->{graph}->{content}->store( $in );
+
+  }
+
+
+
+
+  sub training_docs {
+
+
+    my $self = shift;
+
+    my ($i,$prop) = ();
+
+    my $cat={};
+    foreach my $th (@{$self->{structures}})
+    {
+
+     $prop = sprintf(`micro  $th   all`);
+
+     $cat->{sprintf("%s",$th)}={categories => [$th],content =>$prop};
+
+      $i++;
+    }
+
+    return $cat;
+  }
+
+
+
+  sub play {
+
+    my $self = shift;
+
+    my ($style,$in) = @_;
+
+    $style->{$in}->{structs} = [$self->{graph}->{content}->search($self->metaArg($in,$style))];
+
+    return $style;
+
+  };
+
+  sub metaArg {
+
+    my $self = shift;
+    my $in = shift;
+    my $style  = shift;
+
+    my @metaArg = ();
+
+    $style->{explicit} = 0 unless($style->{explicit});
+
+    return split(" ",$style->{explicit} ? $in : `micro all $in`);
+
+
+  }
+
+
+  sub getOverAvg {
+
+    my $self = shift;
+
+    my $style  = shift;
+
+    my ($payload) = @_;
+
+    my @files = keys %$payload;
+    my @scores = values %$payload;
+    my $avgscrore= mean(@scores);
+
+
+     foreach my $file ( sort { $a cmp $b } @files ) {
+        printf("%s=%s\n",$file,
+                         $payload->{$file})
+                         unless(($payload->{$file}*$payload->{modifier})<=$avgscrore);
+
+     }
+  }
+
+sub intersect {
+
+      my $self = shift;
+
+      my ($style,$in) = @_;
+
+      my @in = $self->metaArg($in,$style);
+
+      return [$self->{graph}->{content}->intersection( terms => [@in] )];
+
+
+  }
+
+
+sub similar {
+
+
+    my $self = shift;
+
+    my ($style,$in) = @_;
+
+
+    my @in = $self->metaArg($in,$style);
+
+    my @ranked_docs =  $self->{graph}->{content}->simple_search(@in);
+
+    return [$self->{graph}->{content}->find_similar(@ranked_docs)];
+
+ #   return @in;
+
+  }
+
+  sub simpleMixedSearch {
+
+
+
+    my $self = shift;
+
+    my ($style,$in) = @_;
+
+    my @in = $self->metaArg($in,$style);
+
+    my @ranked_docs =  $self->{graph}->{content}->simple_search(@in);
+
+
+    p @ranked_docs;
+
+    my( $docs, $words ) =$self->{graph}->{content}->mixed_search( {documents => [@ranked_docs],
+                                    terms => [@in]
+                               } );
+
+
+    p $docs;
+    p $words;
+
+
+    $words->{modifier} = 0.1;
+    $docs->{modifier} = 0.1;
+
+    $self->getOverAvg($words);
+    $self->getOverAvg($docs);
+
+    return 1;
+  }
+
+
 1;
+
+
+__DATA__
+
+ $check->{"step-1"}->{"intersect animal snake dinosaur "} = [$g->intersection( terms => ['snake','animal'] )];
+
+
+
+
+
+#   $check->{"step-3"}->{"local-animal-concepts"}->{"snake-docs-having-dinosaur"} = $docs;
+
+
+#    p $check;
+
+
+  print Dumper $c->play($_,{explicit=>1,
+                            unglue=>0}) for qw(animal snake dinosaur);
+
+
+
+  p $c;
+
+
+print Dumper @{$g->mixed_search( {
+                                terms => [ 'snake', 'pony' ]
+                            )};
+
+  ( $docs, $words ) = $g->find_similar($docs);
+
+print Dumper ( $docs, $words ) ;
+
+
+# my @ranked_docs =  $g->( terms => ['biology'] );
+ #print Dumper @ranked_docs ;
+
+
+
+
 
