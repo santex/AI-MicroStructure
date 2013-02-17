@@ -33,6 +33,13 @@ sub _init_test_data
     }
 }
 
+#TODO
+#
+# match score too
+# building hash with topics keys
+# to decide when use topic regex in get_topic
+#
+
 _init_test_data();
 my @links = get_topics($file,());
 is_deeply(\@links,
@@ -41,16 +48,31 @@ is_deeply(\@links,
 
 my @all_links = ();
 for (@links) {
+    say;
     push @all_links, get_topics($_,@links);
+    printf "\t%s\n", $_ for (@all_links);
 }
 
 is_deeply(\@all_links,
           \@second_stage_expected,
           qq/second stage done/);
 
+
+# my @tmp = (@links, @all_links);
+# my @content_files = ();
+# p $all_links[0];
+# @content_files = get_topics($all_links[0],@tmp);
+# p @content_files; 
+# for (@all_links) {
+#     push @content_files, get_topics($_,@all_links);
+# }
+
 # 
-# p @all_links;
-# `wget --user-agent=Mozilla5/0 $_` for (@links);
+# say $_  for (@all_links);
+# for (@all_links) {
+#     $_ = $url.$_; 
+#     `wget --user-agent=Mozilla5/0 $_`;
+# }
 
 done_testing();
 

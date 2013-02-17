@@ -15,7 +15,6 @@ our @EXPORT = qw(
                  make_request
                 );
 
-
 my $url = "http://mathworld.wolfram.com/";
 
 sub get_topics
