@@ -79,8 +79,9 @@ my $cont = {};
  foreach(@{$pdf->{rows}}) {
    foreach my $l(@{$_->{value}}){
 
-
-    $cc->{$l} = 1 unless($l!~ m/^http.*.pdf$/i);
+    if($l){
+      $cc->{$l} = 1 unless($l!~ m/^http.*.pdf$/i);
+    }
   }
 }
 
@@ -97,7 +98,9 @@ my $cont = {};
 
  foreach(@{$img->{rows}}) {
    foreach my $l(@{$_->{value}}){
-    $cc->{$l} = 1 unless($l!~ m/upload.*.(png|jpg|gif|svg|jpeg)$/i);
+     if($l){
+      $cc->{$l} = 1 unless($l!~ m/upload.*.(png|jpg|gif|svg|jpeg)$/i);
+     }
   }
 }
 
@@ -113,15 +116,15 @@ $res = $ua->get(sprintf('%s/%s/_design/base/_view/audio?reduce=false&start_key="
 
  foreach(@{$media->{rows}}) {
    foreach my  $l  (@{$_->{value}}){
-    $cc->{$l} = 1 unless($l!~ m/upload.*.(ogg|avi|mpg)$/i);
+     if($l){
+      $cc->{$l} = 1 unless($l!~ m/upload.*.(ogg|avi|mpg)$/i);
+     }
   }
 }
 
 
 
-return  {set=>\@all,kv=>keys %$cc};
-
-#return @all;
+return {set=>[@all],kv=>keys %$cc};
 
 
 }
@@ -153,11 +156,11 @@ sub printer {
      my $data = getAll($msg);
 
     my @data = @{$data->{set}};
-     
 
-     $cmd->{q} = join(" ",@{$data->{set}});
 
-     $cmd->{action} = [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g; $_={neighbour => $a[0][1], spawn => $a[0][0]}} split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq`)];
+     $cmd->{q} = join(" ",@data);
+
+     $cmd->{action} = [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g; $_={neighbour => $a[0][1], spawn => $a[0][0]}} split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq --limit 100`)];
 
 
 
@@ -177,13 +180,14 @@ my $server = Net::Async::WebSocket::Server->new(
    on_client => sub {
       my ( undef, $client ) = @_;
       my $list;
+
       $client->configure(
          on_frame => sub {
             my ( $self, $frame ) = @_;
-            $self->{frame} = $frame;
 
             $list = printer($frame);
-            $self->send_frame( $list );
+            my %args = (max_payload_size=>9999999,buffer=> $list);
+            $self->send_frame(%args);
 
          },
       );
@@ -198,6 +202,7 @@ $server->listen(
    family => "inet",
    service => $PORT,
    ip=>"127.0.0.1",
+
    on_listen => sub { print Dumper "Cannot listen - ",$_[-1];  },
    on_resolve => sub { print Dumper "Cannot resolve - ",$_[-1];},
    on_listen_error => sub { die "Cannot listen - $_[-1]" },
