@@ -229,41 +229,43 @@ sub similar {
 1;
 
 
-__DATA__
+=head1 NAME
 
- $check->{"step-1"}->{"intersect animal snake dinosaur "} = [$g->intersection( terms => ['snake','animal'] )];
+  AI::MicroStructure::Context
 
+=head1 DESCRIPTION
 
+  Context driven scoreing
 
+=head1 SYNOPSIS
 
+  ~$ micro new world
 
-#   $check->{"step-3"}->{"local-animal-concepts"}->{"snake-docs-having-dinosaur"} = $docs;
+  ~$ micro structures
 
+  ~$ micro any 2
 
-#    p $check;
+  ~$ micro drop world
 
+  ~$ micro
 
-  print Dumper $c->play($_,{explicit=>1,
-                            unglue=>0}) for qw(animal snake dinosaur);
+=head1 AUTHOR
 
+  Hagen Geissler <santex@cpan.org>
 
+=head1 COPYRIGHT AND LICENCE
 
-  p $c;
+  Hagen Geissler <santex@cpan.org>
 
+=head1 SUPPORT AND DOCUMENTATION
 
-print Dumper @{$g->mixed_search( {
-                                terms => [ 'snake', 'pony' ]
-                            )};
+ [sample using concepts](http://quantup.com)
 
-  ( $docs, $words ) = $g->find_similar($docs);
-
-print Dumper ( $docs, $words ) ;
-
-
-# my @ranked_docs =  $g->( terms => ['biology'] );
- #print Dumper @ranked_docs ;
-
-
+ [PDF info on my works](https://github.com/santex)
 
 
+=head1 SEE ALSO
 
+  AI-MicroStructure
+
+=cut

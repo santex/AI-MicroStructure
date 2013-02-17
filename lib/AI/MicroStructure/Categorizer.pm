@@ -1,4 +1,4 @@
-#!/usr/bin/perl	-W
+#!/usr/bin/perl -W
 
 package AI::MicroStructure::Categorizer;
 use strict;
@@ -63,13 +63,13 @@ sub initialize {
 sub trim
 {
   my $self = shift;
-	my $string = shift;
+  my $string = shift;
   $string =  "" unless  $string;
-	$string =~ s/^\s+//;
-	$string =~ s/\s+$//;
-	$string =~ s/\t//;
-	$string =~ s/^\s//;
-	return $string;
+  $string =~ s/^\s+//;
+  $string =~ s/\s+$//;
+  $string =~ s/\t//;
+  $string =~ s/^\s//;
+  return $string;
 }
 
 
@@ -264,15 +264,15 @@ sub perform_standard_tests {
   my $docs;
   foreach my $cat(keys %$chaps) {
   $docs->{$cat} = {categories => [$cat],
-	     content => {subject => $chaps->{$cat}->{subject},
-		         body => $chaps->{$cat}->{body},
-		        },
-	    };
+       content => {subject => $chaps->{$cat}->{subject},
+             body => $chaps->{$cat}->{body},
+            },
+      };
   }
   my $c = AI::Categorizer->new(knowledge_set =>
            AI::Categorizer::KnowledgeSet->new( name => 'CSL'),
-	         verbose => 0,
-	        );
+           verbose => 0,
+          );
 
   while (my ($name, $data) = each %$docs) {
     $c->knowledge_set->make_document(name => $name, %$data, %features);
@@ -317,6 +317,48 @@ END{
 }
 
 1;
+
+=head1 NAME
+
+  AI::MicroStructure::Categorizer;
+
+=head1 DESCRIPTION
+
+  old obsolete Categorizer
+
+=head1 SYNOPSIS
+
+  ~$ micro new world
+
+  ~$ micro structures
+
+  ~$ micro any 2
+
+  ~$ micro drop world
+
+  ~$ micro
+
+=head1 AUTHOR
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+ [sample using concepts](http://quantup.com)
+
+ [PDF info on my works](https://github.com/santex)
+
+
+=head1 SEE ALSO
+
+  AI-MicroStructure
+
+=cut
+
 
 __DATA__
 

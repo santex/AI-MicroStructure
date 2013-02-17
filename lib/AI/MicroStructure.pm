@@ -15,7 +15,7 @@ use AI::MicroStructure::Util;
 our $absstructdir = "";
 our $structdir = "";
 our @CWD=();
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 our $Structure = 'any'; # default structure
 our $CODESET = 'utf8';
 our $LANG = '';
@@ -953,14 +953,4 @@ __END__
 =head1 SEE ALSO
 
   AI-MicroStructure
-  AI-MicroStructure-Cache
-  AI-MicroStructure-Deamon
-  AI-MicroStructure-Relations
-  AI-MicroStructure-Concept
-  AI-MicroStructure-Data
-  AI-MicroStructure-Driver
-  AI-MicroStructure-Plugin-Pdf
-  AI-MicroStructure-Plugin-Twitter
-  AI-MicroStructure-Plugin-Wiki
-
-
+=cut

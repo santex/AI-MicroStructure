@@ -33,3 +33,44 @@
 
   1;
 
+
+=head1 NAME
+
+  AI::MicroStructure::ObjectSet
+
+=head1 DESCRIPTION
+
+  Stack of ObjectContainers
+
+=head1 SYNOPSIS
+
+  ~$ micro new world
+
+  ~$ micro structures
+
+  ~$ micro any 2
+
+  ~$ micro drop world
+
+  ~$ micro
+
+=head1 AUTHOR
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+ [sample using concepts](http://quantup.com)
+
+ [PDF info on my works](https://github.com/santex)
+
+
+=head1 SEE ALSO
+
+  AI-MicroStructure
+
+=cut
