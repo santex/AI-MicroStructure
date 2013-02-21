@@ -29,12 +29,12 @@ sub gofor {
     my $opt  = shift;
 
 
-   
+
 my   $wiki = WWW::Wikipedia->new();
 my   $result = $wiki->search($next);
 
 
-    	eval( 'use IO::Page' );
+      eval( 'use IO::Page' );
 
       if(defined($result) and $result){
 
@@ -42,36 +42,18 @@ my   $result = $wiki->search($next);
         my $micosense = qx_nonblock("micro-sense $next")->recv;
         my $sense = JSON::XS->new->pretty(1)->decode($micosense);
         delete($sense->{rows}->{search});
-        
+
         push @{$self->{storage}->{category}},{$next=>$sense} unless(!@{$sense->{senses}});
-        
+
         $self->{storage}->{related}->{$next} = [grep{!/\(/}map{$_=~ s/ /_/g; $_=ucfirst $_;} $result->related()];
-        
+
 
         foreach my $elem ($result->related()){
 
          $elem =~ s/ /_/g;
-         
+
          $self->{storage}->{data}->{$elem} = defined($self->{storage}->{data}->{$elem}) ?
-         $self->{storage}->{data}->{$elem}+1:1; 
-
-
-#         if($_ &&
- #          !defined($self->{storage}->{data}->{$elem})) {
-
-          # $wiki = WWW::Wikipedia->new();
-          # $result = $wiki->search($_);
-         
- #        $result = $wiki->search($_);
-
-#         $self->{storage}->{$_}->{related} = [grep{!/\(/}map{$_=~ s/ /_/g; $_=ucfirst $_;}$result->related()] unless(!$result);
-
-
-         #  $self->{storage}->{$_}->{related} = [grep{!/\(/}map{$_=~ s/ /_/g; $_=ucfirst $_;}$result->related()] unless(!$result);
-
-  #       }
-
-
+         $self->{storage}->{data}->{$elem}+1:1;
 
 
         }
@@ -90,14 +72,14 @@ sub inspect {
    my $self = shift;
    my $times = shift;
 
-   
+
   foreach(sort {$a cmp $b} keys %{$self->{storage}->{data}} ){
 
 
     $self->{storage}->{dominant}->{$self->{storage}->{data}->{$_}} = $_;
 
   }
-  
+
   $self->{storage}->insert($self->{storage});
   return $self->{storage};
 }
@@ -115,19 +97,19 @@ sub inspect {
 
   Gets Relations for Concepts based on  words
 
-=head1 SYNOPSIS    
+=head1 SYNOPSIS
 
-  
+
   ~$ micro new world
-  
+
   ~$ micro structures
-  
+
   ~$ micro any 2
-  
+
   ~$ micro drop world
-  
+
   ~$ micro
-  
+
 
 =head1 AUTHOR
 
@@ -143,7 +125,7 @@ sub inspect {
 
   ☞ [PDF info on my works](https://github.com/santex)
 
-  
+
 =head1 SEE ALSO
 
   AI-MicroStructure
@@ -157,7 +139,7 @@ sub inspect {
   AI-MicroStructure-Plugin-Twitter
   AI-MicroStructure-Plugin-Wiki
 
-  
-__END__
+=cut
+
 __DATA__
 

@@ -1,8 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -W
 package AI::MicroStructure;
 use strict;
 use warnings;
-use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use File::Basename;
@@ -10,7 +9,7 @@ use File::Spec;
 use File::Glob;
 use Data::Dumper;
 use AI::MicroStructure::Util;
-
+use Carp qw(croak);
 
 our $absstructdir = "";
 our $structdir = "";
@@ -46,6 +45,27 @@ if( grep{/\bdrop\b/} @ARGV ){ $drop = 1; cleanArgs("drop");  };
 our $StructureName = $ARGV[0]; # default structure
 our $structure = $ARGV[0]; # default structure
 
+
+
+
+our $micro = AI::MicroStructure->new($Structure);
+$absstructdir = $micro->{state}->{path}->{"cwd/structures"};
+
+
+push @CWD,$absstructdir;
+#push @CWD,$_ for @INC;
+
+
+
+$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@CWD)} };
+$MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
+$search = join("|",keys %MICRO);
+
+#if( grep{/$search/} @ARGV ){ $Structure = $ARGV[0] unless(!$ARGV[0]); }
+
+# fetch the list of standard structures
+
+#print Dumper keys %MICRO;
 
 
 
@@ -103,24 +123,7 @@ sub find_modules {
 }
 
 
-our $micro = AI::MicroStructure->new($Structure);
-$absstructdir = $micro->{state}->{path}->{"cwd/structures"};
 
-
-push @CWD,$absstructdir;
-#push @CWD,$_ for @INC;
-
-
-
-$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@CWD)} };
-$MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
-$search = join("|",keys %MICRO);
-
-#if( grep{/$search/} @ARGV ){ $Structure = $ARGV[0] unless(!$ARGV[0]); }
-
-# fetch the list of standard structures
-
-#print Dumper keys %MICRO;
 sub getComponents(){
 
   my $x= sprintf("%s",Dumper keys %MICRO);
@@ -214,7 +217,7 @@ EOC
    # export the microstructure() function
    no strict 'refs';
    my $callpkg = caller;
-   *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
+   *{"$callpkg\::micro$structure"} = sub { $callpkg->name( $structure, @_ ) };
    }
 }
 
@@ -275,9 +278,11 @@ sub fitnes {
 }
 
 # main function
-sub microname { $micro->name( @_ ) };
+sub microname { my $self = shift; $self->name( @_ ) };
 
-# corresponding method
+
+
+
 sub name {
    my $self = shift;
    my ( $structure, $count ) = ("any",1);
@@ -294,9 +299,7 @@ sub name {
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
    eval "require '$absstructdir/$structure.pm';";
-   #croak "MicroStructure list $structure does not exist!" if $@;
-
-   use AI::MicroStructure::any;
+   croak "MicroStructure list $structure does not exist!" if $@;
    $MICRO{$structure} = 1; # loaded
    }
    $self->{micro}{$structure} =
@@ -305,7 +308,6 @@ sub name {
 
    $self->{micro}{$structure}->name( $count );
 }
-
 
 
 # other methods
@@ -725,10 +727,6 @@ return $usage;
 }
 
 
-BEGIN {
-
-
-}
 
 END{
 
@@ -748,7 +746,7 @@ if($version){
 
 
 if($help) {
-    printf($micro->help());
+    printf(__PACKAGE__->help());
     exit(0);
 
 }
@@ -758,7 +756,7 @@ if($help) {
 
 
 if($drop == 1) {
-   $micro->drop($StructureName);
+   __PACKAGE__->drop($StructureName);
    exit 0;
 }
 
@@ -779,7 +777,7 @@ if($new==1){
   \033[0;34m
   %s
   Type: the number you choose 1..$senses
-  \033[0m",$micro->usage($StructureName,$senses,$data));
+  \033[0m",__PACKAGE__->usage($StructureName,$senses,$data));
 
   $line = 1 unless($senses != 1);
   chomp($line = <STDIN>) unless($line);
@@ -790,7 +788,7 @@ if($new==1){
   @{$data->{rows}->{"search"}}=split("#",join("",@d));
 
   if($line>0){
-   $micro->save_new($StructureName,$data,$line);
+   __PACKAGE__->save_new($StructureName,$data,$line);
    exit 0;
   }else{
 
@@ -804,7 +802,7 @@ if($new==1){
   }
 
   if($write == 1) {
-   $micro->save_default();
+   __PACKAGE__->save_default();
   }
 }
 
@@ -954,3 +952,48 @@ __END__
 
   AI-MicroStructure
 =cut
+
+
+__DATA__
+
+Fuck lots of stress with the bug series after the config implementation
+
+
+
+
+# corresponding method
+sub name {
+   my $self = shift;
+   my ( $structure, $count ) = ("any",1);
+
+   if (@_) {
+   ( $structure, $count ) = @_;
+   ( $structure, $count ) = ( $self->{structure}, $structure )
+   if defined($structure) && $structure =~ /^(?:0|[1-9]\d*)$/;
+   }
+   else {
+   ( $structure, $count ) = ( $self->{structure}, 1 );
+   }
+
+
+#   croak "MicroStructure does not exist!" if (!defined $structure || $@);
+
+   if( ! exists $self->{micro}{$structure} ) {
+   if( ! $MICRO{$structure} ) {
+   eval "require '$absstructdir::$structure.pm';";
+
+
+
+   $MICRO{$structure} = 1 ;
+   }
+
+   if($MICRO{$structure} || $structure=~/any/){
+     use AI::MicroStructure::any;
+     $self->{micro}{$structure} = AI::MicroStructure::any->new($structure, %{ $self->{tools} } );
+     }else {
+     $self->{micro}{$structure} = AI::MicroStructure->new(%{ $self->{tools} } );
+       }
+   }
+
+   $self->{micro}{$structure}->name( $count );
+}

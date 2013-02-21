@@ -58,5 +58,55 @@ sub new {
 
 1;
 
-__END__
 
+=head1 NAME
+
+  AI::MicroStructure::Locale
+
+=head1 DESCRIPTION
+
+  Gets Relations for Concepts based on  words
+
+=head1 SYNOPSIS
+
+
+  ~$ micro new world
+
+  ~$ micro structures
+
+  ~$ micro any 2
+
+  ~$ micro drop world
+
+  ~$ micro
+
+
+=head1 AUTHOR
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+  ☞ [sample using concepts](http://quantup.com)
+
+  ☞ [PDF info on my works](https://github.com/santex)
+
+
+=head1 SEE ALSO
+
+  AI-MicroStructure
+  AI-MicroStructure-Cache
+  AI-MicroStructure-Deamon
+  AI-MicroStructure-Relations
+  AI-MicroStructure-Concept
+  AI-MicroStructure-Data
+  AI-MicroStructure-Driver
+  AI-MicroStructure-Plugin-Pdf
+  AI-MicroStructure-Plugin-Twitter
+  AI-MicroStructure-Plugin-Wiki
+
+=cut

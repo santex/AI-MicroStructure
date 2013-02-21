@@ -2,7 +2,7 @@
 package AI::MicroStructure::Context;
 use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
-
+use AI::MicroStructure;
 require Carp;
 require Symbol;
 require Exporter;

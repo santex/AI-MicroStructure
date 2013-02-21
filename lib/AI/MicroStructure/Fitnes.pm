@@ -16,42 +16,42 @@ use Statistics::Contingency;
 
 use vars qw(
   $configure
-	$pi
-	$driver
-	);
+  $pi
+  $driver
+  );
 
 
 
 
 sub import {
-	##$ex->{log} .= sprintf "import called with @_\n";
-	local $configure = @_; # shame that Getopt::Long isn't structured better!
-	use Getopt::Long ();
+  ##$ex->{log} .= sprintf "import called with @_\n";
+  local $configure = @_; # shame that Getopt::Long isn't structured better!
+  use Getopt::Long ();
 
 
-  
 
 
-	Getopt::Long::GetOptions( '-',
-		'driver=f'=>\$driver,
-		'configure=f'=>\$configure,
-		) or croak("bad import arguments");
 
-    
+  Getopt::Long::GetOptions( '-',
+    'driver=f'=>\$driver,
+    'configure=f'=>\$configure,
+    ) or croak("bad import arguments");
+
+
 } # end subroutine import definition
 
 
 sub new {
-  
+
   my($class,$args) = @_;
- 
+
   my $self = bless { cache => [] }, $class;
   $configure = $args;
-  $self->{"log"}="";  
+  $self->{"log"}="";
   $class->import;
   $class->connectStats;
 
- 
+
   return $self;
 }
 
@@ -70,11 +70,11 @@ sub defaultDriver {
   my $self = shift;
 
     return $configure;
-  
+
   }
 
 
-  
+
 sub connectStats{
 
 
@@ -84,14 +84,14 @@ sub connectStats{
 
    if( scalar keys %$configure < 8){
 
-      
+
    }else{
-   
+
       $self->{configure} = $configure;
    }
-  
+
 END{
-	
+
 my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, input_verbosity => 1, output_verbosity => 1 } );
          use Statistics::Descriptive;
          my $stat = Statistics::Descriptive::Full->new();
@@ -101,25 +101,25 @@ my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, inpu
          my $mean = $stat->mean();
          my $var  = $stat->variance();
        my $tm   = $stat->trimmed_mean(0.25000);
-  
+
   # The observation series see http://www.cs.jhu.edu/~jason/.
-  my $obs_series = [qw/ obs2 obs3 obs3 obs2 obs3 obs2 obs3 obs2 obs2 
-  obs3 obs1 obs3 obs3 obs1 obs1 obs1 obs2 obs1 
-  obs1 obs1 obs3 obs1 obs2 obs1 obs1 obs1 obs2 
+  my $obs_series = [qw/ obs2 obs3 obs3 obs2 obs3 obs2 obs3 obs2 obs2
+  obs3 obs1 obs3 obs3 obs1 obs1 obs1 obs2 obs1
+  obs1 obs1 obs3 obs1 obs2 obs1 obs1 obs1 obs2
   obs3 obs3 obs2 obs3 obs2 obs2
   /];
 
   # The emission matrix - each nested array corresponds to the probabilities of a single observation type.
-  my $emis = { 
-  obs1 =>  [0.3, 0.3], 
-  obs2 =>  [0.3, 0.4], 
-  obs3 =>  [0.4, 0.3], 
+  my $emis = {
+  obs1 =>  [0.3, 0.3],
+  obs2 =>  [0.3, 0.4],
+  obs3 =>  [0.4, 0.3],
   };
 
   # The transition matrixi - each row and column correspond to a particular state e.g. P(state1_x|state1_x-1) = 0.9...
-  my $trans = [ 
-  [0.9, 0.1], 
-  [0.1, 0.9], 
+  my $trans = [
+  [0.9, 0.1],
+  [0.1, 0.9],
   ];
 
   # The probabilities of each state at the start of the series.
@@ -134,15 +134,15 @@ my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, inpu
   # Feed in the transition and emission matrices and the starting probabilities.
   $ba->feed_values($trans, $emis, $start);
 
-  # Alternatively you can randomly initialise the values - pass it the number of hidden states - 
+  # Alternatively you can randomly initialise the values - pass it the number of hidden states -
   # i.e. to determine the parameters we need to make a first guess).
   # $ba->random_initialise(2);
 
   # Perform the algorithm.
   $ba->baum_welch;
 
-  # Use results to pass data. 
-  # In VOID-context prints formated results to STDOUT. 
+  # Use results to pass data.
+  # In VOID-context prints formated results to STDOUT.
   # In LIST-context returns references to the predicted transition & emission matrices and the starting parameters.
   $ba->results;
 
@@ -151,7 +151,7 @@ my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, inpu
 
 
     # we have two groups of data each with 4 variables and 9 observations.
-    my $data_x = [ 
+    my $data_x = [
                     [qw/ 292 222 52 57/],
                     [qw/ 100 227 51 45/],
                     [qw/ 272 218 49 36/],
@@ -173,7 +173,7 @@ my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, inpu
                     [qw/ 373 127 85 60/],
                     [qw/ 408  95 57 71/],
                  ];
-    
+
     # Create a Statistics::MVA::HotellingTwoSample object and pass the data as two Lists-of-Lists within an anonymous array.
     my $mva = Statistics::MVA::HotellingTwoSample->new([ $data_x, $data_y ]);
 
@@ -182,26 +182,26 @@ my $anc = Statistics::Distributions::Ancova->new ( { significance => 0.005, inpu
 
 my @all_categories = 0..3;
  my $s = new Statistics::Contingency(categories => \@all_categories);
- 
+
 foreach(@all_categories) {
-my $assigned_categories = $_; 
+my $assigned_categories = $_;
 my $correct_categories=sprintf "%d" ,$_+rand 10;
   $s->add_result($assigned_categories, $correct_categories);
  }
- 
+
 
  my $ex = AI::MicroStructure::Fitnes->new;
- 
+
 $ex->{log} .=  $s->stats_table; # Show several stats in table form
 
  my $stats = $s->category_stats;
  my $show = {};
- 
+
   while (my ($cat, $value) = each %$stats) {
     $show->{$cat} = $value;
   }
-  
-  
+
+
 
 
 
@@ -268,7 +268,7 @@ my $h_ref = { 'group_A' =>  {
                         Y => \@Drug_A_Y,
                         X => \@Drug_A_X,
                 },
-    'group_B' =>  { 
+    'group_B' =>  {
                         Y => \@Drug_B_Y,
                         X => \@Drug_B_X,
                 },
@@ -294,3 +294,15 @@ p $mva;
 }
 
 1;
+
+
+=head1 NAME
+=head1 DESCRIPTION
+=head1 CONTRIBUTOR
+=over 4
+=back
+=head1 DEDICATION
+=head1 SEE ALSO
+=head1 AUTHOR
+=head1 COPYRIGHT
+=cut

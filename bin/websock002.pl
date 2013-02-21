@@ -124,7 +124,7 @@ $res = $ua->get(sprintf('%s/%s/_design/base/_view/audio?reduce=false&start_key="
 
 
 
-return {set=>[@all],kv=>keys %$cc};
+return {set=>[@all],kv=>[]};
 
 
 }
@@ -157,14 +157,17 @@ sub printer {
 
     my @data = @{$data->{set}};
 
-
+     @data  = @data[0..5000] unless($#data<10000);
      $cmd->{q} = join(" ",@data);
 
-     $cmd->{action} = [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g; $_={neighbour => $a[0][1], spawn => $a[0][0]}} split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq --limit 100`)];
+     $cmd->{action} =
+      [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g;
+                    $_={neighbour => $a[0][1], spawn => $a[0][0]}}
+                    split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq --limit 100`)];
 
 
 
-     $cmd->{json} = JSON::XS->new->pretty(1)->encode({ "query" => $msg,
+     $cmd->{json} = JSON::XS->new->pretty(0)->encode({ "query" => $msg,
                                                       "callback" => "makeList",
                                                       "responce" =>
                                                       [$cmd->{action},

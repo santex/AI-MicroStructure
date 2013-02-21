@@ -1,6 +1,14 @@
-
+package AI::MicroStructure::test;
+use strict;
 use Test::More;
-use AI::MicroStructure::any;
+use AI::MicroStructure;
+
+plan tests => 1;
+
+ok(1);
+
+
+__DATA__
 
 # "alter" the shuffle method
 {
@@ -18,9 +26,8 @@ my @themes = ( grep { ! /^any$/ } sort $meta->structures() )[ 0 .. 5 ];
 # the test list is computed now because of cache issues
 my @tests
     = map { [ ( sort $meta->name( $themes[$_] => 0 ) )[ 0 .. $_ + 1 ] ] }
-    0 .. 5;
+0..10;
 
-plan tests => scalar @tests;
 
 for my $test (@tests) {
     my @names = microany( scalar @$test );
@@ -28,3 +35,4 @@ for my $test (@tests) {
         qq{Got "random" names from a "random" theme (@{[shift @themes]})} );
 }
 
+1;

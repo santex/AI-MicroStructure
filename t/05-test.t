@@ -96,7 +96,7 @@ for my $XS ( 0..1 ) {
   }
 
   my $y = Search::ContextGraph->new( debug => 1, xs => $XS );
-  $path = sprintf("$PWD/t/sample.tdm");
+  $path = sprintf("$PWD/t/canned/sample.tdm");
   $y->load_from_tdm( $path );
   ok( !length $@, "able to load TDM file $@" );
   is( $y->doc_count(), 177, "correct document count" );

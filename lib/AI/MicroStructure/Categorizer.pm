@@ -7,17 +7,12 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 use File::Spec;
 use Data::Dumper;
 
-#use BerkeleyDB;
-use AI::MicroStructure::util;
 use Cache::Memcached::Fast;
 require AI::Categorizer;
 require AI::Categorizer::Learner::NaiveBayes;
 require AI::Categorizer::Document;
 require AI::Categorizer::KnowledgeSet;
 require Lingua::StopWords;
-
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
-$config->{memcached} ||= "localhost:11211";
 
 sub new {
   my $this = shift;

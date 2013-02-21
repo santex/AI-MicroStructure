@@ -64,7 +64,7 @@ END{
 
   lock_store($set,$opts{cache_file});
 
-  print Dumper [$set];
+  print Dumper [$set->size,$set->members];
 
 
   }
@@ -84,7 +84,7 @@ sub translate {
 
   if (/\.(html|htm)$/) {
     $files->{html}->{$name}=$rel_name;
-      ok(my $obj = AI::MicroStructure::Object->new($rel_name));
+  ok(my $obj = AI::MicroStructure::Object->new($rel_name));
   ok($set->insert($obj));
 
   }

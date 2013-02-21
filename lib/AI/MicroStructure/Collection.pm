@@ -4,15 +4,15 @@ use strict;
 
 
 sub new {
-  
+
   my($class,$args) = @_;
- 
+
   my $self = bless { cache => [] }, $class;
-  
+
   $self->import;
   $self->connectDriver;
 
- 
+
   return $self;
 }
 
@@ -120,24 +120,46 @@ my %_operations = (
 1;
 
 
+1;
 
 
-#package main;
+=head1 NAME
 
-#my $ms = AI::MicroStructure::Collection;
-#->reduction_function;
+ AI::MicroStructure::Collection
 
-__DATA__
+=head1 DESCRIPTION
+
+  Context driven scoreing
+
+=head1 SYNOPSIS
+
+  ~$ micro new world
+
+  ~$ micro structures
+
+  ~$ micro any 2
+
+  ~$ micro drop world
+
+  ~$ micro
+
+=head1 AUTHOR
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+  Hagen Geissler <santex@cpan.org>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+ [sample using concepts](http://quantup.com)
+
+ [PDF info on my works](https://github.com/santex)
 
 
-  my $c = new AI::Categorizer::Collection::Files
-    (path => '/home/hagen/myperl/test/txt/ok',
-     category_file => '/home/hagen/myperl/oldstuff/test/txt/opf/');
-  print "Total number of docs: ", $c->count_documents, "\n";
-  while (my $document = $c->next) {
+=head1 SEE ALSO
 
-  }
-  $c->rewind;
-__END__
+  AI-MicroStructure
 
-print AI::MicroStructure::Collection->new;
+=cut

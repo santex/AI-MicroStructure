@@ -1,45 +1,16 @@
 #!/bin/bash
-limit=30;
+IFS_BAK=$IFS;
+IFS=$'\n';
 
-function fromPDF(){
-    echo `date  +"%Y-%m-%d +%H"` > $1.txt;
-    pdftotext $1 - | sed 's/[^a-zA-Z0-9, ]*//g' | sed 's/Page/@@MARKER@@ Page/g' | sed 's/CHAPTER/@@MARKER@@ CHAPTER/g' | sed 's/SUMMARY/@@MARKER@@ SUMMARY/g' | sed 's/REFERENCES/@@MARKER@@ REFERENCES/g' | sed 's/OVERVIEW/@@MARKER@@ OVERVIEW/g' | sed 's/Chapter/@@MARKER@@ Chapter/g' | sed 's/Index/@@MARKER@@ Index/g' >> $1.txt;
+mkdir -p /tmp/test/pages;
+pdftotext "$1" "$2";
+pdftohtml -i "$1" "$2.html";
+#mv "$2" /tmp/test/pages;
+#mv "$2.*.html" /tmp/test/pages;
+#mv "$2.*.png" /tmp/test/pages;
+#mv "$2.*.jpg" /tmp/test/pages;
 
-    mv $1.txt tmp-test;
-    cat  tmp-test/$1.txt | egrep -v  "^[0-9]*[A-Z]$|[0-9][0-9]$|[0-9]$|^[*]$" | data-freq  --limit $limit
-}
+FROM="$1"
+TO="$2"
 
-function fromImage(){
-    echo `date  +"%Y-%m-%d +%H"` > $1.txt;
-    tesseract $1 $1.ocr
-    cat $1.ocr.txt | sed 's/[^a-zA-Z0-9, ]*//g' >> $1.txt;
-    rm $1.ocr.txt
-
-    mv $1.txt tmp-test;
-    cat  tmp-test/$1.txt | egrep -v  "^[0-9]*[A-Z]$|[0-9][0-9]$|[0-9]$|^[*]$" | data-freq  --limit $limit
-}
-
-function find_all(){
-    for i in `find . -iname "*$1" -print | cut -d '/' -f2`; do
-        if [ -f tmp-test/$i.txt ] || [ -f $i.txt ] ;then
-            echo "skip $i";
-        else
-            case $1 in
-                pdf) fromPDF $i ;;
-                jpeg|jpg|tif|tiff|png) fromImage $i ;;
-                *) echo "MISSING transform function for $1 in $i!" ;;
-            esac
-
-        fi
-    done
-}
-
-
-
-mkdir -p tmp-test
-
-for i in `echo -e 'pdf\npng\njpeg\njpg\ntif\ntiff'`; do
-    find_all $i;
-done
-
-
+#awk '/MARKER/{n++}{print > ".out" n }' "$TO.txt";
