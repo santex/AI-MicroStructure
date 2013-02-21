@@ -3,13 +3,10 @@
 use strict;
 use warnings;
 use Data::Printer;
-
-use Data::Dumper;
 use Getopt::Long;
-use Statistics::Basic qw(:all);
+use HTML::Tiny;
 use LWP::UserAgent;
 use File::Spec;
-use JSON::XS;
 use File::Path;
 use PerlIO::gzip;
 use YAML qw<DumpFile LoadFile>;
@@ -26,14 +23,11 @@ $| = 1;
 
 
 use constant WORDS     =>  '/home/santex/data-hub/book/output-unique';
-
-use constant MAIL_RC =>    'http://quantup.com/concept-knowledge/science/0.001-brain.txt.gz';
+use constant MAIL_RC =>    'http://localhost/concept-knowledge/science/0.001-brain.txt.gz';
 use constant USER_BASE => 'http://localhost//training-knowledge/science';
 use constant AUTHOR    => 'http://localhost/~';
 use constant OUTPUT    => 'cpan-faces';
 use constant STATE     => File::Spec->catfile( OUTPUT, 'work.yml' );
-use constant DATA     => File::Spec->catfile( OUTPUT, 'data.html' );
-use constant QUERYS     => File::Spec->catfile( OUTPUT, 'querys.html' );
 use constant SIZE      => 80;
 
 my $UPDATE = 0;
@@ -56,50 +50,84 @@ my $pid = $$;
 
 my $cmd = {};
 
-$cmd->{one} = 'for i in `cat '.WORDS.' | egrep "*.or.*"`; do y=$(wn $i -grepn  | egrep -v "Grep og*|^\n\n"); echo  $i"="$y"\n"  ; done';
+$cmd->{one} = 'for o in `cat /home/santex/data-hub/book/output-unique | egrep "^*.(alg|qua|sozio|therm|exo|geo|bio|phys|chem).*"`;
+do qq=$(wordnet $o  -grepn -hypen -hypon -synsn -smemn -ssubn -sprtn -partn -meron -holon -domnn -famln -coorn -hmern -hholn | egrep -v "of noun");  echo -split-hit $qq ;  done ';
 
 
-#|sub|mul|dev|eq|math|calc|ma
+#'for i in `cat '.WORDS.'  | egrep "(a|b|c|d)*('.join("|",@ARGV).')"`; done';
+
+    our $index = File::Spec->catfile( OUTPUT, 'index.html' );
+    open our $ih, '>>', $index or die "Can't write $index ($!)\n";
+    print $ih $cmd->{one};
+    close $ih;
+#
+
+
   my $date ;
   our $sub ={};
-  my ( %currents,   $id ) = ();
- foreach my $call (keys %$cmd){
+  my ( %currents, $id ) = ();
+ foreach(keys %$cmd){
 
-  $date = qx_nonblock($cmd->{$call})->recv;
+  $date = qx_nonblock($cmd->{$_})->recv;
 
-foreach my $line(split(/\n/,$date)){
-  next unless($line);
-my  $sx=sx(split(/=/,$line));
-    $sub->{$call}->{$sx}->{line}=$line;
-        $sub->{$call}->{$sx}->{concept}=[split(/=/,$line)];
-        $sub->{$call}->{$sx}->{concept}=$sub->{$call}->{$sx}->{concept}[0];
-        $sub->{$call}->{$sx}->{features}=$analyzer->analyze($line);
+  my @set = split(/\n/,$date);
+  my $index = File::Spec->catfile( OUTPUT, 'index.html' );
+  open my $ih, '>>', $index or die "Can't write $index ($!)\n";
 
-    $sub->{$call}->{$sx}->{avg}=[values %{$sub->{$call}->{$sx}->{features}}];
-    $sub->{$call}->{$sx}->{avg}=sprintf mean($sub->{$call}->{$sx}->{avg});
-}
-#   $sub->{avg}=>mean($sub->{$call}->{features}->{call}->{score});
+  foreach(0..$#set){
+    print ".";
+    next unless(!$_);
+    if( $set[$_] =~ /^-split-hit/ && $set[1+  $_])
+    {
+
+      $set[$_] =~ s/-split-hit //g;
+      $sub->{$set[$_]} = substr($set[1+  $_],1);
+      $currents{$set[$_]}= $sub->{$set[$_]};
 
 
+    open my $ih, '>>', $index or die "Can't write $index ($!)\n";
+    print $ih build_page( sprintf("\n%s=%s\n<hr>\n",$set[$_],$sub->{$set[$_]}));
+
+
+    }
+    else
+    {
+      print ".\n" ;
+    }
+  }
+  close $ih;
+
+
+  #my $features = $analyzer->analyze( $date );
+
+  #$sub->{f}={F=>$features,R=>$date};
+
+  #p $sub;
+
+ }
+
+
+BEGIN
+{
+
+
+    our $index = File::Spec->catfile( OUTPUT, 'index.html' );
+    open our $ih, '>', $index or die "Can't write $index ($!)\n";
+    print $ih "";
+  close $ih;
 
 
   }
 
 
 END {
+  if ( $$ == $pid ) {
     print "Saving ", STATE, "\n";
-    DumpFile( STATE, $cmd );
+    DumpFile( STATE, $currents );
 
 
- my $index = File::Spec->catfile( OUTPUT, 'data.html' );
-  open my $ih, '>', $index or die "Can't write $index ($!)\n";
-    print $ih  JSON::XS->new->pretty(1)->encode({data=>$sub});
-    close $ih;
 
-  $index = File::Spec->catfile( OUTPUT, 'querys.html' );
-  open  $ih, '>', $index or die "Can't write $index ($!)\n";
-    print $ih  JSON::XS->new->pretty(1)->encode({data=>$cmd});
-    close $ih;
+  }
 }
 
 update(
@@ -115,19 +143,6 @@ update(
      && $currents->{$id}->{state} eq 'done';
   }
 );
-  sub sx
-  {
-
-      my ( @res ) = @_;
-      my ($i, $t, $_);
-      for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
-          ($i,$t) = /(.)(.*)/;
-         $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
-         $_ = substr(($i||'Z').$t.'000', 0, 4 );
-      }
-      wantarray ? @res : $res[0];
-  }
-
 
 
 sub build_head {
@@ -242,4 +257,5 @@ sub get_current {
   }
   return;
 }
+
 

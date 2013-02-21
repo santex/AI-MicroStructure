@@ -8,7 +8,7 @@ use AI::MicroStructure::Util;
 use Storable::CouchDB;
 my @ARGVX = ();
 
-my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 
 our $json_main =  {lang=>"C",category=>"no",name=>"santex",size=>1,children=>[]};
 
@@ -53,9 +53,10 @@ return @all;
 
 
 
-
-$ARGV[0] = "" unless($ARGV[0]);
-my $key = sprintf("%s_%s",join("",@ARGVX),$ARGV[0]);
+eval
+{
+$ARGV[0] = "$_";
+my $key = sprintf("%s_%s",join("",sort @ARGVX),$ARGV[0]);
 my @datax = getAll($ARGV[0]);
 
 if($#datax){
@@ -63,11 +64,11 @@ if($#datax){
 
 foreach my $i(0..$#datax) {
 
-  printf("%s\n","".$datax[$i]) unless(!$datax[$i]);
+  printf("%s%s%s%s","\n"x3,"@"x123,,"\n"x3,$datax[$i]);
 
 }
 }
-
+} for("a".."z");
 1;
 __DATA__
 
