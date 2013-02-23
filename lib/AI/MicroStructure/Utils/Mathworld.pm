@@ -20,34 +20,18 @@ my $url = "http://mathworld.wolfram.com/";
 sub get_topics
 {
     my $item = shift;
-    my @content = @_;
-    my $ignore_extensions = join '|', qw( js css gif );
-    my @tmp = ();
+    my $ignore_extensions = join '|', qw( js css gif png );
     my $extor = make_request($item);
-    my @all_content_links = grep { /^\/topics/ &&
-                                   ! /\.$ignore_extensions$/ &&
-                                   s#(?:^/[^/]+)/(.*)$#$1# } $extor->links;
-    if ( @content ) {
-        my $limit = ($#content > $#all_content_links) ? $#content : $#all_content_links;
-        for (0..$limit) {
-            if ($content[$_] xor $all_content_links[$_]) {
-                push @tmp, $all_content_links[$_];
-            }
-        }
-    }
-    else {
-        @tmp = @all_content_links;
-    }
-    return @tmp if -f $item;
-    my @links = map { $url.$_ } @tmp;
-    return @links;
+    return  map { $_ => 1 } grep { ! /\.$ignore_extensions$/ } $extor->links;
 }
 
 sub make_request
 {
     my $request_item = shift;
     my $extor = undef;
-    if ( -f $request_item ) {
+    $request_item =~ m#^(?:/?[^/]+)/(.*)$#;
+    if ( -f $1 || -f $request_item ) {
+        $request_item = $1 || $request_item;
         $extor = HTML::SimpleLinkExtor->new();
         $extor->parse_file($request_item);
     }

@@ -1,3 +1,4 @@
+package mathworld;
 use strict;
 use warnings;
 use Test::More;
@@ -8,7 +9,7 @@ use feature "say";
 BEGIN { use_ok("AI::MicroStructure::Utils::Mathworld"); }
 
 
-my $url = "http://mathworld.wolfram.com/";
+my $url = "http://mathworld.wolfram.com";
 my $file = "mathworld_index.html";
 
 
@@ -18,56 +19,55 @@ our @second_stage_expected = ();
 sub _init_test_data
 {
     my $flag = 0;
-    while (<DATA>) {
+    while (<mathworld::DATA>) {
         chomp;
         if (/^==(?:\w\s?)+==$/) {
             $flag++;
             next;
         }
-        unless ( $flag ){
+        unless ( $flag ) {
             push @first_stage_expected, $_;
         }
-        else {
+        else { 
             push @second_stage_expected, $_;
         }
     }
 }
 
-#TODO
-#
-# match score too
-# building hash with topics keys
-# to decide when use topic regex in get_topic
-#
-
 _init_test_data();
-my @links = get_topics($file,());
-is_deeply(\@links,
+@first_stage_expected = sort {$a cmp $b} @first_stage_expected;
+@second_stage_expected = sort {$a cmp $b} @second_stage_expected;
+my %ignore = get_topics($file);
+my @got = sort {$a cmp $b} grep {/^\/topics/} keys %ignore;
+is_deeply(\@got,
           \@first_stage_expected,
           qq/first stage done/);
 
-my @all_links = ();
-for (@links) {
-    say;
-    push @all_links, get_topics($_,@links);
-    printf "\t%s\n", $_ for (@all_links);
+$ignore{'/'} = 1;
+
+my @aoh = ();
+for my $topic ( @got ) {
+    push @aoh, { get_topics($topic) };
 }
+@got = ();
+my %tmp = ();
+for my $iter (@aoh) {
+    for (keys %{$iter}) {
+        $tmp{$_} = 1 unless exists $ignore{$_};
+    }
+    %ignore = ( %ignore, map { delete $tmp{$_}; $_ => 1
+        } grep { /^\/?about.*/ xor /^http:.*/ 
+        } keys %tmp );
+}
+@got = sort {$a cmp $b} keys %tmp;
+is($#got,
+    $#second_stage_expected,
+    qq/same length of expected array and compute array/);
 
-is_deeply(\@all_links,
-          \@second_stage_expected,
-          qq/second stage done/);
+is_deeply(\@got,
+    \@second_stage_expected,
+    qq/second stage done/);
 
-
-# my @tmp = (@links, @all_links);
-# my @content_files = ();
-# p $all_links[0];
-# @content_files = get_topics($all_links[0],@tmp);
-# p @content_files; 
-# for (@all_links) {
-#     push @content_files, get_topics($_,@all_links);
-# }
-
-# 
 # say $_  for (@all_links);
 # for (@all_links) {
 #     $_ = $url.$_; 
