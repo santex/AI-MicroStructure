@@ -11,18 +11,18 @@ use feature "say";
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
-                 get_topics
+                 get_links
                  make_request
                 );
 
-my $url = "http://mathworld.wolfram.com/";
+my $url = "http://mathworld.wolfram.com";
 
-sub get_topics
+sub get_links
 {
     my $item = shift;
     my $ignore_extensions = join '|', qw( js css gif png );
     my $extor = make_request($item);
-    return  map { $_ => 1 } grep { ! /\.$ignore_extensions$/ } $extor->links;
+    return  map { $_ => 1 } grep { !/\.$ignore_extensions$/ } $extor->links;
 }
 
 sub make_request
@@ -38,7 +38,9 @@ sub make_request
     else {
         my $ua = LWP::UserAgent->new();
         my $response = $ua->get($request_item);
-        # fail if response dosen't succeed
+        unless ( $response->is_success ) {
+            die $response->status_line;
+        }
         $extor = HTML::SimpleLinkExtor->new($response->base);
         $extor->parse($response->decoded_content);
     }
