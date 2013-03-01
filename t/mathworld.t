@@ -37,26 +37,13 @@ sub _init_test_data
 _init_test_data();
 @first_stage_expected = sort {$a cmp $b} @first_stage_expected;
 @second_stage_expected = sort {$a cmp $b} @second_stage_expected;
-my %ignore = get_links($file);
+%ignore = get_links($file);
 my @got = sort {$a cmp $b} grep {/^\/topics/} keys %ignore;
 is_deeply(\@got,
           \@first_stage_expected,
           qq/first stage done/);
 
 $ignore{'/'} = 1;
-
-sub myfilter
-{
-    my %rawset = %{ shift() };
-    my %resultset = ();
-    for (keys %rawset) {
-        $resultset{$_} = 1 unless exists $ignore{$_};
-    }
-    %ignore = ( %ignore, map{ delete $resultset{$_}; $_ => 1
-        } grep { /^\/?about.*/ xor /^http:.*/
-        } keys %rawset );
-    return %resultset;
-}
 
 my @aoh = ();
 for my $topic ( @got ) {

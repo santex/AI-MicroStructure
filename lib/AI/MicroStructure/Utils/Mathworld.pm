@@ -13,9 +13,12 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(
                  get_links
                  make_request
+                 myfilter
+                 %ignore
                 );
 
 my $url = "http://mathworld.wolfram.com";
+our %ignore;
 
 sub get_links
 {
@@ -23,6 +26,20 @@ sub get_links
     my $ignore_extensions = join '|', qw( js css gif png );
     my $extor = make_request($item);
     return  map { $_ => 1 } grep { !/\.$ignore_extensions$/ } $extor->links;
+}
+
+# split with parallel iterator ?
+sub myfilter
+{
+    my %rawset = %{ shift() };
+    my %resultset = ();
+    for (keys %rawset) {
+        $resultset{$_} = 1 unless exists $ignore{$_};
+    }
+    %ignore = ( %ignore, map{ delete $resultset{$_}; $_ => 1
+        } grep { /^\/?about.*/ xor /^http:.*/
+        } keys %rawset );
+    return %resultset;
 }
 
 sub make_request
