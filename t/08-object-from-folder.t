@@ -40,8 +40,8 @@ our $curSysDate = `date +"%F"`;
     $curSysDate=~ s/\n//g;
 
 our %opts = (cache_file =>
-              sprintf("/tmp/%s.cache",
-              $curSysDate));
+              sprintf("%s/%s/%s_.cache",
+              $PWD,"t/canned",$curSysDate));
 
 GetOptions (\%opts, "cache_file=s");
 

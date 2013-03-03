@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-
-
 use strict;
 use Test::More 'no_plan';#tests =>12;
 use File::Find;
@@ -13,35 +11,32 @@ use Data::Printer;
 use AI::MicroStructure;
 use AI::MicroStructure::Object;
 use AI::MicroStructure::ObjectSet;
-use AI::MicroStructure::ObjectParser;
 use Env qw(PWD);
 
 
 #print Dumper join "-", soundex(("rock'n'roll", 'rock and roll', 'rocknroll'));
 
 our $meta = AI::MicroStructure->new();
-our @t = $meta->structures;
+our @t = $meta->structures();
 
 my $TOP = "";
 
-#$TOP = "/tmp/test";#$ARGV[0] unless(!@ARGV);
    $TOP = "$PWD/t/canned/docs";
 
-#   if($TOP  eq ""){
- #   $TOP =  $meta->{state}->{path}->{"cwd/structures"} unless(!$meta->{state}->{path}->{"cwd/structures"});
+   if($TOP  eq ""){
+  $TOP =  $meta->{state}->{path}->{"cwd/structures"} unless(!$meta->{state}->{path}->{"cwd/structures"});
 
-  # }
+ }
 
 
-#mkpath dirname($TOP),1;
 
 
 our $curSysDate = `date +"%F"`;
     $curSysDate=~ s/\n//g;
 
 our %opts = (cache_file =>
-              sprintf("/tmp/%s.cache",
-              $curSysDate));
+              sprintf("%s/%s/%s_.cache",
+              $PWD,"t/canned",$curSysDate));
 
 GetOptions (\%opts, "cache_file=s");
 

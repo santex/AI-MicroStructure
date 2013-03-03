@@ -1,0 +1,622 @@
+#!/usr/bin/perl -w
+package App::DrKnow;
+
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = "0.001";
+#use IO::File;
+use File::Path;
+use Data::Dumper;
+use Data::Printer;
+use File::Temp qw(tempfile tempdir);
+use File::Find;
+use Getopt::Long;
+use Term::ShellUI;
+
+use Data::Freq;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+use Cwd;
+use Env qw(PWD);
+
+use Log::Log4perl qw(:easy);
+use Log::Log4perl::Util;
+
+use Term::ProgressBar::Simple;
+use Term::ProgressBar;
+use Term::Emit qw/:all/, {-bullets   => ' * ',
+                        -color     => 1,
+                        -closestat => "OK"};
+
+use Time::HiRes qw( usleep );
+use vars qw(@ISA);
+
+our $files={};
+our @check = ();
+
+
+
+
+#use File::Copy;
+#
+#use File::Basename;
+#use File::Spec::Functions qw(rel2abs abs2rel);
+#use File::stat qw(:FIELDS);
+#use Digest::MD5 qw(md5_hex);
+#use Term::Emit;
+#use Term::ProgressBar::Simple;
+#use Storable qw(lock_store lock_retrieve);
+#use IPC::Run qw(run);
+
+#use constant DISCIPLIN => '0.001-brain.txt.gz';
+
+
+
+our %name = (action=>[qw/list use new/],#search get set   change plot cloudy
+                        type=>[qw/new my related/],# popular growing fit term
+                        location=>[qw/category content/]);
+
+
+
+my @name =();
+my @vals =();
+
+my $set = {};
+our $type = {};
+our $action = {};
+our $sep=sprintf("%s%s%s","\n"x 3,"#" x 70,"\n");
+
+
+our $ms = AI::MicroStructure->new();
+
+
+
+our $DRY_RUN;
+our $CONFIRM;
+our $DRY_RUN_MSG;
+our $DATA_SNIPPED_LEN = 60;
+
+
+
+sub new {
+    my($class, %options) = @_;
+
+    my $self = {
+        %options,
+    };
+
+    bless $self, $class;
+
+    return $self;
+}
+
+
+sub tardir {
+
+    my($self) = @_;
+
+    return $self->{tardir};
+}
+
+
+sub download {
+
+    my $self = shift;
+    my($url) = @_;
+
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    INFO "download $url";
+
+    _confirm("Downloading $url => ", basename($url)) or return 1;
+
+    require LWP::UserAgent;
+    require HTTP::Request;
+    require HTTP::Status;
+
+    my $ua = LWP::UserAgent->new();
+    my $request = HTTP::Request->new(GET => $url);
+    my $response = $ua->request($request, basename($_[0]));
+    my $rc = $response->code();
+
+    if($rc != HTTP::Status::RC_OK()) {
+        LOGCROAK("Cannot download $_[0] (",
+                  $response->message(),
+                 ")");
+    }
+
+    return 1;
+}
+
+
+
+#dry_run(0);
+#confirm(1);
+our $search =  "";
+    $search = sprintf("%s",join("|",@ARGV)) unless(!@ARGV);
+
+our $cache = {};
+
+
+###############################################
+sub dry_run {
+###############################################
+    my($on) = @_;
+
+    if($on) {
+        $DRY_RUN     = 1;
+        $DRY_RUN_MSG = "(skipped - dry run)";
+    } else {
+        $DRY_RUN     = 0;
+        $DRY_RUN_MSG = "";
+    }
+}
+
+###############################################
+sub confirm {
+###############################################
+    my($on) = @_;
+
+    $CONFIRM = $on;
+}
+
+###########################################
+sub _confirm {
+###########################################
+    my($msg) = @_;
+
+    if($DRY_RUN) {
+        INFO "$msg $DRY_RUN_MSG";
+        return 0 if $DRY_RUN;
+    }
+
+    if($CONFIRM) {
+        my $answer = ask("$msg ([y]/n)", "y");
+        if($answer =~ /^\s*y\s*$/) {
+            INFO $msg;
+            return 1;
+        }
+
+        INFO "$msg (*CANCELLED* as requested)";
+        return 0;
+    }
+
+    return 1;
+}
+
+##################################################
+sub ask {
+##################################################
+    my ($prompt, $default) = @_;
+
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    if(@_ != 2) {
+        LOGCROAK("ask() called with wrong # of args");
+    }
+
+  print STDERR "$prompt [$default]> "
+        or die "Couldn't write STDERR: ($!)";
+
+    my $value = <STDIN>;
+    chomp $value;
+
+    $value = $default if $value eq "";
+
+    return $value;
+}
+
+
+###############################################
+sub mkd {
+###############################################
+
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    _confirm "mkd @_" or return 1;
+
+    INFO "mkpath @_";
+
+    mkpath @_ or
+        LOGCROAK("Cannot mkdir @_ ($!)");
+}
+
+
+our $curSysDate = `date +"%F"`;
+    $curSysDate=~ s/\n//g;
+
+our $TOP = "/media/Elements/media";
+    $TOP = "/home/santex/data-hub";
+
+my $create = -1;
+my $target_dir = "";
+
+   $target_dir = $TOP unless(-d $target_dir);
+
+my $TOP_URL = "http://www.stonehenge.com/merlyn/WebTechniques";
+
+
+
+our %opts = (cache_file =>
+              sprintf("%s/%s_.cache",
+              $TOP,$curSysDate));
+
+GetOptions (\%opts, "cache_file=s");
+
+eval {
+    category $^W = 0;  # because otherwhise doesn't pass errors
+
+    $cache = lock_retrieve($opts{cache_file});
+
+    if($@){
+      lock_strore($cache,$opts{cache_file});
+    }
+    $cache = {} unless $cache;
+
+    warn "New cache!\n" unless defined $cache;
+
+
+
+};
+
+
+our $descriptions = {action=>{},type=>{},location=>{}};
+    $descriptions->{action} = {
+                    'use'     =>"activate something !",
+                    'new'     =>"creates something !",
+                    #  'desc'    =>"show a description about something",
+                    #  'delete'  =>"remove something",
+                    'list'    =>"lists something",
+                    # 'search'    =>"search something",
+                    # 'change'  =>"modify something",
+                    # 'plot'    =>"create vissualisation of something",
+                    # 'cloudy'  =>"create optimal query surface for something",
+};
+
+$descriptions->{type} =
+{
+
+'new'     =>"things you dont have yet",
+'my'      =>"things you have already",
+'related' =>"things which are related to you",
+'popular' =>"trending things",#
+#'growing' =>"expanding things",
+#'fit'    =>"usefull things",
+};
+
+$descriptions->{location} =
+{
+  'category'     =>"on your computer",
+  'content'     =>"on a distant computer",
+
+};
+
+my $usage=usage();
+
+
+sub get_cname{
+
+
+p @_;
+
+my @cats = $cache->{categories};
+
+printf `echo -e "\x1b[1m bold"` for (@cats);
+
+
+}
+
+
+our $cmd={"h" =>                { alias => "help", exclude_from_completion => 1 },
+                "?" =>          { alias => "help", exclude_from_completion =>1 },
+    "quit" =>           { alias => "exit", exclude_from_completion =>1 },
+                "help" => {
+                        desc =>sub{ print usage();},
+                        args => sub { shift->help_args(undef, @_); },
+                        method => sub { shift->help_call(undef, @_); }
+                },
+                "history" => { desc => "Prints the command history",
+                        doc => "Specify a number to list the last N lines of history\n" .
+                                "Pass -c to clear the command history, " .
+                                "-d NUM to delete a single item\n",
+                        args => "[-c] [-d] [number]",
+                        exclude_from_completion =>1,
+                        method => sub { shift->history_call(@_) },
+
+                },
+                "exit" => {
+                        desc => "Exits the program.",
+                        maxargs => 0,
+                        exclude_from_completion =>1,
+                        method => sub { shift->exit_requested(1); },
+
+                },
+                "quit" => {
+                        desc => "Quit using Fileman",
+                        maxargs => 0,
+                        method => sub { shift->exit_requested(1); }, exclude_from_completion => 1,
+                },
+
+                # Term::ShellUI normally displays "asdf: unknown command".
+                # This shows how to use the default command.  If the user
+                # type an unknown command, ShellUI calls '' if it exists.
+                '' => {
+                        proc => "No command here by that name!\n",
+                        desc => "No help for unknown commands.",
+                        doc => "Well, here's a little help: don't type them.\n",
+                },
+
+        };
+
+
+our $location = {
+  "category" => {
+        args => "(path)",
+        desc => "use list new",
+        proc => sub {
+                                                my $self = shift;
+                                                my $parms = shift;
+                                                print get_cname(@_) .
+                                                        ": " . join(" ",@_), "\n";
+                                        },
+                },
+"content" => {
+                        args => sub {   },
+        desc => $descriptions->{location}->{content},
+        proc => sub{  App::DrKnow::invoke(); }}
+};
+
+
+### pod & usage in one
+sub usage {
+
+
+  # create some things to loop over
+
+
+printf("
+             i!~!!))!!!!!!!!!!!!!!!!!!!!!!!!
+          i!!!{!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!i
+       i!!)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    '!h!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  '!!`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!i
+   /!!!~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+' ':)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ~:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+..!!!!!\!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ `!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ~ ~!!!)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~
+~~'~{!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:'~
+{-{)!!{!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:!
+`!!!!{!~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!':!!!
+' {!!!{>)`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)!~..
+:!{!!!{!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -!!:
+    ~:!4~/!!!!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!!!
+     :~!!~)(!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ``~!!).~!!!!!!!!!!!!!{!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:
+            ~  '!\!!!!!!!!!!(!!!!!!!!!!!!!!!!!!!!!!4!!!~:
+           '      '--`!!!!!!!!/:\!!{!!((!~.~!!`?~-      :
+              ``-.    `~!{!`)(>~/ \~                   :
+   .                \  : `{{`. {-   .-~`              /
+    .          !:       .\\?.{\   :`      .          :!
+    \ :         `      -~!{:!!!\ ~     :!`         .>!
+    '  ~          '    '{!!!{!!!t                 ! !!
+     '!  !.            {!!!!!!!!!              .~ {~!
+      ~!!..`~:.       {!!!!!!!!!!:          .{~ :LS{
+       `!!!!!!h:!?!!!!!!!!!!!!!(!!!!::..-~~` {!!!!.
+         4!!!!!!!!!!!!!!!!!!!!!~!{!~!!!!!!!!!!!!'
+          `!!!!!!!!!!!!!!!!!!!!(~!!!!!!!!!!!!!~
+            `!!!!!!!!!!!{\``!!``(!!!!!!!!!~~  .
+             `!!!!!!!!!!!!!!!!!!!!!!!!(!:
+               .!!!!!!!!!!!!!!!!!!!!!\~
+               .`!!!!!!!/`.;;~;;`~!! '
+                 -~!!!!!!!!!!!!!(!!/ .
+                    `!!!!!!!!!!!!!!'
+                      `\!!!!!!!!!~
+\033[0;34m
+
+  <action>
+  %s
+  <location>
+  %s
+\033[0m
+",
+sprintf("\033[0;31m\t|-%s\033[255;34m",join( "\n\t|-", @{$name{action}})),
+# <type>
+#  %s
+#sprintf("\033[0;31m\t|-%s\033[255;34m",join( "\n\t|-", @{$name{type}})),
+sprintf("\033[0;31m\t|-%s\033[255;34m",join( "\n\t|-", @{$name{location}})));
+
+
+
+}
+
+
+sub getCommands {
+
+my @c = keys $descriptions->{action};
+
+foreach my $ele (@c){
+
+                                my $s ={};
+                                $cmd->{$ele}->{cmds} = $s;
+
+                                foreach (keys %{$descriptions->{location}}){
+
+                                  $s->{$_}->{cmds} = {};
+
+
+                                }
+
+
+}
+
+        return $cmd;
+}
+
+
+
+
+sub setDir{
+
+    my $dir = shift;
+    if(-d $dir){
+
+      $TOP = $dir;
+
+    }
+
+}
+sub  checkStructures{
+
+
+    use AI::MicroStructure;
+    our $meta = AI::MicroStructure->new();
+    our @t = $meta->structures;
+
+
+
+    my $number_of_things = scalar @t;
+
+    # create the progress bar object
+   # my $progress = Term::ProgressBar::Simple->new( $number_of_things );
+
+    # loop
+    foreach my $th (@t) {
+if ($th =~/$search/ || $search eq ""){
+  emit ("Chrecking $th  \n")
+}
+
+
+                # increment the progress bar object to tell it a step has been taken.
+    #    $progress++;
+    }
+  }
+    # See also use of '$progress += $number' later in pod
+
+
+  sub sx {
+
+  no warnings;
+  my ( @res ) = @_;
+  my ($i, $t, $_) = (undef,"",undef);
+
+  for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
+      ($i,$t) = /(.)(.*)/;
+     $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
+     $_ = substr(($i||'Z').$t.'000', 0, 4 );
+  }
+  wantarray ? @res : $res[0];
+}
+
+
+sub translate {
+  return unless -f;
+
+  @check = ();
+  (my $rel_name = $File::Find::name) =~ s{.*/}{}xs;
+
+
+  if (/\.html$/) {
+
+  }
+  elsif (/\.pdf$/) {
+
+  my $first = "";
+  my $xname = $rel_name;
+
+  $xname =~ s/([s|S]pringer.|.pdf|The)/-/gui;
+  my @sy = split(/(\.|\(|\)|\_|\ |,|-)/,$xname);
+
+
+
+  foreach(@sy){
+      push @check,lc $_ unless(length($_)<=2);
+
+
+ #     print $_."\n";
+
+  }
+
+  @sy = App::DrKnow::sx(@check);
+
+  @sy = grep{!/Z000/}@sy;
+#  $first = shift @sy;
+ # my $second = shift @sy;
+
+  #$first = "empty" unless(length($first));
+
+
+  my $s = join("_",@sy);
+     $s = "empty" unless($s);
+  my $name=sprintf("%s\t%s",$s,$rel_name);
+
+#->{pdf}->{$first}->{$second}
+    push @{$files->{$s}} ,$rel_name;
+
+
+  }elsif (/\.ltx$/) {
+  }elsif (/^AI*\.pm$/) {
+
+  }elsif (/\.json$/) {
+  }elsif (/\.txt$/) {
+  }else{
+
+  }
+
+}
+
+
+sub invoke {
+
+
+emit("searching knowledge to assimilate for $search");
+
+find(\&translate, "$TOP/./");
+
+foreach(sort{$a cmp $b} keys %{$files}){
+  if($_=~/$search/ && $search){
+  print "$_\n";
+  }else{
+  print "$_\n";
+  }
+};
+
+#P200_Z000_Z000_Z000_A530_Z000
+
+
+return $files;
+
+}
+
+
+
+
+      my  $app = App::DrKnow->new();
+          $app->checkStructures();
+ $files = $app->invoke();
+p$files;
+
+1;
+__DATA__
+#  App::DrKnow::checkStructures();
+#
+  my $term = new Term::ShellUI(commands =>getCommands(),
+  history_file => '~/.active-memory');
+  $term->prompt(sub {"active-memory> " });
+  $term->run();
+
+  print usage();
+  App::DrKnow::checkStructures();
+  App::DrKnow::envoke();
+
+
+1;
+__DATA__
+
+our @check = ();

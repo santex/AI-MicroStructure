@@ -52,6 +52,7 @@ done
 
 for i in  `micro any 20`; do echo $i | xargs micro-wiki & done
 ~
-~
-~
-~
+mech-dump --text http://www.latest-ufo-sightings.net/p/polls.html  |  tr "P|." "\n" | tr -d "("   | tr  ")" "\n" | egrep "^[1-31]|oll \#"  | egrep -v "Support|Facebook|Google"
+
+
+

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -W
+#!/usr/bin/perl 
 package AI::MicroStructure;
 use strict;
 use warnings;
@@ -601,7 +601,6 @@ my $self = shift;
 my $StructureName = shift;
 my $data = shift;
 
-    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
     $StructureName = lc $self->trim(`micro`) unless($StructureName);
     my $file = "$absstructdir/$StructureName.pm";
     print `mkdir $absstructdir` unless(-d $absstructdir);
@@ -779,7 +778,7 @@ if($new==1){
   Type: the number you choose 1..$senses
   \033[0m",__PACKAGE__->usage($StructureName,$senses,$data));
 
-  $line = 1 unless($senses != 1);
+  $line = 1 unless($senses <= 1);
   chomp($line = <STDIN>) unless($line);
 
   my $d = join("#",@{$data->{rows}->{search}});

@@ -2,6 +2,12 @@
   package AI::MicroStructure::ObjectSet;
   use strict;
 
+  use Exporter;
+  our @ISA = qw(Exporter);
+
+  @ISA = qw(Exporter DynaLoader);
+
+
   sub new {
     my $pkg = shift;
     my $self = bless {}, $pkg;

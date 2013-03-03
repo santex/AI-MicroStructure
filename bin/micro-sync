@@ -1,84 +1,80 @@
 #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use Data::Printer;
+  use Parse::RecDescent;
+  use Getopt::Long;
+  use Statistics::Basic qw(:all);
+  use LWP::UserAgent;
+  use File::Spec;
+  use JSON::XS;
+  use File::Path;
+  use PerlIO::gzip;
+  use YAML qw<DumpFile LoadFile>;
+  use Parallel::Iterator qw( iterate );
+  use AnyEvent::Subprocess::Easy qw(qx_nonblock);
+  use AI::Classifier::Text::Analyzer;
+  use AI::MicroStructure;
 
-use strict;
-use warnings;
-use Data::Printer;
+  my $pid = $$;
 
-use Data::Dumper;
-use Getopt::Long;
-use Statistics::Basic qw(:all);
-use LWP::UserAgent;
-use File::Spec;
-use JSON::XS;
-use File::Path;
-use PerlIO::gzip;
-use YAML qw<DumpFile LoadFile>;
-use Parallel::Iterator qw( iterate );
-use AnyEvent::Subprocess::Easy qw(qx_nonblock);
-use AI::Classifier::Text::Analyzer;
-use AI::MicroStructure;
-our $micro = AI::MicroStructure->new();
-our @t = $micro->structures;
+  use constant WORDS     =>  '/home/santex/data-hub/book/output-unique';
+  use constant MAIL_RC   =>  'http://quantup.com/concept-knowledge/science/0.001-brain.txt.gz';
+  use constant OUTPUT    =>  'conceptor';
+  use constant AUTHOR    => 'http://localhost/~';
+  use constant USER_BASE => 'http://localhost//training-knowledge/science';
+  use constant STATE     =>  File::Spec->catfile(OUTPUT,'work.yml');
+  use constant DATA      =>  File::Spec->catfile(OUTPUT,'data.html');
+  use constant QUERYS    =>  File::Spec->catfile(OUTPUT,'querys.html');
+  use constant SIZE      =>  80;
 
-my $analyzer = AI::Classifier::Text::Analyzer->new();
+  mkpath( OUTPUT );
 
-$| = 1;
+  my  $currents = -f STATE ? LoadFile( STATE ) : {};
+  my ($date, $analyzer , $micro ,$sub, $UPDATE, $ua ,$sx,$cmd);
 
+  GetOptions( 'update' => \$UPDATE )
+   or die "$1 [--update]\n";
 
-use constant WORDS     =>  '/home/santex/data-hub/book/output-unique';
-
-use constant MAIL_RC =>    'http://quantup.com/concept-knowledge/science/0.001-brain.txt.gz';
-use constant USER_BASE => 'http://localhost//training-knowledge/science';
-use constant AUTHOR    => 'http://localhost/~';
-use constant OUTPUT    => 'cpan-faces';
-use constant STATE     => File::Spec->catfile( OUTPUT, 'work.yml' );
-use constant DATA     => File::Spec->catfile( OUTPUT, 'data.html' );
-use constant QUERYS     => File::Spec->catfile( OUTPUT, 'querys.html' );
-use constant SIZE      => 80;
-
-my $UPDATE = 0;
-
-GetOptions( 'update' => \$UPDATE )
- or die "cpan-gravatar.pl [--update]\n";
-
-my $ua = LWP::UserAgent->new;
-
-mkpath( OUTPUT );
-
-my $currents = -f STATE ? LoadFile( STATE ) : {};
-
-$SIG{INT} = sub {
-  print "Got SIGINT, stopping\n";
-  exit;
-};
-
-my $pid = $$;
-
-my $cmd = {};
-
-$cmd->{one} = 'for i in `cat '.WORDS.' | egrep "*.or.*"`; do y=$(wn $i -grepn  | egrep -v "Grep og*|^\n\n"); echo  $i"="$y"\n"  ; done';
+  $UPDATE        = 0;
+  $analyzer = AI::Classifier::Text::Analyzer->new();
+  $ua       = LWP::UserAgent->new;
+  $micro    = AI::MicroStructure->new();
 
 
-#|sub|mul|dev|eq|math|calc|ma
-  my $date ;
-  our $sub ={};
+  mkpath( OUTPUT );
+
+  $currents = -f STATE ? LoadFile( STATE ) : {};
+
+
+  $SIG{INT} = sub {
+    print "Got SIGINT, stopping\n";
+    exit;
+  };
+
+
+my @DATA = <DATA>;
+
   my ( %currents,   $id ) = ();
- foreach my $call (keys %$cmd){
+  foreach my $call (@DATA){
 
-  $date = qx_nonblock($cmd->{$call})->recv;
+  next unless($call);
 
-foreach my $line(split(/\n/,$date)){
-  next unless($line);
-my  $sx=sx(split(/=/,$line));
-    $sub->{$call}->{$sx}->{line}=$line;
-        $sub->{$call}->{$sx}->{concept}=[split(/=/,$line)];
-        $sub->{$call}->{$sx}->{concept}=$sub->{$call}->{$sx}->{concept}[0];
-        $sub->{$call}->{$sx}->{features}=$analyzer->analyze($line);
+  $date = qx_nonblock($call)->recv;
 
-    $sub->{$call}->{$sx}->{avg}=[values %{$sub->{$call}->{$sx}->{features}}];
-    $sub->{$call}->{$sx}->{avg}=sprintf mean($sub->{$call}->{$sx}->{avg});
-}
-#   $sub->{avg}=>mean($sub->{$call}->{features}->{call}->{score});
+    foreach my $line(split(/\n/,$date)){
+        next unless($line);
+
+      $sx=sx(split(/=/,$line));
+      $sub->{$call}->{$sx}->{line}=$line;
+          $sub->{$call}->{$sx}->{concept}=[split(/=/,$line)];
+          $sub->{$call}->{$sx}->{concept}=$sub->{$call}->{$sx}->{concept}[0];
+          $sub->{$call}->{$sx}->{features}=$analyzer->analyze($line);
+
+      $sub->{$call}->{$sx}->{avg}=[values %{$sub->{$call}->{$sx}->{features}}];
+      $sub->{$call}->{$sx}->{avg}=sprintf mean($sub->{$call}->{$sx}->{avg});
+
+    }
 
 
 
@@ -88,7 +84,7 @@ my  $sx=sx(split(/=/,$line));
 
 END {
     print "Saving ", STATE, "\n";
-    DumpFile( STATE, $cmd );
+    DumpFile( STATE, $cmd ,[values %$sub]);
 
 
  my $index = File::Spec->catfile( OUTPUT, 'data.html' );
@@ -100,6 +96,8 @@ END {
   open  $ih, '>', $index or die "Can't write $index ($!)\n";
     print $ih  JSON::XS->new->pretty(1)->encode({data=>$cmd});
     close $ih;
+
+
 }
 
 update(
@@ -115,20 +113,16 @@ update(
      && $currents->{$id}->{state} eq 'done';
   }
 );
-  sub sx
-  {
-
-      my ( @res ) = @_;
-      my ($i, $t, $_);
-      for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
-          ($i,$t) = /(.)(.*)/;
-         $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
-         $_ = substr(($i||'Z').$t.'000', 0, 4 );
-      }
-      wantarray ? @res : $res[0];
+sub sx {
+  my ( @res ) = @_;
+  my ($i, $t, $_);
+  for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
+      ($i,$t) = /(.)(.*)/;
+     $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
+     $_ = substr(($i||'Z').$t.'000', 0, 4 );
   }
-
-
+  wantarray ? @res : $res[0];
+}
 
 sub build_head {
   my $currents = shift;
@@ -243,3 +237,12 @@ sub get_current {
   return;
 }
 
+#comma,separated=>values
+#with,q{a,perl,twist},/to them/
+#latst,query=>mech-dump --text http://www.latest-ufo-sightings.net/p/polls.html  |  tr "P|." "\n" | tr -d "("   | tr  ")" "\n" | egrep "^[1-31]|oll"
+#all,query=>for url in $(mech-dump --links http://www.latest-ufo-sightings.net  | egrep -i "archive"); do echo $url; done
+
+__DATA__
+for o in `cat /home/santex/data-hub/book/output-unique | egrep "^*.(alg|qua|sozio|therm|exo|geo|bio|phys|chem).*"`; do qq=$(wordnet $o  -grepn | egrep -v "of noun");  echo -split-hit $qq ;  done
+mech-dump --text http://www.latest-ufo-sightings.net/p/polls.html  |  tr "P|." "\n" | tr -d "("   | tr  ")" "\n" | egrep "^[1-31]|oll"
+for url in $(mech-dump --links http://www.latest-ufo-sightings.net  | egrep -i "archive"); do echo $url; done

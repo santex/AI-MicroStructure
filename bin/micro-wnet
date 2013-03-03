@@ -4,5 +4,5 @@ echo "you need a word you want to check"
 exit 0;
 fi
 
-wn $1 -hypon -hypen -synsv -synsn | sed 's/Sense/Sense~~~~~~~~~/g' | sed 's/[[:space:]]*=> / /' | sed '/^$/d' | sed 's/ //'  | sed 's/,/, /' | sed 's/HAS INSTANCE//g';
+wn $1 -hypon -hypen -synsv -synsn | sed 's/Sense/Sense~~~~~~~~~/g' | sed 's/[[:space:]]*=> / /' | sed '/^$/d' | sed 's/ //'  | sed 's/,/, /' | sed 's/HAS INSTANCE//g | egrep -v "^([ ]|[0-9][A-Z])"';
 

@@ -8,7 +8,7 @@ use Params::Validate qw(:types);
 use Data::Dumper;
 use AI::MicroStructure::Collection;
 use AI::MicroStructure;
-my @themes = grep { !/^(?:any)/ } AI::MicroStructure->themes;
+my @themes = grep { !/^(?:any)/ } AI::MicroStructure->structures;
 
 my $root = Tree::DAG_Node->new({attributes=>{BASE_STRUCTURE=>[@themes]}});
    $root->name("micro");
