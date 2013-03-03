@@ -26,9 +26,10 @@ use Log::Log4perl::Util;
 
 use Term::ProgressBar::Simple;
 use Term::ProgressBar;
-use Term::Emit qw/:all/, {-bullets   => ' * ',
+use Term::Emit qw/:all/, {-bullets => [" * ", " + ", " - ", "   "],
                         -color     => 1,
-                        -closestat => "OK"};
+                        -closestat => "OK",
+                        -width=>200};
 
 use Time::HiRes qw( usleep );
 use vars qw(@ISA);
@@ -51,6 +52,21 @@ our @check = ();
 #use IPC::Run qw(run);
 
 #use constant DISCIPLIN => '0.001-brain.txt.gz';
+
+
+
+our $curSysDate = `date +"%F"`;
+    $curSysDate=~ s/\n//g;
+
+our $TOP = "/media/Elements/media";
+    $TOP = "/home/santex/data-hub";
+
+my $create = -1;
+my $target_dir = "";
+
+   $target_dir = $TOP unless(-d $target_dir);
+
+my $TOP_URL = "http://www.stonehenge.com/merlyn/WebTechniques";
 
 
 
@@ -136,6 +152,11 @@ sub download {
 #dry_run(0);
 #confirm(1);
 our $search =  "";
+
+    if(-d $ARGV[0]){
+      $TOP = shift @ARGV;
+    }
+
     $search = sprintf("%s",join("|",@ARGV)) unless(!@ARGV);
 
 our $cache = {};
@@ -225,20 +246,6 @@ sub mkd {
     mkpath @_ or
         LOGCROAK("Cannot mkdir @_ ($!)");
 }
-
-
-our $curSysDate = `date +"%F"`;
-    $curSysDate=~ s/\n//g;
-
-our $TOP = "/media/Elements/media";
-    $TOP = "/home/santex/data-hub";
-
-my $create = -1;
-my $target_dir = "";
-
-   $target_dir = $TOP unless(-d $target_dir);
-
-my $TOP_URL = "http://www.stonehenge.com/merlyn/WebTechniques";
 
 
 
@@ -575,18 +582,22 @@ sub translate {
 sub invoke {
 
 
-emit("searching knowledge to assimilate for $search");
+
 
 find(\&translate, "$TOP/./");
 
 foreach(sort{$a cmp $b} keys %{$files}){
-  if($_=~/$search/ && $search){
-  print "$_\n";
+  my $find = App::DrKnow::sx($search);
+  if($_=~ m/$find|$search/gui && $search){
+  foreach my $f(@{$files->{$_}}){
+    emit($f);
+  }
+
   }else{
-  print "$_\n";
+#  print "$_\n";
   }
 };
-
+emit("\n\nsearching knowledge to assimilate for $search");
 #P200_Z000_Z000_Z000_A530_Z000
 
 
@@ -600,7 +611,7 @@ return $files;
       my  $app = App::DrKnow->new();
           $app->checkStructures();
  $files = $app->invoke();
-p$files;
+#p$files;
 
 1;
 __DATA__
