@@ -147,7 +147,7 @@ sub call  {
 
 my ($idx,$url) = @_;
 
-#return () unless (!checkIsThere($url) || $idx==0);
+exit (0) unless (!checkIsThere($url) || $idx==0);
 
 
 warn "doing ", $url;

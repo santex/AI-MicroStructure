@@ -104,9 +104,6 @@ function pause(){
 function run_test(){
 
 
-    write_header " Testing "
-    micro=$(micro any 1)
-    write_header $micro
     show_menu $@
     read_input $@
     pause
@@ -207,9 +204,9 @@ function read_input(){
     4)  user_info "who" ;;
     5)  user_info "last" ;;
     6)  mem_info ;;
-    7)  micro-cachex;;
+    7)  /home/santex/AI-MicroStructure-test/bin/micro-cachex;;
     8)  run_test ;;
-    9)  perl $WEBSOCKET_SERVER & ;;
+    9)  $WEBSOCKET_SERVER & ;;
     10) micro ;;
     11) micro ;;
     12) micro ;;
@@ -259,6 +256,22 @@ function show_menu(){
 
     echo "0. for exiting the programm"
     echo "---------------------------"
+    echo "   Main Menu"
+    echo "---------------------------"
+    echo "7. "
+    echo "8. "
+    echo "9. "
+    echo "10."
+    echo "11."
+    echo "12."
+    echo "13."
+    echo "14."
+    echo "15."
+    echo "16."
+    echo "17."
+    echo "18."
+    echo "19."
+    echo "---------------------------"
     echo "   Host Menu"
     echo "---------------------------"
     echo "1. Operating system info"
@@ -267,22 +280,6 @@ function show_menu(){
     echo "4. Who is online"
     echo "5. Last logged in users"
     echo "6. Free and used memory info"
-    echo "---------------------------"
-    echo "   Main Menu"
-    echo "---------------------------"
-    echo "7. Create Db"
-    echo "8. Scann IBES for strong buy"
-    echo "9. Start report server"
-    echo "10. Start structure cli"
-    echo "11. Market Overview"
-    echo "12. Start R back-test"
-    echo "13. Start Tray"
-    echo "14. Restore previous run from master-run Storable"
-    echo "15. XML EXPORT"
-    echo "16. View Knowledge on the system "
-    echo "17. View Trades"
-    echo "18. Manage Category's"
-    echo "19. Custom Module"
 
 }
 
@@ -659,17 +656,16 @@ textbox() {
 formbox () {
     dialog --backtitle "...." \
         --form " Form Test - use [up] [down] to select input field " 21 70 18 \
-        "name" 2 4 "" 2 15 20 0\
-        "surname" 4 4 "" 4 15 20 0\
-        "city" 6 4 "" 6 15 20 0\
-        "county" 8 4 "Germany" 8 15 "-20" 0\
+        "content dir" 2 2 "" 2 15 20 0\
+        "category" 4 4 "" 4 15 20 0\
+        "category 2" 6 4 "" 6 15 20 0\
+        "category 2" 8 4 "" 8 15 "-20" 0\
         2>$_temp
 
     if [ ${?} -ne 0 ]; then return; fi
     result=`cat $_temp`
     echo "Result=$result"
-    dialog --title "Items are separated by \\n" --cr-wrap \
-           --msgbox "\nYou entered:\n$result" 12 52
+    micro-cachex $result
 }
 
 ### Text Box - show file test.txt

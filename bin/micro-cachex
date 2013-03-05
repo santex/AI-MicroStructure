@@ -6,30 +6,35 @@ use strict;
 use warnings;
 
 our $VERSION = "0.001";
-#use IO::File;
-use File::Path;
-use Data::Dumper;
-use Data::Printer;
-use File::Temp qw(tempfile tempdir);
-use File::Find;
-use Getopt::Long;
-use Term::ShellUI;
-
-use Data::Freq;
-use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Cwd;
 use Env qw(PWD);
+use IO::File;
+use File::Path;
+use File::Basename;
+use File::Temp qw(tempfile tempdir);
+use File::Find;
 
-use Log::Log4perl qw(:easy);
-use Log::Log4perl::Util;
+use Data::Dumper;
+use Data::Printer;
+use Data::Freq;
+
+use Getopt::Long;
 
 use Term::ProgressBar::Simple;
 use Term::ProgressBar;
 use Term::Emit qw/:all/, {-bullets => [" * ", " + ", " - ", "   "],
                         -color     => 1,
-                        -closestat => "OK",
-                        -width=>200};
+                        -closestat => "CATEGORY",
+                        -fh => *STDOUT,
+                        -width=>180};
+
+use Term::ShellUI;
+use Term::Complete;
+
+use Log::Log4perl qw(:easy);
+use Log::Log4perl::Util;
+
 
 use Time::HiRes qw( usleep );
 use vars qw(@ISA);
@@ -53,10 +58,20 @@ our @check = ();
 
 #use constant DISCIPLIN => '0.001-brain.txt.gz';
 
+our $ms = AI::MicroStructure->new();
+
 
 
 our $curSysDate = `date +"%F"`;
     $curSysDate=~ s/\n//g;
+
+
+
+our $cache={};
+
+
+
+
 
 our $TOP = "/media/Elements/media";
     $TOP = "/home/santex/data-hub";
@@ -67,6 +82,31 @@ my $target_dir = "";
    $target_dir = $TOP unless(-d $target_dir);
 
 my $TOP_URL = "http://www.stonehenge.com/merlyn/WebTechniques";
+
+our %opts = (categorys=>"biology",
+             content=>"bio|micro|plant",
+             directory=>$ms->{state}->{cfg}->{"default"},
+             cache_file =>  sprintf("%s/%s_.cache",
+             $ms->{state}->{cfg}->{"default"},
+             $curSysDate));
+
+GetOptions (\%opts, "cache_file=s","categorys=s","content=s", "directory=s");
+
+eval {
+    category $^W = 0;  # because otherwhise doesn't pass errors
+
+    $cache = lock_retrieve($opts{cache_file});
+
+    if($@){
+      lock_strore($cache,$opts{cache_file});
+    }
+    $cache = {} unless $cache;
+
+    warn "New cache!\n" unless defined $cache;
+
+
+
+};
 
 
 
@@ -84,8 +124,6 @@ our $type = {};
 our $action = {};
 our $sep=sprintf("%s%s%s","\n"x 3,"#" x 70,"\n");
 
-
-our $ms = AI::MicroStructure->new();
 
 
 
@@ -107,6 +145,17 @@ sub new {
 
     return $self;
 }
+
+
+BEGIN{
+
+
+  }
+INIT{
+
+    #emit($search);
+
+  }
 
 
 sub tardir {
@@ -150,16 +199,18 @@ sub download {
 
 
 #dry_run(0);
-#confirm(1);
+confirm(1);
 our $search =  "";
 
-    if(-d $ARGV[0]){
-      $TOP = shift @ARGV;
+
+    if(-d $opts{directory}){
+      $TOP =  $opts{directory};
     }
 
-    $search = sprintf("%s",join("|",@ARGV)) unless(!@ARGV);
+    $opts{categorys}=~s/ /|/g;
+    $search = $opts{categorys} unless(!$opts{categorys});
 
-our $cache = {};
+
 
 
 ###############################################
@@ -248,30 +299,6 @@ sub mkd {
 }
 
 
-
-our %opts = (cache_file =>
-              sprintf("%s/%s_.cache",
-              $TOP,$curSysDate));
-
-GetOptions (\%opts, "cache_file=s");
-
-eval {
-    category $^W = 0;  # because otherwhise doesn't pass errors
-
-    $cache = lock_retrieve($opts{cache_file});
-
-    if($@){
-      lock_strore($cache,$opts{cache_file});
-    }
-    $cache = {} unless $cache;
-
-    warn "New cache!\n" unless defined $cache;
-
-
-
-};
-
-
 our $descriptions = {action=>{},type=>{},location=>{}};
     $descriptions->{action} = {
                     'use'     =>"activate something !",
@@ -291,8 +318,7 @@ $descriptions->{type} =
 'new'     =>"things you dont have yet",
 'my'      =>"things you have already",
 'related' =>"things which are related to you",
-'popular' =>"trending things",#
-#'growing' =>"expanding things",
+'expanding' =>"expanding knowledge",
 #'fit'    =>"usefull things",
 };
 
@@ -529,15 +555,10 @@ sub translate {
   (my $rel_name = $File::Find::name) =~ s{.*/}{}xs;
 
 
-  if (/\.html$/) {
-
-  }
-  elsif (/\.pdf$/) {
-
   my $first = "";
   my $xname = $rel_name;
 
-  $xname =~ s/([s|S]pringer.|.pdf|The)/-/gui;
+  $xname =~ s/([s|S]pringer.|.pdf|The|micro|relations|.json)/-/gui;
   my @sy = split(/(\.|\(|\)|\_|\ |,|-)/,$xname);
 
 
@@ -553,24 +574,34 @@ sub translate {
   @sy = App::DrKnow::sx(@check);
 
   @sy = grep{!/Z000/}@sy;
-#  $first = shift @sy;
- # my $second = shift @sy;
 
-  #$first = "empty" unless(length($first));
+
+
+  if (/\.html$/) {
+
+  }
+  elsif (/\.pdf$/){
+  my $s = join("_",@sy);
+     $s = "empty" unless($s);
+  my $name=sprintf("%s\t%s",$s,$rel_name);
+
+
+    $files->{pdf}->{$s}={$rel_name=>\@check};
+
+  }elsif(/\.json$/) {
+
 
 
   my $s = join("_",@sy);
      $s = "empty" unless($s);
   my $name=sprintf("%s\t%s",$s,$rel_name);
 
-#->{pdf}->{$first}->{$second}
-    push @{$files->{$s}} ,$rel_name;
+
+    $files->{json}->{$s}={$rel_name=>\@check};
 
 
   }elsif (/\.ltx$/) {
   }elsif (/^AI*\.pm$/) {
-
-  }elsif (/\.json$/) {
   }elsif (/\.txt$/) {
   }else{
 
@@ -583,46 +614,105 @@ sub invoke {
 
 
 
+my $self = shift;
+
+
+my $type = shift || "pdf";
+
 
 find(\&translate, "$TOP/./");
 
-foreach(sort{$a cmp $b} keys %{$files}){
-  my $find = App::DrKnow::sx($search);
-  if($_=~ m/$find|$search/gui && $search){
-  foreach my $f(@{$files->{$_}}){
-    emit($f);
-  }
+$search = sprintf("%s",$opts{content});
+emit($search);
 
-  }else{
-#  print "$_\n";
+foreach(sort{$a cmp $b} keys %{$files->{$type}}){
+  my $find = App::DrKnow::sx(($search));
+  my $show = [keys %{$files->{$type}->{$_}}];
+
+
+  if($show->[0] =~ m/($search)/gui ||
+     $files->{$type}->{$_}->{$show->[0]} =~ m/($search)/gui){
+
+
+#    $show =~ s/\n| /./g;
+    my $x = 70-length($_);
+    emit(sprintf("%s%s%s",$_," "x$x,substr(join(" ",@{$show}),0,64)));
+
+#    p@{$files->{$_}};
+
+#  foreach my $f(@{$files->{$_}}){
+
+ # }
+ }else{
+
   }
 };
-emit("\n\nsearching knowledge to assimilate for $search");
-#P200_Z000_Z000_Z000_A530_Z000
 
 
-return $files;
+
+return $files->{$type};
 
 }
 
+sub action {
+
+    my $self = shift;
+    my($url) = @_;
+
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    INFO "download $url";
+
+    _confirm("Downloading $url => ", basename($url)) or return 1;
 
 
+    p $self;
 
-      my  $app = App::DrKnow->new();
-          $app->checkStructures();
- $files = $app->invoke();
-#p$files;
+    return 0;
+}
+
+p %opts;
+
+  my  $app = App::DrKnow->new();
+
+      $app->checkStructures();
+
+
+      Term::Emit::setopts(-closestat => "SOURCE");
+      foreach(qw(json pdf)) {
+        printf("\n%s\n","@"x185);
+        printf("%s%s"," "x55,"$_ "x15);
+        printf("%s\n"," "x55);
+        printf("%s\n\n","@"x185);
+        $app->invoke($_);
+      }
+      printf("%s\n","@"x185);
+
+#      p $files;
+#  if($app->action("use sources as content")){
+
+ #   my $term = new Term::ShellUI(commands =>getCommands(),
+  #    history_file => '~/.active-memory');
+   #   $term->prompt(sub {"active-memory> " });
+    #  $term->run();
+
+
+#  }else{
+
+
+ #   _confirm("Downloading $target_dir => ", basename($target_dir));
+
+#    print usage();
+
+
+  #}
 
 1;
 __DATA__
 #  App::DrKnow::checkStructures();
 #
-  my $term = new Term::ShellUI(commands =>getCommands(),
-  history_file => '~/.active-memory');
-  $term->prompt(sub {"active-memory> " });
-  $term->run();
 
-  print usage();
   App::DrKnow::checkStructures();
   App::DrKnow::envoke();
 

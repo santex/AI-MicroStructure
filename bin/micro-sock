@@ -111,7 +111,7 @@ sub printer {
 
      $cmd->{action} =
       [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g;
-                    $_={neighbour => $a[0][1], spawn => $a[0][0]}}
+                    $_={nb => $a[0][1], sp => $a[0][0]}}
                     split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq --limit 100`)];
 
 
