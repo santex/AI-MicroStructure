@@ -23,7 +23,7 @@ use Data::Printer;
 use Data::Freq;
 
 use Getopt::Long;
-
+use Digest::MD5 qw(md5_hex);
 use Term::ProgressBar::Simple;
 use Term::ProgressBar;
 use Term::Emit qw/:all/, {-bullets => [" * ", " + ", " - ", "   "],
@@ -62,17 +62,6 @@ our $cache={};
 
 
 
-
-our $TOP = "/media/Elements/media";
-    $TOP = "/home/santex/data-hub";
-
-my $create = -1;
-my $target_dir = "";
-
-   $target_dir = $TOP unless(-d $target_dir);
-
-my $TOP_URL = "";
-
 our %opts = (categorys=>"biology",
              content=>"plant",
              verbose=>0,
@@ -98,6 +87,17 @@ eval {
 };
 
 
+
+
+our $TOP = "/media/Elements/media";
+    $TOP = $opts{directory};
+
+my $create = -1;
+my $target_dir = $opts{directory};
+
+   $target_dir = $TOP unless(-d $target_dir);
+
+my $TOP_URL = "";
 
 
 
@@ -513,9 +513,9 @@ sub  checkStructures{
 
     # loop
     foreach my $th (@t) {
-if ($th =~/$search/ || $search eq ""){
-  emit ("Chrecking $th  \n")
-}
+    if ($th =~/$search/ || $search eq ""){
+      emit ("Checking $th  \n")
+    }
 
 
                 # increment the progress bar object to tell it a step has been taken.
@@ -558,9 +558,6 @@ sub translate {
 
   foreach(@sy){
       push @check,lc $_ unless(length($_)<=2);
-
-
- #     print $_."\n";
 
   }
 
@@ -645,7 +642,7 @@ my $self = shift;
 my $type = shift || "pdf";
 
 
-find(\&translate, "/$TOP");
+find(\&translate, sprintf("/%s",$opts{directory}));
 
 if($opts{verbose}==1){
 $search = sprintf("%s",join("|",split("\n",`micrownet $opts{content}`)));
@@ -668,8 +665,9 @@ foreach(sort{$a cmp $b} keys %{$files->{$type}}){
 
 
 #    $show =~ s/\n| /./g;
-    my $x = 70-length($_);
-    emit(sprintf("%s%s%s",$_," "x$x,substr($show,0,64)));
+    my $x = 60-length($_);
+    my $eshow = pop [split('/',$show)];
+    emit(sprintf("%s%s%s",$_," "x$x,substr($eshow,0,94)));
     $found->{$type}->{$show}=$show;
 #    p@{$files->{$_}};
 
@@ -726,17 +724,22 @@ sub action {
 
 
 
-      foreach my $t(qw/pdf json txt/) {
+      foreach my $t(qw/pdf json/) {
         Term::Emit::setopts(-closestat => "SOURCE");
        printf("%s\n","@"x185);
-        printf("%s%s"," "x90,"$t "x15);
+        printf("%s%s"," "x80,"$t "x15);
         printf("%s\n\n"," "x90);
         $app->invoke($t);
 
         Term::Emit::setopts(-closestat => "COPY DONE");
         foreach(keys %{$found->{$t}}){
-          system("IFS=\$'\n'; cp '/$_' ".$app->{tempdir});
-           $data->{$_}=$app->convertJson("/$_") unless($t=~/pdf/);
+          my $n=pop [split("/",$_)];
+          system(sprintf(" cp '/$_' '%s/%s.json'",$app->{tempdir},$n))unless($t!~/json/);
+          system(sprintf("cp '/$_' '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
+          system(sprintf("pdftotext '%s/%s.pdf' '%s/%s.txt' ",$app->{tempdir},$n,$app->{tempdir},$n)) unless($t!~/pdf/);
+
+          #pdftotext '/$_' %s/%s.pdf",$app->{tempdir},$n))unless($t!~/pdf/);
+           $data->{$_}=$app->convertJson("/$_") unless($t!~/json/);
 #          emit($_);
         }
 
@@ -765,19 +768,14 @@ sub action {
   #}
 
 
-my $cmd = sprintf("IFS=\$'\n'; for i in `ls %s/* | grep pdf`; do IFS=\$'\n'; pdftotext \$i   \$i.txt; rm \$i; done",$app->{tempdir});
-print `$cmd`;
-
-
-        my $i=0;
-        foreach my $txt (split("\n\n",`cat $app->{tempdir}/*.txt`)){
+ my $i=0;
+        foreach my $txt (split("\n\n",`IFS=\$'\n'; cat $app->{tempdir}/*.txt`)){
           $data->{book}->{$i}=$txt;
           $i++;
         }
 
 
 p $data;
-
 
 1;
 __DATA__

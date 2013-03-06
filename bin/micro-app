@@ -534,11 +534,11 @@ FS=$'\n'
            --inputbox "Enter a line, please" 18 152 2>$_temp
     x=$(cat $_temp);
 
-    words=$(wn $x -grepv -grepn -grepa )
+    words=$(micrownet $x)
    # number the lines
 
 
-SPLITTED=$( echo $words | sed 's/ /\n/g' | awk -- '{print NR, $0, 0 }' )
+SPLITTED=$( echo $words | awk -- '{print NR, $0, 0 }' )
 
 
 
@@ -576,7 +576,7 @@ done
    x=$(cat $_temp);
 
 
-   words=`cat  $HOME/active-memory/test/wordlist.out | grep $x`
+   words=`cat  $HOME/data-hub/data/wordlist.out | grep $x`
 
    # number the lines
 SPLITTED=$( echo $words | sed 's/ /\n/g' | awk -- '{print NR, $0, 0 }' )
@@ -628,7 +628,7 @@ IFS=$'\n';
 
      x=$(cat $_temp);
 
-     words=`cat  $HOME/data-hub/book/output-unique | grep $x`
+     words=`cat  $HOME/data-hub/steam/freq-raw.micro | grep $x`
     result=`echo -n $words | tr "\t" "\n"`
 
      dialog --msgbox "\nYou entered:\n$result" 19 152

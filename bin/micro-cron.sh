@@ -41,17 +41,17 @@ if [ $(contains "${array2[@]}" "$item") == "n" ]; then
 var=$(ps aux | grep -c perl);
 
 
-if  [ 30 -lt $n ];
+if  [ 60 -lt $n ];
 then
 killall -9 /usr/bin/perl;
 n=0;
 fi
 
-if  [ 4 -lt $var ];
+if  [ 8 -lt $var ];
 then
   echo $n;
   let n+=1
-  sleep 10;
+  sleep 20;
   echo "wait";
 else
 
