@@ -15,6 +15,9 @@ use File::Basename;
 use File::Temp qw(tempfile tempdir);
 use File::Find;
 
+use JSON::XS;
+use Storable qw(lock_store lock_retrieve freeze thaw dclone);
+use Statistics::Basic qw(:all);
 use Data::Dumper;
 use Data::Printer;
 use Data::Freq;
@@ -38,27 +41,14 @@ use Log::Log4perl::Util;
 
 use Time::HiRes qw( usleep );
 use vars qw(@ISA);
-
+our $found = {};
 our $files={};
 our @check = ();
 
-
-
-
-#use File::Copy;
-#
-#use File::Basename;
-#use File::Spec::Functions qw(rel2abs abs2rel);
-#use File::stat qw(:FIELDS);
-#use Digest::MD5 qw(md5_hex);
-#use Term::Emit;
-#use Term::ProgressBar::Simple;
-#use Storable qw(lock_store lock_retrieve);
-#use IPC::Run qw(run);
-
-#use constant DISCIPLIN => '0.001-brain.txt.gz';
-
 our $ms = AI::MicroStructure->new();
+our $state  = AI::MicroStructure::Util::config();
+our $config = $state->{cfg};
+
 
 
 
@@ -81,32 +71,33 @@ my $target_dir = "";
 
    $target_dir = $TOP unless(-d $target_dir);
 
-my $TOP_URL = "http://www.stonehenge.com/merlyn/WebTechniques";
+my $TOP_URL = "";
 
 our %opts = (categorys=>"biology",
-             content=>"bio|micro|plant",
+             content=>"plant",
+             verbose=>0,
              directory=>$ms->{state}->{cfg}->{"default"},
              cache_file =>  sprintf("%s/%s_.cache",
              $ms->{state}->{cfg}->{"default"},
              $curSysDate));
 
-GetOptions (\%opts, "cache_file=s","categorys=s","content=s", "directory=s");
+GetOptions (\%opts, "cache_file=s","categorys=s","content=s", "directory=s", "verbose=i");
 
 eval {
-    category $^W = 0;  # because otherwhise doesn't pass errors
-
+    local $^W = 0;
+    if(-f $opts{cache_file}){
     $cache = lock_retrieve($opts{cache_file});
+    }else{
+      lock_store({},$opts{cache_file});
+      $cache = lock_retrieve($opts{cache_file});
 
-    if($@){
-      lock_strore($cache,$opts{cache_file});
     }
     $cache = {} unless $cache;
 
     warn "New cache!\n" unless defined $cache;
-
-
-
 };
+
+
 
 
 
@@ -138,6 +129,7 @@ sub new {
     my($class, %options) = @_;
 
     my $self = {
+        tempdir=>tempdir(),
         %options,
     };
 
@@ -552,13 +544,14 @@ sub translate {
   return unless -f;
 
   @check = ();
-  (my $rel_name = $File::Find::name) =~ s{.*/}{}xs;
+  (my $rel_name = $File::Find::name) =~ s{./*/*}{}xs;
 
 
   my $first = "";
   my $xname = $rel_name;
-
-  $xname =~ s/([s|S]pringer.|.pdf|The|micro|relations|.json)/-/gui;
+  $xname = pop [split("/",$rel_name)];
+  my $remove = shift [split("/",$rel_name)];
+  $xname =~ s/([s|S]pringer.|.pdf|The|micro|relations|.json|$remove)/-/gui;
   my @sy = split(/(\.|\(|\)|\_|\ |,|-)/,$xname);
 
 
@@ -586,7 +579,7 @@ sub translate {
   my $name=sprintf("%s\t%s",$s,$rel_name);
 
 
-    $files->{pdf}->{$s}={$rel_name=>\@check};
+    $files->{pdf}->{$s}=$rel_name;#=>{name=>$rel_name,check=>\@check}};
 
   }elsif(/\.json$/) {
 
@@ -597,18 +590,50 @@ sub translate {
   my $name=sprintf("%s\t%s",$s,$rel_name);
 
 
-    $files->{json}->{$s}={$rel_name=>\@check};
+    $files->{json}->{$s}=$rel_name;#={$rel_name=>{name=>$rel_name,check=>\@check}};
 
 
   }elsif (/\.ltx$/) {
   }elsif (/^AI*\.pm$/) {
   }elsif (/\.txt$/) {
+
+  my $s = join("_",@sy);
+     $s = "empty" unless($s);
+  my $name=sprintf("%s\t%s",$s,$rel_name);
+
+
+    $files->{txt}->{$s}=$rel_name;#={$rel_name=>{name=>$rel_name,check=>\@check}};
+
+
   }else{
 
   }
 
 }
 
+sub convertJson {
+
+my $self = shift;
+my $file = shift;
+
+return unless(-f $file);
+
+  my @lines = ();
+  my $filename = sprintf("%s",$file);
+  open(IN,$filename) or warn "Error: couldn't open file $filename : $!\n";
+
+    my $lines=join("",<IN>);
+
+    close (IN);
+
+    my $sense = JSON::XS->new->pretty(1)->decode($lines);
+
+
+    return $sense;
+
+
+
+}
 
 sub invoke {
 
@@ -620,24 +645,32 @@ my $self = shift;
 my $type = shift || "pdf";
 
 
-find(\&translate, "$TOP/./");
+find(\&translate, "/$TOP");
 
-$search = sprintf("%s",$opts{content});
-emit($search);
+if($opts{verbose}==1){
+$search = sprintf("%s",join("|",split("\n",`micrownet $opts{content}`)));
+$search =~ s/\n/\|/g;
+$search =~ s/ /|/g;
+$search = substr($search,0,length($search)-1);
+}else{
+ $search = $opts{content};
+}
+
+#emit($search);
 
 foreach(sort{$a cmp $b} keys %{$files->{$type}}){
   my $find = App::DrKnow::sx(($search));
-  my $show = [keys %{$files->{$type}->{$_}}];
+  my $show = $files->{$type}->{$_};
 
 
-  if($show->[0] =~ m/($search)/gui ||
-     $files->{$type}->{$_}->{$show->[0]} =~ m/($search)/gui){
+  if($show =~ m/($search)/gui ||
+     $files->{$type}->{$_} =~ m/($search)/gui){
 
 
 #    $show =~ s/\n| /./g;
     my $x = 70-length($_);
-    emit(sprintf("%s%s%s",$_," "x$x,substr(join(" ",@{$show}),0,64)));
-
+    emit(sprintf("%s%s%s",$_," "x$x,substr($show,0,64)));
+    $found->{$type}->{$show}=$show;
 #    p@{$files->{$_}};
 
 #  foreach my $f(@{$files->{$_}}){
@@ -652,6 +685,21 @@ foreach(sort{$a cmp $b} keys %{$files->{$type}}){
 
 return $files->{$type};
 
+}
+
+sub trim
+{
+  my $string = shift;
+
+  $string =  "" unless  $string;
+  $string =~ s/^\s+//;
+  $string =~ s/\s+$//;
+  $string =~ s/\t//;
+  $string =~ s/^\s//;
+  $string =~ s/^->//;
+  $string =~ s/^=>//;
+
+  return $string;
 }
 
 sub action {
@@ -671,25 +719,33 @@ sub action {
 
     return 0;
 }
-
-p %opts;
-
+  my $data = {};
   my  $app = App::DrKnow->new();
 
       $app->checkStructures();
 
 
-      Term::Emit::setopts(-closestat => "SOURCE");
-      foreach(qw(json pdf)) {
-        printf("\n%s\n","@"x185);
-        printf("%s%s"," "x55,"$_ "x15);
-        printf("%s\n"," "x55);
-        printf("%s\n\n","@"x185);
-        $app->invoke($_);
-      }
-      printf("%s\n","@"x185);
 
-#      p $files;
+      foreach my $t(qw/pdf json txt/) {
+        Term::Emit::setopts(-closestat => "SOURCE");
+       printf("%s\n","@"x185);
+        printf("%s%s"," "x90,"$t "x15);
+        printf("%s\n\n"," "x90);
+        $app->invoke($t);
+
+        Term::Emit::setopts(-closestat => "COPY DONE");
+        foreach(keys %{$found->{$t}}){
+          system("IFS=\$'\n'; cp '/$_' ".$app->{tempdir});
+           $data->{$_}=$app->convertJson("/$_") unless($t=~/pdf/);
+#          emit($_);
+        }
+
+      }
+      printf("%s\n","@"x190);
+#      printf("%s","\n"x150);
+
+
+
 #  if($app->action("use sources as content")){
 
  #   my $term = new Term::ShellUI(commands =>getCommands(),
@@ -707,6 +763,21 @@ p %opts;
 
 
   #}
+
+
+my $cmd = sprintf("IFS=\$'\n'; for i in `ls %s/* | grep pdf`; do IFS=\$'\n'; pdftotext \$i   \$i.txt; rm \$i; done",$app->{tempdir});
+print `$cmd`;
+
+
+        my $i=0;
+        foreach my $txt (split("\n\n",`cat $app->{tempdir}/*.txt`)){
+          $data->{book}->{$i}=$txt;
+          $i++;
+        }
+
+
+p $data;
+
 
 1;
 __DATA__

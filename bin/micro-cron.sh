@@ -57,7 +57,7 @@ else
 
 
 
-  micro-wiki $item &
+  micro-wiki-2 $item &
   echo $item >> "$1.last"
   n=0;
   sleep 5;
