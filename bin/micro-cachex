@@ -741,6 +741,7 @@ sub action {
           system(sprintf(" cp '/$_' '%s/%s.json'",$app->{tempdir},$n))unless($t!~/json/);
           system(sprintf("cp '/$_' '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
           system(sprintf("pdftotext '%s/%s.pdf' '%s/%s.txt' ",$app->{tempdir},$n,$app->{tempdir},$n)) unless($t!~/pdf/);
+          system(sprintf("rm '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
 
           #pdftotext '/$_' %s/%s.pdf",$app->{tempdir},$n))unless($t!~/pdf/);
            $data->{$_}=$app->convertJson("/$_") unless($t!~/json/);
