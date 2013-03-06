@@ -738,10 +738,10 @@ sub action {
         Term::Emit::setopts(-closestat => "COPY DONE");
         foreach(keys %{$found->{$t}}){
           my $n=pop [split("/",$_)];
-          system(sprintf(" cp '/$_' '%s/%s.json'",$app->{tempdir},$n))unless($t!~/json/);
-          system(sprintf("cp '/$_' '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
-          system(sprintf("pdftotext '%s/%s.pdf' '%s/%s.txt' ",$app->{tempdir},$n,$app->{tempdir},$n)) unless($t!~/pdf/);
-          system(sprintf("rm '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
+          system(sprintf("IFS=\$'\n'; cp '/$_' '%s/%s.json'",$app->{tempdir},$n))unless($t!~/json/);
+          system(sprintf("IFS=\$'\n'; cp '/$_' '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
+          system(sprintf("IFS=\$'\n'; pdftotext '%s/%s.pdf' '%s/%s.txt' ",$app->{tempdir},$n,$app->{tempdir},$n)) unless($t!~/pdf/);
+          system(sprintf("IFS=\$'\n'; rm '%s/%s.pdf' ",$app->{tempdir},$n))unless($t!~/pdf/);
 
           #pdftotext '/$_' %s/%s.pdf",$app->{tempdir},$n))unless($t!~/pdf/);
            $data->{$_}=$app->convertJson("/$_") unless($t!~/json/);
@@ -778,7 +778,7 @@ my   $analyzer = AI::Classifier::Text::Analyzer->new();
 
 
  my $i=0;
-        foreach my $txt (split("\n\n",`IFS=\$'\n'; cat $app->{tempdir}/*.txt`)){
+        foreach my $txt (split("\n\n",`IFS=\$'~'; cat $app->{tempdir}/*.txt`)){
           $data->{book}->{$i}={org=>$txt,feature=>$analyzer->analyze($txt)};
           $i++;
         }
