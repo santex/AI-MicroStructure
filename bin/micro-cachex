@@ -766,11 +766,12 @@ sub action {
 
 
   #}
+  use AI::Classifier::Text::Analyzer;
 
 
  my $i=0;
         foreach my $txt (split("\n\n",`IFS=\$'\n'; cat $app->{tempdir}/*.txt`)){
-          $data->{book}->{$i}=$txt;
+          $data->{book}->{$i}={org=>$txt,feature=>$analyzer->analyze($txt)};
           $i++;
         }
 
