@@ -21,6 +21,10 @@ use Statistics::Basic qw(:all);
 use Data::Dumper;
 use Data::Printer;
 use Data::Freq;
+use AI::Classifier::Text::Analyzer;
+use Parallel::Iterator qw( iterate );
+use AnyEvent::Subprocess::Easy qw(qx_nonblock);
+use AI::Classifier::Text::Analyzer;
 
 use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
@@ -766,7 +770,10 @@ sub action {
 
 
   #}
-  use AI::Classifier::Text::Analyzer;
+
+
+my   $analyzer = AI::Classifier::Text::Analyzer->new();
+
 
 
  my $i=0;
