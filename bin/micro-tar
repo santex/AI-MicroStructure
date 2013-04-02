@@ -4,8 +4,6 @@ use warnings;
 use Getopt::Std;
 use Pod::Usage;
 use Archive::Tar::Wrapper;
-use Sysadm::Install qw(:all);
-
 use vars qw($CVSVERSION);
 
 $CVSVERSION = '$Revision: 1.1 $';
@@ -27,7 +25,7 @@ if(!defined $target_dir or
 }
 
 if(! -d $target_dir) {
-    my $create = ask "$target_dir doesn't exist. Create it [y]", "y";
+    my $create = ask("$target_dir doesn't exist. Create it [y]", "y");
     mkd $target_dir if $create =~ /[yY]/;
 }
 

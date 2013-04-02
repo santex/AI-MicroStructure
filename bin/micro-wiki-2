@@ -193,17 +193,11 @@ my @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedi
 
           $doc->{image}=[$e->img];
           $doc->{linknr}=$#links;
-          $doc->{links}=@links;
+          $doc->{links}=[@all_links];
 
-#          @links = keys %{$linkdata->{base}};
           $doc->{pdf}=[grep{/^(\/\/|upload|http).*.(pdf|PDF)$/}@links];
 
           $doc->{audio}=[grep{/^(\/\/|upload|http).*.(mp3|wave|ogg|OGG|WAVE|MP3)$/}@links];
-
-          #@links = grep{/^http:\/\/$config->{wikipedia}\/wiki/}@links;
-
-
-
 
 
            $doc->{linknr}=$#all_links;

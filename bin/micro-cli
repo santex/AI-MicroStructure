@@ -1,0 +1,253 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+use Term::ShellUI;
+use File::stat qw(:FIELDS);
+use AI::MicroStructure;
+our %name = (action=>[qw/list get set/],#search get set   change plot cloudy
+                        type=>[qw/new my related/],# popular growing fit term
+                        location=>[qw/local remote/]);
+
+my @name =();
+my @vals =();
+
+
+
+our $ms = AI::MicroStructure->new();
+
+our $descriptions = {action=>{},type=>{},location=>{}};
+    $descriptions->{action} = {
+                    'get'     =>"get something !",
+                    'set'     =>"set something !",
+                    #  'desc'    =>"show a description about something",
+                    #  'delete'  =>"remove something",
+                    'list'    =>"list something",
+                    # 'search'    =>"search something",
+                    # 'change'  =>"modify something",
+                    # 'plot'    =>"create vissualisation of something",
+                    # 'cloudy'  =>"create optimal query surface for something",
+};
+
+$descriptions->{type} =
+{
+
+'new'     =>"things you dont have yet",
+'my'      =>"things you have already",
+'related' =>"things which are related to you",
+'popular' =>"trending things",#
+#'growing' =>"expanding things",
+#'fit'    =>"usefull things",
+};
+
+$descriptions->{location} =
+{
+  'local'     =>"on your computer",
+  'remote'     =>"on a distant computer",
+};
+
+
+
+
+
+our $cmd={"h" =>                { alias => "help", exclude_from_completion => 1 },
+                "?" =>          { alias => "help", exclude_from_completion =>1 },
+    "quit" =>           { alias => "exit", exclude_from_completion =>1 },
+                "help" => {
+                        desc => "Print helpful information",
+                        args => sub { shift->help_args(undef, @_); },
+                        method => sub { shift->help_call(undef, @_); }
+                },
+                "history" => { desc => "Prints the command history",
+                        doc => "Specify a number to list the last N lines of history\n" .
+                                "Pass -c to clear the command history, " .
+                                "-d NUM to delete a single item\n",
+                        args => "[-c] [-d] [number]",
+                        method => sub { shift->history_call(@_) },
+                        exclude_from_history => 1,
+                },
+                "exit" => {
+                        desc => "Exits the program.",
+                        maxargs => 0,
+                        method => sub { shift->exit_requested(1); },
+                },
+                "exists" => {
+                        desc => "Shows whether files exist",
+                        args => sub { shift->complete_files(@_); },
+      exclude_from_completion =>1 ,
+                        proc => sub {
+                                print "exists: " .
+                                        join(", ", map {-e($_) ? "<$_>":$_} @_) .
+                                        "\n";
+                        },
+                        doc =>
+<<EOL
+Pass any number of filename.
+If a file exists, it is
+printed in <angle brackets>.
+EOL
+                },
+                "show" => {
+                        desc => "An example of using subcommands",
+                        cmds => {
+                                "warranty" => { proc => "You have no warranty!\n" },
+        exclude_from_completion =>1 ,
+                                "args" => {
+                                        args => [ sub {['create', 'delete']},
+                                                \&Term::ShellUI::complete_files ],
+                                        desc => "Print the passed arguments",
+                                        method => sub {
+                                                my $self = shift;
+                                                my $parms = shift;
+                                                print $self->get_cname($parms->{cname}) .
+                                                        ": " . join(" ",@_), "\n";
+                                        },
+                                },
+                        },
+                },
+                "quit" => {
+                        desc => "Quit using Fileman",
+                        maxargs => 0,
+                        method => sub { shift->exit_requested(1); },
+                },
+
+                # Term::ShellUI normally displays "asdf: unknown command".
+                # This shows how to use the default command.  If the user
+                # type an unknown command, ShellUI calls '' if it exists.
+                '' => {
+                        proc => "No command here by that name!\n",
+                        desc => "No help for unknown commands.",
+                        doc => "Well, here's a little help: don't type them.\n",
+                },
+                "string" => {
+                        desc => "String operations",
+                        cmds => {
+                                "subs" => {
+                                        args => ["(string)", "(pos)", "(len)"],
+                                        desc => "Take STRING,POS,LEN and return a substring.",
+                                        minargs => 1, maxargs => 3,
+                                        proc => sub { print "Substring=".substr(shift,shift||0,shift||0)."\n" }, },
+                                "len" => {
+                                        args => "(any number of strings)",
+                                        desc => "Calculate length of arguments",
+                                        proc => sub { print "Length=" . join(", ", map { length } @_) . "\n" }, },
+                        },
+                },
+
+        };
+
+
+our $location = {
+  "local" => {
+        args => "(path)",
+        desc => $descriptions->{location}->{local},
+        proc => sub {
+                                                my $self = shift;
+                                                my $parms = shift;
+                                                print get_cname($self,$parms) .
+                                                        ": " . join(" ",@_), "\n";
+                                        },
+                },
+"remote" => {
+        args => "(none)",
+        desc => $descriptions->{location}->{remote},
+        proc => sub {
+                                                my $self = shift;
+                                                my $parms = shift;
+                                                print get_cname($self,$parms) .
+                                                        ": " . join(" ",@_), "\n";
+                                        },
+                        }
+};
+
+
+
+sub println{ return sprintf("%s %s \n",shift,localtime); }
+sub show {  my $prod=""; for(@_) { $prod.=$_; }; return $prod; }
+sub set { my $sum=0; for(@_) { $sum+=$_; };  return $sum; }
+sub mult { my $prod=1;  for(@_) { $prod*=$_; }; return $prod; }
+sub ashex {  my $sub = shift; return sprintf("%x", &$sub(map { hex } @_)); }
+sub danger { print "Not performing task -- too dangerous!\n"; return 0; }
+sub getSubCommands { return {}; }
+
+
+
+
+sub getCommands {
+
+
+foreach (keys %name){
+        @vals = @{$name{$_}};
+
+        $ms->add_structure(
+                $_ => $name{$_}
+        );
+
+                eval "require AI::MicroStructure::$_;";
+                my $ams = "AI::MicroStructure::$_"->new;
+                push @name , $ams->name($#vals);
+
+
+                foreach my $ele(@vals){
+                        if($_ =~ /action/) {
+                                $cmd->{$ele} = {
+                                        args => sprintf("\033[0;31m%s\033[0m",join( " |", @{$name{type}})),
+                                        desc => $descriptions->{action}->{$ele},
+                                        proc => sub { printf("\033[0;31m%s\033[0m\n" ,ashex(\&set,@_)) },};
+                                my $s ={};
+
+                                foreach (keys %{$descriptions->{type}}){
+
+
+                                $s->{$_}={
+                                            args=>sprintf("\033[0;31m%s\033[0m",join( " |", @{$name{location}})),
+                                            desc =>sprintf("\n%s\n%s",$descriptions->{action}->{$ele},$descriptions->{type}->{$_}),
+                    cmds=>$location,
+                                            meth => sub { printf("\033[0;31m%s\033[0m\n" ,println(">methode",Dumper @_)) },};
+
+                                }
+                                $cmd->{$ele}->{cmds} = $s;
+
+                        }
+
+                }
+
+        }
+        return $cmd;
+}
+
+
+
+our $type = {};
+our $action = {};
+our $sep=sprintf("%s%s%s","\n"x 3,"#" x 70,"\n");
+our $usage = sprintf("
+\033[0;32m
+Usage: (active-memory micro structure db)
+\033[0;34m
+<action>
+%s
+
+<type>
+%s
+
+<location>
+%s
+\033[0m
+",
+sprintf("\033[0;31m%s\033[255;34m",join( " |", @{$name{action}})),
+sprintf("\033[0;31m%s\033[255;34m",join( " |", @{$name{type}})),
+sprintf("\033[0;31m%s\033[255;34m",join( " |", @{$name{location}})));
+
+
+
+printf "\n%s",$usage;
+
+
+  my $term = new Term::ShellUI(commands =>getCommands (),history_file => '~/.active-memory');
+#  print "\n" x 4 ."Using ".$term->{term}->ReadLine."\n";
+  $term->prompt(sub { "active-memory> " });
+  $term->run();
+
+1;
+__DATA__

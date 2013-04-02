@@ -67,7 +67,7 @@ foreach(@{$content->{rows}}){
 }
 if(!$#all){
 
-my $wn = `wn $key -over -hypen -hypon -synsn -smemn -membn -subsn -meron -holon -derin -domnn -famln -coorn -hmern -grepn`;
+my $wn = `micrownet $key`;
 
 @all = split(/(\,|.|\)|\n|=>|[ ])/,$wn);
 
@@ -94,7 +94,16 @@ return {set=>[@all]};
 
 #}
 #}
+sub search {
+  my $search = shift;
 
+    use AnyEvent::Subprocess::Easy qw(qx_nonblock);
+
+           my $date = qx_nonblock('micro-search --match '.$search)->recv;
+
+    return encode_json({file=>$date});
+
+  }
 
 sub printer {
   my ($msg) = @_;
@@ -116,7 +125,7 @@ sub printer {
 
 
 
-     $cmd->{json} = JSON::XS->new->pretty(0)->encode({ "query" => $msg,
+     $cmd->{json} = JSON::XS->new->pretty(1)->encode({ "query" => $msg,
                                                       "callback" => "makeList",
                                                       "responce" =>
                                                       [$cmd->{action}]});
@@ -141,9 +150,12 @@ my $server = Net::Async::WebSocket::Server->new(
 
 
             $self->send_frame(%args);
-            p %args;
+
+
+
          },
       );
+
    }
 );
 

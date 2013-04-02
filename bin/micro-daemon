@@ -49,7 +49,7 @@ $new->{scale} = 0.1;
 
 
 if(!@ARGV) {
-push @ARGV,$_ for qw("Lie Conspiracy Politics President NWO International_relations War Crime Freedom Weapon Ufo");
+push @ARGV,$_ for qw("Lie Conspiracy");
 }
 
 foreach(@ARGV)

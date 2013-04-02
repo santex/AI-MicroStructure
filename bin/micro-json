@@ -1,0 +1,33 @@
+#!/bin/bash
+IFS=$'\n';
+
+file=$1;
+shift 1
+foo=($@)
+bar=$(printf "|%s" "${foo[@]}")
+#echo
+bar=${bar:1}
+#echo
+echo $file;
+#echo
+echo $bar;
+
+
+cat $file | sed -e 's/[{}]/''/g' | \
+awk -v k="text" '{n=split($0,a,","); for(i=1; i<=n; i++) print a[i]}' | \
+egrep -i '"(image|pdf|audio|files|links)":' | \
+sed 's/:/ /1' | \
+awk -F" " '{ print $2 }' | \
+egrep  -i "(http|upload|\/\/)" | \
+egrep -i $bar |
+sort -u | tr -d "[]" | \
+sed 's/htt.*.://g' |
+sed 's/\/\//http:\/\//g'
+
+#
+#echo -e "\n"$i,$xx;
+#
+#
+
+
+

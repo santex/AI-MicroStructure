@@ -48,33 +48,23 @@ return @{$res->{rows}};
                                      );
 
 
-
-push @ARGV,'film';
-push @ARGV,"band";
-push @ARGV,"single";
-push @ARGV,"album";
-push @ARGV,"music";
-push @ARGV,"movie";
-push @ARGV,"rapstar";
-push @ARGV,"artist";
-push @ARGV,"actor";
-push @ARGV,"movie";
-push @ARGV,"rock";
-push @ARGV,"pop";
-push @ARGV,"song";
+my @bigwikimedia = ();
+push @bigwikimedia,$_ for qw(song band music musician album rapper singer songwritter
+       entertainer magazin film tv_series david_bowie_song lyricist cristina_aguilera_song
+       film single movie rapstar actor rock pop band sport journal magazine sportscaster band newspaper writer music basketball novel film song artist cartoonist tv_series author dj tv_channel novelist band finnish_band journalist rapper music);
 
 
 sub deleteByCategory  {
 my $cat = shift;
 my @q=();
 my @set = checkIsThere($cat);
-print  map{  push @q,$_->{id} unless(!$_->{id});}@set;
+print "\n", map{  push @q,$_->{id} unless(!$_->{id});}@set;
 print join "\n",@q;
-map{ $x->delete($_); }@q;
+map{ $x->delete($_) && print $_."\n"; }@q;
 }
 
 
-deleteByCategory($_) for(@ARGV);
+deleteByCategory($_) for(@bigwikimedia);
 
 
   1;

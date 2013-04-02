@@ -132,7 +132,7 @@ $line = $ARGV[0];
 
 #//map{$_=map{ trim($_)}split("=>",$_)unless($_=~/Coordinate Terms/)}
 #print Dumper [split("sense",`wn $line  -coorn`)];
-push @{$data->{'search'}},grep{/[a-z|A-Z]/}split("\n|,",lc `micrownet $line words`) unless(!$words);
+push @{$data->{'search'}},grep{/[a-z|A-Z]/}split("\n|,",lc `micro-wnet $line words`) unless(!$words);
 #push @{$data->{'coordinate'}},map{$_=trim($_); @_=grep(/[A-Z]|[0-9]|[a-z]/,map{$_=trim($_)}split("\n|=>",$_))}split(/Sense/,`wn $line -coorn`) unless(!$words);
 #shift @{$data->{'coordinate'}} &&  shift @{$data->{'search'}} for(0..1);
 #@{$data->{'search'}};

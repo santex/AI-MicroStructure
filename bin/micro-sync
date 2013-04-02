@@ -1,14 +1,23 @@
 #!/usr/bin/perl
   use strict;
   use warnings;
+  use File::Temp qw(tempdir);
+  use Log::Log4perl qw(:easy);
+  use File::Spec::Functions;
+  use File::Spec;
+  use File::Path;
+  use File::Copy;
+  use File::Find;
+  use File::Basename;
   use Data::Printer;
+  use Data::Dumper;
+
   use Parse::RecDescent;
   use Getopt::Long;
   use Statistics::Basic qw(:all);
   use LWP::UserAgent;
   use File::Spec;
   use JSON::XS;
-  use File::Path;
   use PerlIO::gzip;
   use YAML qw<DumpFile LoadFile>;
   use Parallel::Iterator qw( iterate );
@@ -18,7 +27,7 @@
 
   my $pid = $$;
 
-  use constant WORDS     =>  '/home/santex/data-hub/book/output-unique';
+  use constant WORDS     =>  '/home/santex/data-hub/steam/freq-org.micro';
   use constant MAIL_RC   =>  'http://quantup.com/concept-knowledge/science/0.001-brain.txt.gz';
   use constant OUTPUT    =>  'conceptor';
   use constant AUTHOR    => 'http://localhost/~';
@@ -243,6 +252,6 @@ sub get_current {
 #all,query=>for url in $(mech-dump --links http://www.latest-ufo-sightings.net  | egrep -i "archive"); do echo $url; done
 
 __DATA__
-for o in `cat /home/santex/data-hub/book/output-unique | egrep "^*.(alg|qua|sozio|therm|exo|geo|bio|phys|chem).*"`; do qq=$(wordnet $o  -grepn | egrep -v "of noun");  echo -split-hit $qq ;  done
+for o in `cat /home/santex/data-hub/steam/freq* | egrep "^*.(alg|qua|sozio|therm|exo|geo|bio|phys|chem).*"`; do qq=$(wordnet $o  -grepn | egrep -v "of noun");  echo -split-hit $qq ;  done
 mech-dump --text http://www.latest-ufo-sightings.net/p/polls.html  |  tr "P|." "\n" | tr -d "("   | tr  ")" "\n" | egrep "^[1-31]|oll"
 for url in $(mech-dump --links http://www.latest-ufo-sightings.net  | egrep -i "archive"); do echo $url; done
