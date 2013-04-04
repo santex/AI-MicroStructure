@@ -34,8 +34,6 @@ my   $wiki = WWW::Wikipedia->new();
 my   $result = $wiki->search($next);
 
 
-      eval( 'use IO::Page' );
-
       if(defined($result) and $result){
 
         use AnyEvent::Subprocess::Easy qw(qx_nonblock);

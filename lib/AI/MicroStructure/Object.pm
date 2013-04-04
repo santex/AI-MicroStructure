@@ -1,27 +1,35 @@
-#!/usr/bin/perl -w
+package AI::MicroStructure::Object;
+use strict;
+use Digest::MD5 qw(md5_hex);
+use AnyEvent::Subprocess::Easy qw(qx_nonblock);
+
+sub new {
+  my $pkg = shift;
+  my $self = bless {}, $pkg;
+  $self->{id} = md5_hex(@_);
+  $self->{name} = lc shift @_;
+  $self->{ elems } = {};
 
 
-  package AI::MicroStructure::Object;
-
-  use strict;
-  use warnings;
-  use Digest::MD5 qw(md5_hex);
-  sub new {
-    my $pkg = shift;
-    my $self = bless {}, $pkg;
-
-    $self->{name} = sprintf(@_);
-    $self->{md5} = md5_hex(@_);
-
-    return $self;
+  foreach my $element (sort grep{/^$self->{name}/}split(/$self->{name},|\n/,`wn $self->{name} -hypon -hypen -synsv -synsn -grepn -grepa -grepv`)) {
+    $element =~ s/\n//g;
+    $element =~ s/([\\\'\"])/\\$1/gi;
+    $element =~ s/^\s+//;
+    $element =~ s/\s+$//;
+    $element =~ s/\t//;
+    $element =~ s/^\s//;
+    $self->{ elems }->{$element} = 1;#`wn '$element' -grepn | egrep -v "Grep" | tr  "\n" "@"`;
   }
 
-  sub name {
+  return $self;
+}
 
-      my $self = shift;
-      return $self->{name};
-  }
-  1;
+sub name {
+
+    my $self = shift;
+    return $self->{name};
+}
+1;
 
 
 =head1 NAME

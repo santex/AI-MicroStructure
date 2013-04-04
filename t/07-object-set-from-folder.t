@@ -11,6 +11,8 @@ use Data::Printer;
 use AI::MicroStructure;
 use AI::MicroStructure::Object;
 use AI::MicroStructure::ObjectSet;
+use AI::MicroStructure::Context;
+use Search::ContextGraph;
 use Env qw(PWD);
 
 
@@ -20,7 +22,6 @@ our $meta = AI::MicroStructure->new();
 our @t = $meta->structures();
 
 my $TOP = "";
-
    $TOP = "$PWD/t/canned/docs";
 
    if($TOP  eq ""){
@@ -36,7 +37,7 @@ our $curSysDate = `date +"%F"`;
 
 our %opts = (cache_file =>
               sprintf("%s/%s/%s_.cache",
-              $PWD,"t/canned",$curSysDate));
+              $PWD,"canned",$curSysDate));
 
 GetOptions (\%opts, "cache_file=s");
 
@@ -57,7 +58,7 @@ eval {
 
 END{
 
-  lock_store($set,$opts{cache_file});
+#  lock_store($set,$opts{cache_file});
 
   print Dumper [$set];
 
@@ -68,8 +69,47 @@ END{
 our $files={};
 
 
-find(\&translate, "$TOP");
-#p $set;
+   my $style = {};
+      $style->{explicit}  = 1;
+  our $c = AI::MicroStructure::Context->new(@ARGV);
+      $c->retrieveIndex($TOP);#"data-hub" structures=0 text=1 json=1
+      my $cg = $c->{graph}->{content};
+
+         my @ranked_docs = $cg->simple_search( 'peanuts' );
+
+         # get back both related terms and docs for more power
+
+         my ( $docs, $words ) = $cg->search('dna');
+
+p $docs;
+p $words;
+         # you can use a document as your query
+
+          ( $docs, $words ) = $cg->find_similar('First Document');
+
+p $docs;
+p $words;
+         # Or you can query on a combination of things
+
+         ( $docs, $words ) =
+           $cg->mixed_search( { docs  => [ 'First Document' ],
+                                terms => [ 'snake', 'pony' ]}
+                            );
+
+
+p $docs;
+p $words;
+         # Print out result set of returned documents
+         foreach my $k ( sort { $docs->{$b} <=> $docs->{$a} }
+             keys %{ $docs } ) {
+             print "Document $k had relevance ", $docs->{$k}, "\n";
+         }
+
+
+
+
+
+
 sub translate {
 
   return unless -f;
@@ -77,103 +117,23 @@ sub translate {
 
   my $name = md5_hex($rel_name);
 
-  if (/\.(html|htm)$/) {
+  if (/\.(html|htm|txt|json)$/) {
     $files->{html}->{$name}=$rel_name;
-      ok(my $obj = AI::MicroStructure::Object->new($rel_name));
-  ok($set->insert($obj));
+      #ok(my $obj = AI::MicroStructure::Object->new($rel_name));
+      #ok($set->insert($obj));
+
+
+
 
   }
   elsif (/\.pdf$/) {
     $files->{pdf}->{$name}=$rel_name;
-  }elsif (/\.ltx$/) {
-    $files->{latex}->{$name}=$rel_name;
-  }elsif (/\.(flv|mpg4|ogg)$/) {
-    $files->{media}->{$name}=$rel_name;
-  }elsif (/\.json$/) {
-    $files->{text}->{$name}=$rel_name;
   }
 
-
 }
+#p $set;
+
+
+
+find(\&translate, "$TOP");
 p $set;
-
-
-__DATA__
-our $c = AI::MicroStructure::Context->new(@ARGV);
-    $c->retrieveIndex($PWD."/t/docs"); #"/home/santex/data-hub/data-hub" structures=0 text=1 json=1
-
-
-
-   my $style = {};
-      $style->{explicit}  = 1;
-ok($c->simpleMixedSearch($style,$_)) && ok($c->play($style,$_))   for
- qw(atom antimatter planet);
-
-
-
-ok(print Dumper $c->intersect($style,$_)) for
- qw(atom antimatter planet);
-
-ok(print Dumper $c->similar($style,$_)) for
- qw(atom antimatter planet);
-
-#p @out;
-
-1;
-
-package main;
-
-$|++;
-use strict;
-
-use File::Find;
-use Data::Dumper;
-use Storable qw(lock_store lock_retrieve);
-use Getopt::Long;
-our $curSysDate = `date +"%F"`;
-    $curSysDate=~ s/\n//g;
-
-our %opts = (cache_file =>
-              sprintf("/tmp/%s.cache",
-              $curSysDate));
-
-GetOptions (\%opts, "cache_file=s");
-
-our $cache = {};
-our @target = split("\/",$opts{cache_file});
-my $set = AI::MicroStructure::ObjectSet->new();
-
-eval {
-    local $^W = 0;  # because otherwhise doesn't pass errors
-#`rm $opts{cache_file}`;
-    $cache = lock_retrieve($opts{cache_file});
-
-    $cache = {} unless $cache;
-
-    warn "New cache!\n" unless defined $cache;
-};
-
-
-END{
-
-  lock_store($cache,$opts{cache_file});
-
-  print Dumper [$set->size,$set->members];
-
-
-  }
-
-
-
-
-find(\&translate, "$TOP/./");
-
-sub translate {
-  return unless -f;
-  (my $rel_name = $File::Find::name) =~ s{.*/}{}xs;
-
-  $set->insert(AI::MicroStructure::Object->new($rel_name));
-
-}
-
-

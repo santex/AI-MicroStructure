@@ -151,7 +151,7 @@ my $server = Net::Async::WebSocket::Server->new(
 
             $self->send_frame(%args);
 
-
+            p $list;
 
          },
       );

@@ -149,20 +149,8 @@ sub insert {
 
 
     }
-    $self->{obj}->{mean} = sprintf mean values %{$self->{obj}->{center}};
-  }
-
-  foreach ( keys %{$self->{obj}->{center}}) {
-
-    next unless $self->{obj}->{center}->{$_}>$self->{obj}->{mean}*2;
-
-
-    $self->{obj}->{dense}->{$_} = $self->{obj}->{center}->{$_};
 
   }
-
-
-
 
 }
 
@@ -188,7 +176,44 @@ sub doit {
 
   if(grep{!/search/}@{$self->{tools}}){
 
-      $self->{search} = $self->check($self->{obj}->{domain},"micro-search --full 1 --short 1 --match");
+      $self->{search} = $self->check($self->{obj}->{domain},"micro-search --full 1 --match");
+  }
+  if(grep{!/relation/}@{$self->{tools}}){
+      my @relation = split("\n",$self->check($self->{obj}->{domain},"micro-relation"));
+      @relation = sort @relation;
+      $self->{relation} =  \@relation;
+      $self->{match} = [grep{/$self->{domain}/}@relation];
+
+    $self->{obj}->{center}->{$_} = defined($self->{obj}->{center}->{$_}) ?
+                                    $self->{obj}->{center}->{$_} + 1 : 1
+                                      for @relation;
+
+
+
+
+  $self->{obj}->{mean} = sprintf mean values %{$self->{obj}->{center}};
+  foreach ( keys %{$self->{obj}->{center}}) {
+
+    next unless $self->{obj}->{center}->{$_}>$self->{obj}->{mean};
+
+
+    $self->{obj}->{dense}->{$_} = $self->{obj}->{center}->{$_};
+
+
+
+  }
+
+
+
+
+#      foreach (@relation){
+      #    $self->{relation}
+
+  #      $ob = AI::MicroStructure::Object->new($_,$self->{tools});
+   #     $self->insert($ob);
+ #     }
+
+
   }
 
 }
@@ -204,6 +229,7 @@ sub check {
     return $ret;
   }else{
     my $ret = `$prog $name`;
+     $ret = "empty" unless($ret);
      $memd->set(sprintf("%s_%s",$name,$prog),$ret);
      return $ret;
   }
@@ -226,8 +252,8 @@ use AI::MicroStructure;
 our @t = ();
 our $micro = AI::MicroStructure->new();
 my $set = AI::MicroStructure::ObjectSet->new(@t);
-   $set->domain;
-   $set->doit(qw(micro-index micro-search micrownet));
+   $set->domain(sprintf(@ARGV));
+   $set->doit(qw(search index relation micrownet));
 
 
 p $set;

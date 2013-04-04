@@ -1,10 +1,12 @@
 #! /bin/bash
 for i in $@; do
-wn $i -hypon -hypen -synsv -synsn -synsn -hypon -hypen -synsv -synsn -grepn -grepa -grepv | sed 's/[[:space:]]*=> /\n/' | sed '/^$/d' | sed 's/ /_/'  | sed 's/,/, /' | sed 's/HAS INSTANCE//g' |
-sed 's/Sense//g' |
-sed 's/[[:space:]]*=> //' |
-sed 's/^[[:digit:]] senses of.*.$//'|
-egrep -v "([ ]|[0-9][A-Z])" |
-grep -i $1
+wn $i  -hypon -hypen -synsv -synsn -hypen -synsv -synsn -synsa -grepn -grepa -grepv -synsa -perta -deria -famla -grepv -derin -famln |
+ sed 's/[[:space:]]*=> / /' | sed 's/HAS INSTANCE//g' | egrep -v "(Synonyms|Hypernyms|Grep|The |*.[ ]of[ ].*|Overview|Hyponyms|noun|[1-9]|^(\W+))" |
+sed '/^$/d' | sed 's/ /_/g'| sed 's/,_/\n/g' | sort -u;
 done;
 
+
+#
+#echo -e "\n"$i,$xx;
+#
+#

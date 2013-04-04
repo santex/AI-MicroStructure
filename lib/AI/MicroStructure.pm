@@ -32,7 +32,7 @@ our @a=();
 
 our ($init,$new,$drop,$available,$lib,
      $list,$use,$off,$switch,$mirror,
-     $version,$help,$write)  = (0,0,0,0,0,0,0,0,0,0,0,0,0);
+     $version,$help,$write,$verbose)  = (0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 
 eval "\$$_=1; " for @ARGV;
 
@@ -41,6 +41,7 @@ eval "\$$_=1; " for @ARGV;
 if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
 if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  };
 if( grep{/\bdrop\b/} @ARGV ){ $drop = 1; cleanArgs("drop");  };
+if( grep{/\bverbose\b/} @ARGV ){ $verbose = 1; cleanArgs("verbose");  };
 
 our $StructureName = $ARGV[0]; # default structure
 our $structure = $ARGV[0]; # default structure
@@ -299,7 +300,7 @@ sub name {
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
    eval "require '$absstructdir/$structure.pm';";
-   croak "MicroStructure list $structure does not exist!" if $@;
+   warn  "MicroStructure list $structure does not exist!" if $@;
    $MICRO{$structure} = 1; # loaded
    }
    $self->{micro}{$structure} =
@@ -568,7 +569,7 @@ foreach my $k
    $k =~ s/[ ]/_/g;
    $k =~ s/[\(]|[\)]//g;
    next if($k=~/synonyms|hypernyms/);
-   print $k;
+ #  print $k;
    $new->{$k}=[map{$_=[map{$_=$self->trim($_)}split("\n|, ",$_)]}
       grep{!/synonyms|hypernyms/}split("sense~~~~~~~~~",
                                       lc `micro-wnet $k`)];
@@ -767,18 +768,23 @@ if($new==1){
   my $data = decode_json(lc`micro-sense $StructureName words`);
 
 
+
   my $char;
   my $line;
   my $senses=@{$data->{"senses"}};
    $senses= 0 unless($senses);
+ if(!$verbose){
 
   printf("\n
   \033[0;34m
   %s
   Type: the number you choose 1..$senses
   \033[0m",__PACKAGE__->usage($StructureName,$senses,$data));
-
-  $line = 1 unless($senses <= 1);
+ }
+  $line = 1 unless($senses != 1);
+  if($verbose){
+    $line=1;
+  }
   chomp($line = <STDIN>) unless($line);
 
   my $d = join("#",@{$data->{rows}->{search}});

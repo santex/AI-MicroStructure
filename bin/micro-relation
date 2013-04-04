@@ -1,47 +1,13 @@
 #!/usr/bin/perl -w
 
-eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
-
 use strict;
 use utf8;
 use File::Spec;
 #use AI::MicroStructure;
 use JSON::XS;
 use Data::Printer;
-
-binmode STDOUT, ':utf8';
-binmode STDERR, ':utf8';
-
-
-BEGIN 
-{
-`IFS_BAK=\$IFS;
-IFS=\$'\n'`;
-
-
-
-}
-# Library path bootstrap
-my @path;
-if (defined $ENV{PAR_TEMP}) { # See PAR.pm
-	@path = ($ENV{PAR_TEMP}, 'inc');
-}
-else {
-	my $binary = File::Spec->rel2abs($0);
-	my ($vol, $dirs, undef) = File::Spec->splitpath($binary);
-	@path = ($vol, $dirs, File::Spec->updir);
-}
-my $libdir = File::Spec->catdir(@path, 'lib');
-unshift @INC, $libdir if -d $libdir;
-
-# Load modules needed in this script
-
-eval q/
-	use AI::MicroStructure::Cache;
-	use AI::MicroStructure::Relations;
-/;
-die $@ if $@;
+use AI::MicroStructure::Cache;
+use AI::MicroStructure::Relations;
 
 
 my $cache = {};
@@ -68,15 +34,9 @@ my $sense = JSON::XS->new->pretty(0)->allow_blessed($new->{storage});
 
 foreach(sort {$a <=> $b} keys %{$new->{storage}->{related}}){
 
-print join("\n", @{ $new->{storage}->{related}->{$_} });
+print join("\n", @{ $new->{storage}->{related}->{$_} }) unless(ref $new->{storage}->{related}->{$_} =~/ARRAY/);
 
 }
-
-`IFS=\$IFS_BAK;`;
-
-
-#p $new->{storage}->{data};
-
 
 
 1;
@@ -93,10 +53,10 @@ __END__
 
   Creates a session to work relations
 
-=head1 SYNOPSIS    
-  
+=head1 SYNOPSIS
+
   perl Deamon.pm ufo secret
-  
+
 =head1 AUTHOR
 
   Hagen Geissler <santex@cpan.org>

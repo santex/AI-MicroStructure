@@ -8,7 +8,7 @@ GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","
                     "init", "export", "import",
                     "check", "category=s", "sources" ,"drop");
 
-our ($new, $write,$drop,$all) =(0,0,0,0);
+our ($new, $write,$drop,$all,$verbose) =(0,0,0,0,0);
 
 
 if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };

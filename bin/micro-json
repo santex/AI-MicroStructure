@@ -8,9 +8,9 @@ bar=$(printf "|%s" "${foo[@]}")
 #echo
 bar=${bar:1}
 #echo
-echo $file;
+#echo $file;
 #echo
-echo $bar;
+#echo $bar;
 
 
 cat $file | sed -e 's/[{}]/''/g' | \

@@ -1,7 +1,4 @@
 #!/usr/bin/perl -W
-
-eval 'exec /usr/bin/perl -W -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
 package IOMicroy;
 
 use strict;
@@ -67,10 +64,11 @@ my @i=[0,0];
     my $out = {};
     my $meta = AI::MicroStructure->new;
     my @t = $meta->structures;
-    foreach my $theme (@t){
+    foreach my $theme (@t[0..19]){
 
-
-          IOMicroy::log("io",$ix++,$theme,`micro $theme all`,`wn $theme -grepn | egrep -v 'Grep'`,"","");
+          my @m = sort split("\n",`micro $theme all`);
+          my @ar = sort split("\n",`micrownet $theme`);
+          IOMicroy::log("io",$ix++,$theme,join("\n",@m),join("\n",@ar),"","");
           printf("\n%s", join (" ",($theme)));
 
       }
