@@ -1,1 +1,462 @@
-My GitHub Page
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" />
+<title>The Investigator</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Yanone%20Kaffeesatz|OFL%20Sorts%20Mill%20Goudy%20TT|Molengo&key=769622cSDqbwL9qEhUFg">
+<style type="text/css">
+@font-face {
+  font-family: 'English Towne';
+  font-size: 12px;
+  src: local('English Towne'), url('EnglishTowne.ttf') format('truetype');
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font: 12px "Times New Roman", Times, serif;
+  padding: 0 30px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+body.web20  {
+  font: 12px 'OFL Sorts Mill Goudy TT', Molengo, "Times New Roman", Times, serif;
+}
+      h1, h2, h3, h4 {
+
+                        text-transform:uppercase;
+      }
+
+hr {
+ margin:4px;
+  width:80%;
+  }
+header.title h1 {
+
+  margin-bottom: 4px;
+  padding: 1px 0;
+  border-bottom: 1px solid #999;
+                  text-transform:uppercase;
+}
+.web20 header.title h1 {
+  text-shadow: rgba(0, 0, 0, 0.5) 0 2px 5px;
+  font: 24pt 'English Towne';
+}
+nav li {
+  list-style: none;
+  float: left;
+  margin-right: 15px;
+}
+nav ,li {
+  text-decoration: none;
+  padding: 1px ;
+  border: 1px solid transparent;
+  color: #004276;
+  margin:10px;
+  display:block;
+
+}
+
+a {
+  text-decoration: none;
+  margin  : 5px ;
+  font-size:105%;
+  color: #004276;
+}
+.web20 nav li a {
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+}
+nav li a:hover {
+  border: 1px solid #004276;
+}
+nav li a:active {
+  background-color: #ddd;
+}
+footer {
+  border-top: 1px solid #999;
+  text-align: center;
+  padding: 10px 0;
+}
+.web20 a[href^="http"] {
+  /*content: url(data:image/png;base64,R0lGODlhCQAMAMQAAPr7/Cpdi6q/0X2duURxmjRlkfz9/vz8/TVlkae8z4+qwoWivTlplDVmkvv8/Up1nUVymvn6/LrL2i1gjStejKS6zkNwmUFvmD5slkJwmbjJ2DZnkqm90Cdbiv///wAAACH5BAEAAB4ALAAAAAAJAAwAAAU6oCeOY7R0aNoByWURQUoOMTpqD0p1Ird1hEGGJ/gVJB5Ip9gpcESYDqOD4BxEFcWkwTGMHACSeDwKAQA7);
+  */
+  color: #004276;
+  background: transparent url(data:image/png;base64,R0lGODlhCQAMAMQAAPr7/Cpdi6q/0X2duURxmjRlkfz9/vz8/TVlkae8z4+qwoWivTlplDVmkvv8/Up1nUVymvn6/LrL2i1gjStejKS6zkNwmUFvmD5slkJwmbjJ2DZnkqm90Cdbiv///wAAACH5BAEAAB4ALAAAAAAJAAwAAAU6oCeOY7R0aNoByWURQUoOMTpqD0p1Ird1hEGGJ/gVJB5Ip9gpcESYDqOD4BxEFcWkwTGMHACSeDwKAQA7) no-repeat center right;
+  padding-right: 12px;
+}
+#wrapper {
+  margin: auto;
+  width: 100%;
+}
+section {
+  clear: both;
+  padding-top: 15px;
+}
+
+article > div > p {
+  text-indent: 20pt;
+}
+article > div {/*article div[class*='text'] {*/
+  margin-bottom: 20px;
+  text-align: justify;
+  text-justify: newspaper;
+}
+.web20 article header {
+  font-family: 'Molengo';
+}
+article footer {
+  border: none;
+  text-align: left;
+  padding: 10px;
+}
+
+article footer.posted:before {
+  content: 'Posted: ';
+}
+.web20 .text1 {
+/*  -webkit-column-width: 250px;
+  -moz-column-width: 250px;
+  column-width: 250px;
+*/
+  -webkit-column-gap: 20px;
+  -moz-column-gap: 20px;
+  column-gap: 20px;
+}
+.text1 header {
+  margin-bottom: 20px;
+}
+.web20 .text2 p:first-of-type::first-letter {
+  font-size: 14pt;
+}
+.text2 {
+  padding: 1em;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #eee;
+}
+.web20 .text2 {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+  -webkit-column-gap: 20px;
+  -moz-column-gap: 20px;
+  column-gap: 20px;
+  -webkit-column-rule: 1px solid #999;
+  -moz-column-rule: 1px solid #999;
+  column-rule: 1px solid #999;
+
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+.web20 .text3 {
+  -moz-column-count: 4;
+  -webkit-column-count: 4;
+  column-count: 4;
+  -webkit-column-gap: 20px;
+  -moz-column-gap: 20px;
+  column-gap: 20px;
+}
+.web20 .text4 {
+  -moz-column-count: 2;
+  -webkit-column-count: 2;
+  column-count: 2;
+  -webkit-column-gap: 20px;
+  -moz-column-gap: 20px;
+  column-gap: 20px;
+}
+.web20 input[type='range'] {
+  vertical-align: middle;
+}
+#configCols {
+  text-align: center;
+  clear: both;
+  padding-top: 10px;
+}
+.web10 article > div {
+  -moz-column-count: 0 !important;
+  -webkit-column-count: 0 !important;
+  column-count: 0 !important;
+  -webkit-column-gap: 0 !important;
+  -moz-column-gap: 0 !important;
+  column-gap: 0 !important;
+  -webkit-column-rule: 0 !important;
+  -moz-column-rule: 0 !important;
+  column-rule: 0 !important;
+}
+hgroup{display:none;};
+</style>
+</head>
+<body class="web20">
+  <div id="wrapper">
+  <header class="title"><h1>Earth realtime inteligence</h1>
+   <div id="configCols" style="float:left;">
+      <label>
+        colums:
+        <input type="range" min="1" max="5" step="1" value="3" name="column-count" id="range" onchange="changeProp(this)"/>
+&nbsp;&nbsp;
+        gap:
+        <input type="range" min="0" max="100" step="10" value="20" name="column-gap" onchange="changeProp(this)"/>
+
+      </label>
+
+    <nav>
+      <ul id="nav">
+      </ul>
+      <div style="display:none;">
+
+        <br>Type of Investigation
+        <br>match
+        <input type="radio" name="article-type" onchange="changeProp(this)"/>
+        <br>density
+        <input type="radio" checked name="article-type" onchange="changeProp(this)"/>
+
+      <label>
+        column-rule:
+        <input type="range" min="0" max="10" step="1" value="1" name="column-rule-width" onchange="changeProp(this)"/>
+      </label>
+
+      <label>
+        justify text:
+        <input type="checkbox" checked name="text-align" onchange="changeProp(this)"/>
+      </label>
+
+      <label>
+        enable CSS3 styles:
+        <input type="checkbox" id="web20" checked="checked">
+      </label>
+
+      </div>
+    </div>
+
+    </nav>
+
+
+
+    <section>
+      <article>
+               <header>
+
+            <hgroup>
+              <h1>Article Title Goes Here</h1>
+              <h2>Subtitle goes here</h2>
+              <p>By: Eric Bidelman</p>
+
+
+            </hgroup>
+
+          </header>
+
+        <div class="text1">
+
+
+   <div id="configCols" style="float:left;">
+
+          </div>
+          <div  class="text1" id="text">
+
+<h2>SOLAR</h2>
+
+<a target="_blank" href="http://www.sec.noaa.gov/pmap/">Auroral Activity</a><br>
+<a target="_blank" href="http://www.n3kl.org/sun/noaa.html">Current Solar Data</a><br>
+<a target="_blank" href="http://solen.info/solar/" >Solar Terrestrial Activity Report !</a><br>
+<a target="_blank" href="http://grb.sonoma.edu/" >Sonoma Real Time Gamma Ray Burst Map</a><br>
+<a target="_blank" href="http://sdo.gsfc.nasa.gov/data/">SDO Real Time Imagery</a><br>
+<a target="_blank" href="http://sohodata.nascom.nasa.gov" >Search and Download SOHO Near Realtime Data</a><br>
+<a target="_blank" href="http://sohowww.nascom.nasa.gov/data/realtime-images.html" >Latest SOHO Imagery</a><br>
+
+
+
+
+<hr>
+<h2>NOAA</h2>
+
+<a target="_blank" href="http://www.iris.edu/seismon/">IRISSeismic Monitor</a><br>
+<a target="_blank" href="http://earthquake.usgs.gov/earthquakes/recenteqsww/Quakes/quakes_all.html">Latest Earthquakes in The World - Past 7 days</a><br>
+<a target="_blank" href="http://www.oe-files.de/gmaps/eqmashup.html">Live Earthquake Mashup</a><br>
+<a target="_blank" href="http://aslwww.cr.usgs.gov/Seismic_Data/heli2.shtml">Live Internet Seismic Server </a><br>
+<a target="_blank" href="http://www.weatherimages.org/index.html">Live Weather Images</a><br>
+<a target="_blank" href="http://earthquake.usgs.gov/earthquakes/map/">Movimientos Sísmicos Actuales</a><br>
+<a target="_blank" href="http://earthquake.usgs.gov/eqcenter/recenteqsww/">Movimientos Sísmicos en el Mundo - Mapadel Día</a><br>
+<a target="_blank" href="http://fireballs.ndc.nasa.gov/">NASA’sAll Sky Fireball Network</a><br>
+<a target="_blank" href="http://www.infoplease.com/ipa/A0197840.html">Numero de Movimientos Sísmicos en el Mundo, 1990–2007</a><br>
+<a target="_blank" href="http://www.huttoncommentaries.com/Monitors.php#X-YGraphs">Pole Shift Research</a><br>
+<a target="_blank" href="http://solarimg.org/files/realtime/">SolarIMG's Almost Real Time Image System</a><br>
+
+<hr>
+<h2>ARTIS</h2>
+
+<a target="_blank" href="http://www.solar-storm-warning.com/">Solar Storm Warning</a><br>
+<a target="_blank" href="http://spaceweather.com/">Space Weather</a><br>
+<a target="_blank" href="http://www.swpc.noaa.gov/alerts/">SpaceWeather Prediction Center</a><br>
+<a target="_blank" href="http://www.huttoncommentaries.com/Monitors.php#CalderaActivity">Super-Eruptive Volcanoes Watch</a><br>
+<a target="_blank" href="http://arctic.atmos.uiuc.edu/cryosphere/">The Cryosphere Today</a><br>
+<a target="_blank" href="http://www.swpc.noaa.gov/SWN/index.html">Today's Space Weather</a><br>
+<a target="_blank" href="http://www.solar.ifa.hawaii.edu/Tropical/tropical.html">Tropical Storms, Worldwide</a><br>
+
+<h2>Tsunami</h2>
+
+<a target="_blank" href="http://www.prh.noaa.gov/ptwc/?region=1">Tsunami Warning Center - Pacific</a><br>
+<a target="_blank" href="http://wcatwc.arh.noaa.gov/events/eventmap.php">Tsunami Warning Center - West Coast &amp;Alaska</a><br>
+<a target="_blank" href="http://porque2012.com/quakesWORLD/index.php">Últimos Terremotos Ocorridos no Mundo</a><br>
+
+<br>
+<h2>Volcanoes</h2>
+
+<a target="_blank" href="http://volcanoes.usgs.gov/">U.S.Volcanoes and Current Activity Alerts</a><br>
+<a target="_blank" href="http://www.volcanolive.com/world.html">Volcanoes of The World</a><br>
+<a target="_blank" href="http://mada.la.coocan.jp/sat/index.htm">3D Satellite Tracker </a><br>
+
+<hr>
+<h2>Maps</h2>
+
+<a target="_blank" href="http://www.embassyworld.com/Maps_Of_The_World/">All The World's Maps </a><br>
+<a target="_blank" href="http://www.astro.uu.nl/~strous/AA/en/woordenboek.html">Astronomical Dictionary </a><br>
+<a target="_blank" href="http://www.calsky.com/">Celestial Observer </a><br>
+<a target="_blank" href="http://www.atlasoftheuniverse.com/">Atlas of The Universe </a><br>
+<a target="_blank" href="http://www.worldatlas.com/aatlas/imageg.htm">World Atlas - Longitude + Latitude </a><br>
+<a target="_blank" href="http://www.wunderground.com/sky/ShowSky.asp">Star Maps </a><br>
+
+<hr>
+<h2>Encyclopedia</h2>
+
+<a target="_blank" href="http://www.daviddarling.info/encyclopedia/ETEmain.html">Encyclopedia of Astrobiology, Astronomy,and Spaceflight </a><br>
+<a target="_blank" href="http://en.wikipedia.org/wiki/Main_Page">Wikipedia - The Free Encyclopedia </a><br>
+
+
+<hr>
+<h2>Orbit</h2>
+
+<a target="_blank" href="http://exoplanets.org/almanacframe.html">Extrasolar Planets - Masses and OrbitalCharacteristics </a><br>
+<a target="_blank" href="http://sunearth.gsfc.nasa.gov/eclipse/lunar.html">Lunar Eclipses </a><br>
+<a target="_blank" href="http://sunearth.gsfc.nasa.gov/eclipse/phase/phase2001gmt.html">Moon Phases </a><br>
+<a target="_blank" href="http://www.psjournal.com/satellite/NASA-SATELLITE-TRACKING-WEB-PAGE-6926-.htm">NASA Satellite Tracking Webpage</a><br>
+<a target="_blank" href="http://neo.jpl.nasa.gov/">Near-Earth Object Program </a><br>
+<a target="_blank" href="http://www.n2yo.com/?s=15391">Real TimeSatellite Tracking</a><br>
+
+<hr>
+<h2>Others</h2>
+
+
+<a target="_blank" href="http://sunearth.gsfc.nasa.gov/eclipse/solar.html">Solar Eclipses </a><br>
+<a target="_blank" href="http://spacespin.org/staticpages/index.php/tracker">Spacecraft Tracker </a><br>
+<a target="_blank" href="http://ufotools.blogspot.com/">UFO Tools </a><br>
+<a target="_blank" href="http://www.usno.navy.mil/USNO/astronomical-applications/data-services">US Naval Observatory </a><br>
+<a target="_blank" href="http://www.worldtimeserver.com/current_time_in_UTC.aspx">What Time Is It In </a><br>
+<a target="_blank" href="http://www2.nict.go.jp/y/y223/simulation/realtime/" >NICT's Real Time Magnetosphere Simulation !</a><br>
+
+
+<hr>
+<h2>Seismic</h2>
+
+
+<a target="_blank" href="http://www.liss.org/" >Live Internet Seismic Server</a><br>
+<a target="_blank" href="http://www.iris.edu/seismon/" >IRIS Seismic Monitor !</a><br>
+<a target="_blank" href="http://www.ssec.wisc.edu/data/" >SSEC Data Center</a><br>
+
+
+
+<hr>
+<h2>NASA</h2>
+
+<a target="_blank" href="http://stereo-ssc.nascom.nasa.gov/beacon/beacon_secchi.shtml" >STEREO Science Center</a><br>
+<a target="_blank" href="http://iswa.gsfc.nasa.gov/" >CCMC's integrated Space Weather Analysis System !</a><br>
+<a target="_blank" href="http://ccmc.gsfc.nasa.gov/downloads/googleearth.php" >CCMC Space Weather on Google Earth</a><br>
+<a target="_blank" href="http://ccmc.gsfc.nasa.gov/cgi-bin/SWMF_RealTime_browse.cgi" >Real-ime SWMF (Magnetosphere-Ionosphere) - Image Browser</a><br>
+<a target="_blank" href="http://wwwghcc.msfc.nasa.gov/GOES/goeswestpacuswv.html" >Interactive Weather Satellite Imagery Viewers from NASA Earth Science Office</a><br>
+<a target="_blank" href="http://www.goes.noaa.gov/" >GEOSTATIONARY SATELLITE SERVER</a><br>
+<a target="_blank" href="http://agaudi.files.wordpress.com/2007/12/mapa-clima.png" >Clima-Map</a><br>
+
+
+
+<hr>
+
+        </div>
+        <div class="text" id="customCols">
+
+        </div>
+      </article>
+    </section>
+
+        <footer class="posted">
+          <p>Copyright 2013 <a href="#">Active-Memory</a><br></p>
+        </footer>
+
+  </div>
+
+<script>
+
+
+
+  function changeProp(input,xvalue){
+
+    var prop = input.name;
+    var value = xvalue;
+
+    if (input.name == 'text-align'){
+      value = input.checked ? 'justify' : 'inherit';
+    } else {
+      value = input.value + (input.name == 'column-count' ? '' : 'px');
+    }
+
+    [].forEach.call( document.querySelectorAll('article > div'), function(elem, k) {
+
+      // an extra column for the middle guy.
+      if (k == 1 && prop == 'column-count'){
+        value++;
+      }
+
+      prop = prop.replace(/(:?^.|(-[a-z]))/ig, function(all, letter) {
+        return letter.replace('-','').toUpperCase();
+      });
+
+      elem.style['Webkit'+prop] = value;
+      elem.style['Moz'+prop] = value;
+      elem.style[prop.charAt(0).toLowerCase() + prop.slice(1)] = value;
+    });
+  }
+
+
+  document.getElementById('web20').addEventListener('click', function() {
+    var el = document.body;
+    if (this.checked) {
+      el.className = 'web20';
+
+    } else {
+      el.className = 'web10';
+    }
+  }, false);
+
+
+$(document).ready(function() {
+
+   changeProp(document.getElementById("range"));
+
+   $(".text a").click(function() {
+      alert();
+
+      return false;
+   });
+
+  $(".posted a").click(function() {
+
+      return false;
+   });
+  $("#nav a").click(function() {
+
+      return false;
+   });
+
+
+});
+
+
+</script>
+
+</body>
+</html>
