@@ -1,0 +1,833 @@
+
+ul.buttons li#bio-Btn{ height: 48px; width: 48px; top:0px; margin-left: -3px;}
+ul.buttons li#blog-Btn{ height: 60px; width: 60px; top:40px; margin: 0px -10px;}
+ul.buttons li#store-Btn{ height: 40px; width: 40px; top: -10px; margin: 0px -5px 0px 5px;}
+ul.buttons li#bio-Btn a, ul.buttons li#store-Btn a {padding-top: 25%;}
+ul.buttons li#store-Btn a {padding-top: 25%; font-size: 14pt;}
+#bioHgr {left: 190px;}
+#blogHgr {left: 241px; height: 70px;}
+
+#storeHgr {left: 290px; height: 60px;}
+
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; } /* HTML5 display-role reset for older browsers */ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; } body { line-height: 1; } ol, ul { list-style: none; } blockquote, q { quotes: none; } blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; } table { border-collapse: collapse; border-spacing: 0; }
+
+html, body {
+background: url('http://santex.github.io/AI-MicroStructure/the-beginning-is-near.jpg') top center repeat;
+font-family: 'LightCond', Helvetica Nue, Helvetica, Arial, sans-serif;
+font-size: 12pt;
+
+}
+
+a {
+color: rgb(0,125,195);
+text-decoration: none;
+}
+
+a:hover {
+color: rgb(108,173,224);
+}
+
+section {
+width: 85%;
+margin: auto;
+}
+
+hr {
+width: 90%;
+border: none;
+background: none;
+height: 8px;
+border-bottom: dashed 1px rgb(108,173,224);
+border-top: dashed 2px rgb(108,173,224);
+clear: both;
+}
+hr.full { width: 100%; }
+h1, h2, h3, h4, h5 {
+font-family: 'LeagueGothic', Helvetica Nue, Helvetica, Arial, sans-serif;
+color: rgb(0,125,195);
+text-transform: uppercase;
+}
+
+h1 {font-size: 38pt;}
+h2 {font-size: 24pt;}
+h3 {color: rgb(102,102,102); font-size: 12pt;display:inline;}
+h4 {color: rgb(102,102,102); font-size: 16pt; padding: 20px 10px 5px;}
+
+
+
+p {
+font-size: 14pt;
+color: rgb(102,102,102);
+line-height: 22pt;
+}
+
+.main {
+background: #fff;
+max-width: 800px;
+min-width: 400px;
+display: block;
+margin: auto;
+padding: 0;
+border-left: 30px solid rgb(229,229,229); /* = #e5e5e5 */
+border-right: 30px solid rgb(229,229,229);
+border-width: 0px 30px 0px 30px;
+-webkit-border-image: url('images/innerborder.jpg') 0 30 0 30 repeat;
+-moz-border-image: url('images/innerborder.jpg') 0 30 0 30 repeat;
+-o-border-image: url('images/innerborder.jpg') 0 30 0 30 repeat;
+border-image: url('images/innerborder.jpg') 0 30 0 30 repeat;
+float: none;
+}
+
+
+.outerB {
+display: block;
+background: url('images/midBorder.jpg') top left repeat #d8d8d8; /* = #d8d8d8 */
+max-width: 900px;
+margin: auto;
+border-left: 15px solid rgb(211,211,211); /* = #d3d3d3 */
+border-right: 15px solid rgb(211,211,211);
+-webkit-border-image: url('images/outerborder.jpg') 0 15 0 15 repeat;
+-moz-border-image: url('images/outerborder.jpg') 0 15 0 15 repeat;
+-o-border-image: url('images/outerborder.jpg') 0 15 0 15 repeat;
+border-image: url('images/outerborder.jpg') 0 15 0 15 repeat;
+border-width: 0px 15px 0px 15px;
+}
+
+
+
+header { position: relative; margin-bottom:40px;}
+
+nav {
+
+width: 380px; height: 90px;
+position: relative;
+float: right;
+zoom:0.8;
+margin-bottom: 10px;
+}
+
+.logo {
+
+margin-right:50px;
+
+
+
+}
+
+/* MAIN SITEWIDE NAVAGATION */
+
+ul.buttons{ position: absolute; height: 100%; margin: 0; left: 0px;}
+
+ul.buttons li {
+display:inline-block;
+width: 75px;
+height: 75px;
+background: rgb(154,154,154);
+border-radius: 50px;
+position: relative;
+margin-right: 5px;
+}
+
+ul.buttons li#home-Btn{ height: 60px; width: 60px; top:15px; margin-left: 15px;}
+ul.buttons li#help-Btn{ height: 80px; width: 80px; top:40px;}
+ul.buttons li#contact-Btn{ height: 70px; width: 70px; top: 40px; margin: 0px; margin-left: 20px;}
+
+ul.buttons li a {
+font-family: 'MediumCond', Helvetica Nue, Helvetica, Arial, sans-serif;
+font-size: 18pt;
+text-decoration: none;
+float: left;
+text-align: center;
+color: #fff;
+height: 70%;
+width: 100%;
+border-radius: 50px;
+text-transform: uppercase;
+font-weight: regular;
+vertical-align: middle;
+}
+
+ul.buttons li#home-Btn a, ul.buttons li#blog-Btn a {padding-top: 30%;}
+
+ul.buttons li#help-Btn a, ul.buttons li#contact-Btn a { padding-top: 35%;}
+
+
+ul.buttons li.current { background: rgb(108,173,224); }
+
+
+ul.buttons li:hover, ul.buttons li.current:hover {
+background: rgb(0,125,195);
+border-radius: 50px;
+margin-bottom: 3px !important;
+margin-top: -3px !important;
+}
+
+
+/* vertical hangers for the buttons */
+
+.hangers {
+width: 4px; height: 50px;
+position: absolute;
+background: #ddd;
+display: block;
+top: -2px;
+}
+
+#homeHgr {left: 43px;}
+#helpHgr {left: 122px;}
+#contactHgr {left: 320px; height: 60px;}
+
+div.clear {
+clear: both;
+}
+
+/* Styles for all of the footer content */
+
+footer {
+width: 89%;
+display: block;
+bottom: 0px;
+margin: auto;
+clear: both;
+}
+
+
+.footerBox {
+display: block;
+float: left;
+width: 160px;
+min-height: 120px;
+margin-right: 7px;
+margin-bottom: 5px;
+font: 14pt/20pt 'LightCond';
+color: rgb(153,153,153);
+}
+
+.footerBox a, .footerBox a:visited {
+color: rgb(153,153,153);
+text-decoration: none;
+}
+
+.footerBox a:hover {
+color: rgb(108,173,224);
+}
+
+.footerBox p, .footerBox ul {
+padding-left: 15px;
+color: rgb(153,153,153);
+}
+
+ #contactBox{
+width: 110px;
+ }
+ #legalBox{
+width: 170px;
+ }
+#mapBox{
+
+width: 110px;
+ }
+#langBox{
+
+width: 110px;
+ }
+
+#homeSection {}
+
+h1.homeCallout, h2.homeCallout {
+font-size: 90pt;
+text-transform: uppercase;
+color: rgb(0,125,195);
+width: 280px;
+margin: 0;
+margin-top: 0px;
+padding: 0;
+float: left;
+}
+
+h2.homeCallout {
+ font-size: 30pt;
+ margin: 0px;
+ margin-bottom: 100px;
+}
+
+
+a.nextprev {
+ display: inline;
+ color: #fff;
+ font-family: 'Medium';
+ font-size: 11pt;
+ width:40px;
+ text-align: center;
+ letter-spacing: 2pt;
+ text-decoration: none;
+ background: rgb(45,163,228);
+ padding: 10px 20px;
+ margin: 20px 15px 0px 10px;
+ border-radius: 5px;
+ border: 2px solid rgb(45,163,228);
+ box-shadow: inset 0px 0px 15px rgba(255,255,255,0.9), 1px 1px rgb(0,100,150), 2px 2px rgb(0,100,150),
+ 3px 3px rgb(0,100,150), 4px 4px rgb(0,100,150), 5px 5px rgb(0,100,150), 5px 10px 6px rgba(0,0,0,0.3), 5px 15px 8px rgba(0,0,0,0.3);
+ }
+
+
+a.nextprev:hover {
+ background: rgb(73,175,255);
+ padding: 10px 20px;
+ margin: 20px 15px 0px 10px;
+ box-shadow: inset 0px 0px 15px rgba(255,255,255,0.9), 0px 1px rgb(0,100,150), 1px 2px rgb(0,100,150),
+ 2px 3px rgb(0,100,150), 3px 4px rgb(0,100,150), 4px 5px rgb(0,100,150), 5px 6px rgb(0,100,150),
+ 6px 7px rgb(0,100,150), 7px 8px rgb(0,100,150), 8px 10px 7px rgba(0,0,0,0.4), 8px 15px 10px rgba(0,0,0,0.3);
+
+}
+
+
+a.HireWill {
+ display: block;
+ color: #fff;
+ font-family: 'Medium';
+ font-size: 11pt;
+ width:180px;
+ text-align: center;
+ letter-spacing: 2pt;
+ text-decoration: none;
+ background: rgb(45,163,228);
+ padding: 10px 20px;
+ margin: 20px 15px 0px 10px;
+ float: left;
+ border-radius: 5px;
+ border: 2px solid rgb(45,163,228);
+ box-shadow: inset 0px 0px 15px rgba(255,255,255,0.9), 1px 1px rgb(0,100,150), 2px 2px rgb(0,100,150),
+ 3px 3px rgb(0,100,150), 4px 4px rgb(0,100,150), 5px 5px rgb(0,100,150), 5px 10px 6px rgba(0,0,0,0.3), 5px 15px 8px rgba(0,0,0,0.3);
+ }
+
+
+a.HireWill:hover {
+ background: rgb(73,175,255);
+ margin: 17px 0px 3px 8px;
+ box-shadow: inset 0px 0px 15px rgba(255,255,255,0.9), 0px 1px rgb(0,100,150), 1px 2px rgb(0,100,150),
+ 2px 3px rgb(0,100,150), 3px 4px rgb(0,100,150), 4px 5px rgb(0,100,150), 5px 6px rgb(0,100,150),
+ 6px 7px rgb(0,100,150), 7px 8px rgb(0,100,150), 8px 10px 7px rgba(0,0,0,0.4), 8px 15px 10px rgba(0,0,0,0.3);
+
+}
+
+a.HireWill:active {
+ background: rgb(45,163,228);
+ margin: 25px 0px 0px 15px;
+ box-shadow: inset 3px 3px 10px rgba(0,0,0,0.75), 0px 0px 3px rgba(0,0,0,0.4);
+ border: 2px solid rgb(0,100,150);
+}
+
+
+
+#macContainer {
+float: right;
+
+margin-right: -20px;
+position: relative;
+}
+
+#outerBody {
+width: 395px;
+height: 310px;
+border-radius: 15px;
+background: rgb(187,189,191);
+margin-top: 0px;
+position: relative;
+}
+
+#frame {
+width: 376px;
+height: 258px;
+border-radius: 15px;
+background: rgb(64,64,65);
+margin: 10px;
+position: absolute;
+}
+
+#screen{
+background: rgb(230,231,232);
+border: 5px solid rgb(50,50,50);
+position:relative;
+margin: 10px;
+}
+
+#leftside {
+width: 60px;
+height: 37px;
+background: #fff;
+border-bottom-right-radius: 50px 30px;
+position: absolute;
+left: 108px;
+}
+#rightside {
+width: 60px;
+height: 37px;
+background: #fff;
+border-bottom-left-radius: 50px 30px;
+position: absolute;
+right: 108px;
+}
+
+#base {
+width: 125px;
+height: 30px;
+border-top: 4px solid rgb(166,168,171);
+border-bottom: 3px solid rgb(166,168,171);
+border-radius: 3px;
+margin: auto;
+background: rgb(208,210,211);
+}
+
+#hands {
+position: absolute;
+right: 20px;
+bottom: -49px;
+z-index: 4;
+}
+
+#design4{
+position: relative;
+top: -45px;
+margin-left: 39%;
+}
+
+.services{
+background: url('http://localhost/pub/images/homePage/bubbleLines.jpg') 220px -30px no-repeat;
+width: 100%;
+height: 310px;
+padding: 10px;
+margin-top: -47px;
+margin-left: 44px;
+position: relative;
+}
+
+.outerBubble {
+background: rgba(90,175,223,0.5);
+width: 255px;
+height: 255px;
+display: block;
+border-radius: 140px;
+margin: -12px;
+float: left;
+}
+
+.serviceBubble {
+margin: 12px;
+width: 230px;
+height: 230px;
+border-radius: 140px;
+background: rgba(63,125,205,0.7);
+float: left;
+}
+
+.serviceBubble h2 {
+color: #fff;
+text-align: center;
+margin: 0px 40px;
+height: 30pt;
+border-bottom: 2px solid #fff;
+font-size: 36pt;
+margin-top: 50px;
+}
+
+.serviceBubble p {
+ padding: 15px 30px;
+ color: rgb(230,230,230);
+ font-family: 'LightCond', Helvetica Nue, Helvetica, Arial, sans-serif;
+ font-size: 15pt;
+ text-align: center;
+}
+
+#print {
+z-index: 2;
+position: relative;
+bottom: -60px;
+}
+
+#brand, #web {
+z-index: 1;
+}
+
+.moHomeContent{
+width: 100%;
+margin: 30px 0px;
+float: left;
+}
+.about {
+width: 25%;
+padding: 30px;
+float: left;
+margin-left: 35px;
+}
+.about p {
+margin: 15px 0px;
+}
+.recentBlogPosts {
+width: 50%;
+padding: 30px;
+float: left;
+margin-right: 35px;
+border-left: 1px solid gray;
+}
+
+.recentBlogPosts li h2, .recentBlogPosts a{
+color: #999;
+display: inline-block;
+}
+
+.recentBlogPosts li h2 {
+font-size: 18pt;
+}
+
+.recentBlogPosts p{
+color: #aaa;
+font-family: 'LeagueGothic';
+text-transform: uppercase;
+margin: -5px 0px 0px 34px;
+font-size: 12pt;
+}
+
+.dot {
+width: 20px;
+height: 20px;
+margin: 5px;
+background: #999;
+border-radius: 20px;
+display: inline-block;
+position: relative;
+top: 7px;
+}
+
+.recentBlogPosts li:hover a, .recentBlogPosts li:hover p {
+color: rgb(108,173,224);
+}
+
+.recentBlogPosts li:hover .dot {
+background: rgb(108,173,224);
+margin: 0px;
+width: 30px; height: 30px;
+}
+
+.readMore a {
+
+width: 130px;
+height: 18px;
+padding: 5px;
+text-align: center;
+margin: 10px 0px;
+color: #000;
+font-family: 'Book';
+}
+
+.readMore a:hover {
+margin-left: 5px;
+}
+
+#cssWinnerNominee {
+position:absolute;
+top: 200px;
+left: 0px;
+}
+
+#cssdaNomineeRibbon {
+position: absolute;
+top: 20px; right: 0px;
+}
+
+.instagram-container {
+  padding: 10px;
+  background: #c0c0c0;
+  display: none;
+}
+
+
+#screen {
+  overflow: hidden; }
+#screen>img,
+#screen>div,
+#screen>a { display: none; }
+
+
+
+
+/* CONTAINER
+   ================================================== */
+
+div.orbit-wrapper {
+  width: 1px;
+  height: 1px;
+  position: relative; }
+
+div.orbit {
+  width: 1px;
+  height: 1px;
+  position: relative;
+  overflow: hidden }
+
+div.orbit>img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none; }
+
+div.orbit>a {
+  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: 0;
+  display: none; }
+
+.orbit>div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+
+/* Note: If your slider only uses content or anchors, you're going to want to put the width and height declarations on the ".orbit>div" and "div.orbit>a" tags in addition to just the .orbit-wrapper */
+
+
+/* TIMER
+   ================================================== */
+
+div.timer {
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  position: absolute;
+  bottom: -50px;
+  right: 145px;
+  opacity: .6;
+  cursor: pointer;
+  z-index: 1001; }
+
+span.rotator {
+  display: block;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  left: -10px;
+  background: url(http://localhost/pub/images/orbit/rotator-black20px.png) no-repeat;
+  z-index: 3; }
+
+span.mask {
+  display: block;
+  width: 10px;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  overflow: hidden; }
+
+span.rotator.move {
+  left: 0 }
+
+span.mask.move {
+  width: 20px;
+  left: 0;
+  background: url(http://localhost/pub/images/orbit/timer-black20px.png) repeat 0 0; }
+
+span.pause {
+  display: block;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url(http://localhost/pub/images/orbit/pause-black20px.png) no-repeat;
+  z-index: 4;
+  opacity: 0; }
+
+span.pause.active {
+  background: url(http://localhost/pub/images/orbit/pause-black20px.png) no-repeat 0 -20px }
+
+div.timer:hover span.pause,
+span.pause.active {
+  opacity: 1 }
+
+
+/* CAPTIONS
+   ================================================== */
+
+.orbit-caption {
+  display: none;
+  font-family: "HelveticaNeue", "Helvetica-Neue", Helvetica, Arial, sans-serif; }
+
+.orbit-wrapper .orbit-caption {
+  background: #000;
+  background: rgba(0,0,0,.6);
+  z-index: 1000;
+  color: #fff;
+  text-align: center;
+  padding: 7px 0;
+  font-size: 13px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%; }
+
+
+/* DIRECTIONAL NAV
+   ================================================== */
+
+div.slider-nav {
+  display: block }
+
+div.slider-nav span {
+  width: 20px;
+  height: 30px;
+  text-indent: -9999px;
+  position: absolute;
+  z-index: 1000;
+  top: 50%;
+  margin-top: -50px;
+  cursor: pointer; }
+
+div.slider-nav span.right {
+  background: url(http://localhost/pub/images/orbit/right-arrow.png);
+  right: -80px; }
+
+div.slider-nav span.left {
+  background: url(http://localhost/pub/images/orbit/left-arrow.png);
+  left: 0; }
+
+/* BULLET NAV
+   ================================================== */
+
+.orbit-bullets {
+  position: absolute;
+  z-index: 1000;
+  list-style: none;
+  bottom: -40px;
+  left: 50%;
+  margin-left: -50px;
+  padding: 0; }
+
+.orbit-bullets li {
+  float: left;
+  margin-left: 5px;
+  cursor: pointer;
+  color: #999;
+  text-indent: -9999px;
+  background: url(http://localhost/pub/images/orbit/bullets.jpg) no-repeat 4px 0;
+  width: 13px;
+  height: 12px;
+  overflow: hidden; }
+
+.orbit-bullets li.active {
+  color: #222;
+  background-position: -8px 0; }
+
+.orbit-bullets li.has-thumb {
+  background: none;
+  width: 100px;
+  height: 75px; }
+
+.orbit-bullets li.active.has-thumb {
+  background-position: 0 0;
+  border-top: 2px solid #000; }
+
+
+/* Web Fonts from fontspring.com
+ * All OpenType features and all extended glyphs have been removed.
+ * Fully installable fonts can be purchased at http://www.fontspring.com
+ * The fonts included in this stylesheet are subject to the End User License you purchased from Fontspring. The fonts are protected under domestic and international trademark and copyright law. You are prohibited from modifying, reverse engineering, duplicating, or distributing this font software.
+ * (c) 2010 Fontspring
+ * The fonts included are copyrighted by the vendor listed below.
+ * Vendor: FontSite Inc.
+ * License URL: http://www.fontspring.com/fflicense/fontsite */
+
+@font-face { font-family: 'LeagueGothic'; src: url('webfonts/LeagueGothic/League_Gothic-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/LeagueGothic/League_Gothic-webfont.woff') format('woff'), url('webfonts/LeagueGothic/League_Gothic-webfont.ttf')  format('truetype'), url('webfonts/LeagueGothic/League_Gothic-webfont.svg#svgFHzvtkso') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Book'; src: url('webfonts/FunctionProFonts/FunctionPro-Book-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-Book-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-Book-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-Book-webfont.svg#svgqoN2YEm5') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'BookObl'; src: url('webfonts/FunctionProFonts/FunctionPro-BookOblique-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-BookOblique-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-BookOblique-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-BookOblique-webfont.svg#svgT61gb0lg') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Light'; src: url('webfonts/FunctionProFonts/FunctionPro-Light-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-Light-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-Light-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-Light-webfont.svg#svgoURYPCFy') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'LightObl'; src: url('webfonts/FunctionProFonts/FunctionPro-LightOblique-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-LightOblique-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-LightOblique-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-LightOblique-webfont.svg#svgpZOfdIDX') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'LightCond'; src: url('webfonts/FunctionProFonts/FunctionPro-CondensedLight-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedLight-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-CondensedLight-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedLight-webfont.svg#svgtgOOl1Ra') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'LightCondObli'; src: url('webfonts/FunctionProFonts/FunctionPro-CondensedLightObl-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedLightObl-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-CondensedLightObl-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedLightObl-webfont.svg#svgy8JMiP3J') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Medium'; src: url('webfonts/FunctionProFonts/FunctionPro-Medium-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-Medium-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-Medium-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-Medium-webfont.svg#svgfPPazdSc') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'MedObl'; src: url('webfonts/FunctionProFonts/FunctionPro-MediumOblique-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-MediumOblique-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-MediumOblique-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-MediumOblique-webfont.svg#svgptpUfu2x') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'MedCondObl'; src: url('webfonts/FunctionProFonts/FunctionPro-CondensedOblique-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedOblique-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-CondensedOblique-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedOblique-webfont.svg#svgXViQysY9') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'MediumCond'; src: url('webfonts/FunctionProFonts/FunctionPro-Condensed-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-Condensed-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-Condensed-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-Condensed-webfont.svg#svgWbIXQG38') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Bold'; src: url('webfonts/FunctionProFonts/FunctionPro-Bold-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-Bold-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-Bold-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-Bold-webfont.svg#svgBPXbofvj') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'BoldObl'; src: url('webfonts/FunctionProFonts/FunctionPro-BoldOblique-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-BoldOblique-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-BoldOblique-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-BoldOblique-webfont.svg#svgLhmWHMaF') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'BoldCond'; src: url('webfonts/FunctionProFonts/FunctionPro-CondensedBold-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedBold-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-CondensedBold-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedBold-webfont.svg#svgrBdX219E') format('svg'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'BoldCondObl'; src: url('webfonts/FunctionProFonts/FunctionPro-CondensedBoldObl-webfont.eot?#iefix') format('embedded-opentype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedBoldObl-webfont.woff') format('woff'), url('webfonts/FunctionProFonts/FunctionPro-CondensedBoldObl-webfont.ttf')  format('truetype'), url('webfonts/FunctionProFonts/FunctionPro-CondensedBoldObl-webfont.svg#svgAZgKIZzm') format('svg'); font-weight: normal; font-style: normal; }
+
+
+
+.threeWide {
+ width: 204px;
+ float: left;
+ margin: 20px 0px;
+}
+
+.threeWide p {
+ text-align: justify;
+ color: #999;
+ font-family: 'Book';
+ font-size: 12pt;
+ line-height: 20pt;
+}
+.leftColumn {
+ margin-right: 30px;
+}
+
+.centerColumn {
+ margin-right: 30px;
+}
+.centerColumn img{
+border: 5px solid #e0e0e0;
+}
+
+.rightColumn {
+
+}
+
+.twoWide {
+
+}
+.firstColumn {
+
+}
+.secondColumn {
+
+}
+
+.servicesSection {
+
+}
+
+.serviceTitle {
+background: rgb(108,173,224);
+color: #fff;
+padding: 5px 10px;
+margin: 10px 0px;
+}
+
+
+.quoteButton {
+float: left;
+width: 100%;
+margin: 20px 0px;
+}
+
+.quoteButton a{
+display: block;
+background: rgb(0,125,195); border: 5px solid rgb(108,173,224);
+border-radius: 20px;
+padding: 15px 50px;
+width: 40%;
+margin: auto;
+font-size: 36pt;
+text-align: center;
+font-family: 'LeagueGothic';
+color: #fff;
+text-decoration: none;
+}
+.quoteButton a:hover {border: 5px solid rgb(0,125,195);
+background: rgb(108,173,224);  }
