@@ -1,0 +1,171 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" />
+    <title>HTML5 Job Finder</title>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:light|Reenie+Beanie" />
+    <style>
+      body {
+        margin: 0 5px 25px 5px;
+        font: 100% normal 'Yanone Kaffeesatz', 'Lucida Grande', 'Trebuchet MS', Verdana, sans-serif;
+        text-align: center;
+        color: #999;
+      }
+      a, a:visited {
+        color: #00b;
+        text-decoration: none;
+      }
+      h1, h2, h3, h4 {
+        margin: 10px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 10px auto;
+        font-size: 11pt;
+      }
+      hgroup {
+        background: #EBF1FF;
+        padding: 2.5em 0 0.5em 0;
+        margin-bottom: 10px;
+        color: black;
+        font-family: 'Reenie Beanie';
+        text-shadow: 2px 2px 5px #ccc;
+        -moz-border-radius-bottomleft: 100px;
+        -moz-border-radius-bottomright: 100px;
+        border-bottom-left-radius: 100px;
+        border-bottom-right-radius: 100px;
+        border: 5px solid rgba(123,156,227,0.25);
+        border-top: 0;
+        width: 99%;
+      }
+      hgroup h1 {
+        color: black;
+        font-size: 29pt;
+      }
+      [contenteditable] {
+        padding: 0 8px 5px 8px;
+        text-decoration: none;
+        border: 2px dashed transparent;
+        color: #666666;
+        font-size: 125%;
+        border-bottom: 2px dotted #ccc;
+      }
+      [contenteditable]:hover,
+      [contenteditable]:focus {
+        outline: none;
+        border: 2px dashed #ccc;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        color: black;
+      }
+      #attribution {
+        position: absolute;
+        top: -80px;
+        left: -15px;
+        color: white;
+        font-size: 16pt;
+        padding: 100px 10px 8px;
+        -webkit-transform: rotate(-15deg);
+        -moz-transform: rotate(-10deg);
+        -o-transform: rotate(-10deg);
+        background: #0037AD;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        -moz-box-shadow: 3px 3px 5px #7B9CE3;
+        -webkit-box-shadow: 3px 3px 5px #7B9CE3;
+        box-shadow: 3px 3px 5px #7B9CE3;
+      }
+
+      #attribution2 {
+        position: absolute;
+        top: -80px;
+        right: -15px;
+        color: white;
+        font-size: 21pt;
+        padding: 100px 10px 8px;
+        -webkit-transform: rotate(15deg);
+        -moz-transform: rotate(10deg);
+        -o-transform: rotate(10deg);
+        background: #0037AD;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        -moz-box-shadow: 3px 3px 5px #7B9CE3;
+        -webkit-box-shadow: 3px 3px 5px #7B9CE3;
+        box-shadow: 3px 3px 5px #7B9CE3;
+      }
+      #attribution a {
+        color: white;
+      }
+      #attribution2 a {
+        color: white;
+      }
+      #search-area {
+        border: 5px solid rgba(123,156,227,0.10);
+        -moz-border-radius: 25px;
+        border-radius: 25px;
+        padding: 10px 10px 15px 10px;
+        font-size: 20pt;
+        text-align: center;
+      }
+      #mapContainer {
+        width: 100%;
+        height: 390px;
+        border: 1px solid black;
+        text-align: left;
+      }
+      #radius {
+        width: 25px;
+      }
+      #content {
+        width: 96%;
+        margin: 0 auto;
+        clear: both;
+      }
+      #main {
+        font-size: 12pt;
+        text-align: left;
+      }
+      #closest-job {
+        cursor: pointer;
+        background: #eee;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        padding: 5px 10px 5px 10px;
+        font-weight: bold;
+      }
+      #nearest {
+        margin-bottom: 12px;
+        color: #666666;
+      }
+      #num-results {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="attribution"><a href="mailto:NagelStudioRadebeul@gmail.de">0351/8307218</a></div>
+    <div id="attribution2"><a href="https://plus.google.com/115651709392458974740/about?gl=de&hl=en">Bilder</a></div>
+
+    <hgroup>
+      <h1>Nagel Studio Hand und Fuß<sub>...</sub></h1>
+    </hgroup>
+    <div id="content">
+      <div id="main">
+
+        <div id="search-area">Ihr Nagelstudio in Radebeul,
+            Nägel - mehr als Fingerspiel und Fußnote. Gepflegte und makellose. Zufrieden Kunden seit ueber 15 jahren
+
+                    </div>
+
+              </div>
+    <br>
+  <div id="maper" style="height:50%;">
+  <iframe  width="90%" height="360px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.de/maps?ie=UTF8&amp;cid=4148809709481225680&amp;q=Nagelstudio+HAND+%26+Fu%C3%9F&amp;gl=DE&amp;hl=en&amp;hq=Nagelstudio+HAND+%26+Fu%C3%9F&amp;hnear=&amp;t=m&amp;ll=51.109908,13.63133&amp;spn=0.00943,0.018239&amp;z=15&amp;iwloc=A&amp;output=embed"></iframe>
+
+    </div>
+
+  </body>
+  </html>
