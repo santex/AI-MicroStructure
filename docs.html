@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="yui3-loading">
+<head>
+    <meta charset="utf-8">
+    <title>Photo Browser</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/2.8.2/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
+    <link rel="stylesheet" type="text/css" href="../test/assets/css/photos.css">
+    <script src="http://yui.yahooapis.com/3.10.3/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+
+<div id="doc3" class="yui-t1">
+    <div id="bd">
+        <div id="yui-main">
+          <div class="yui-b">
+                <div class="yui-g">
+                    <ul>
+                    </ul>
+              </div>
+            </div>
+      </div>
+      <div class="yui-b">
+            <ul id="photoList">
+                <li class="all selected"><a href="#">All Photos</a></li>
+                <li id="a_1"><a href="#">Album #1<span>(0)</span></a></li>
+                <li id="a_2"><a href="#">Album #2<span>(0)</span></a></li>
+                <li id="a_3"><a href="#">Album #3<span>(0)</span></a></li>
+                <li id="a_4"><a href="#">Album #4<span>(0)</span></a></li>
+            </ul>
+            <p>Click and drag a photo to an album above. You can also Shift + Click to select and drag multiple photos.</p>
+            <p>Click on an album to view the photos that you added.</p>
+            <p>You can also use the slider at the bottom to adjust the size of the image to help fit them on your screen.</p>
+        </div>
+    </div>
+    <div id="ft" class="loading"><strong></strong><div class="horiz_slider"></div><em></em></div>
+</div>
+
+
+<script>
+YUI().use('yql', 'node', 'anim', 'dd', 'dd-plugin', 'dd-drop-plugin', 'slider', 'stylesheet', 'event-delegate', function(Y) {
+    //Get a reference to the wrapper to use later and add a loading class to it.
+    var wrapper = Y.one('#yui-main .yui-g ul').addClass('loading');
+    //Set it's height to the height of the viewport so we can scroll it.
+    wrapper.setStyle('height', (wrapper.get('winHeight') - 50 )+ 'px');
+    Y.on('windowresize', function() { wrapper.setStyle('height', (wrapper.get('winHeight') - 50 )+ 'px'); });
+
+
+    var photos = ['http://ufoevidence.org/GovtDocs/FBI10/FBI10-4.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-2.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-13.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-9.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-16.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-3.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-5.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-15.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-10.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-11.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-14.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-12.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-1.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-7.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-6.gif','http://ufoevidence.org/GovtDocs/FBI10/FBI10-8.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-5.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-12.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-10.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-6.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-3.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-16.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-14.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-7.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-9.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-4.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-11.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-13.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-2.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-8.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-1.gif','http://ufoevidence.org/GovtDocs/FBI3/FBI3-15.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-16.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-7.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-6.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-14.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-9.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-10.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-3.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-15.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-11.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-13.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-8.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-4.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-12.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-2.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-1.gif','http://ufoevidence.org/GovtDocs/FBI2/FBI2-5.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-12.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-2.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-7.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-10.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-4.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-14.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-1.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-5.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-13.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-6.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-3.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-15.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-8.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-9.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-11.gif','http://ufoevidence.org/GovtDocs/FBI5/FBI5-16.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-4.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-9.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-6.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-11.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-16.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-3.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-15.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-8.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-5.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-2.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-1.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-14.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-13.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-10.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-12.gif','http://ufoevidence.org/GovtDocs/FBI9/FBI9-7.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-15.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-3.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-11.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-8.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-6.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-1.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-10.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-2.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-5.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-9.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-12.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-7.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-4.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-16.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-13.gif','http://ufoevidence.org/GovtDocs/FBI6/FBI6-14.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-12.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-3.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-14.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-5.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-6.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-1.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-7.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-4.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-2.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-16.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-9.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-11.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-13.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-8.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-10.gif','http://ufoevidence.org/GovtDocs/FBI11/FBI11-15.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-15.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-7.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-10.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-8.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-16.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-3.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-12.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-5.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-6.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-1.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-2.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-11.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-14.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-13.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-9.gif','http://ufoevidence.org/GovtDocs/FBI4/FBI4-4.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-10.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-15.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-14.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-4.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-3.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-6.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-12.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-9.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-5.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-7.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-1.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-2.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-8.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-16.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-13.gif','http://ufoevidence.org/GovtDocs/FBI7/FBI7-11.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-3.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-14.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-9.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-4.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-1.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-2.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-6.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-10.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-5.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-8.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-16.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-7.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-11.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-12.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-15.gif','http://ufoevidence.org/GovtDocs/FBI1/FBI1-13.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-12.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-16.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-8.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-1.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-11.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-7.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-9.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-14.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-13.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-4.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-3.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-6.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-5.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-10.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-15.gif','http://ufoevidence.org/GovtDocs/FBI8/FBI8-2.gif','http://www.bibliotecapleyades.net/imagenes_exopol/exopolZC_FBIVonBraun.gif'];
+
+            Y.each(photos, function(v, k) {
+                //Create our URL
+
+                var url = v,
+                    //Create the image and the LI
+                    li = Y.Node.create('<li class="loading"><img src="' + url + '" title="' + k + '"></li>'),
+                    //Get the image from the LI
+                    img = li.get('firstChild');
+                //Append the li to the wrapper
+                wrapper.appendChild(li);
+                //This little hack moves the tall images to the bottom of the list
+                //So they float better ;)
+                img.on('load', function() {
+                    //Is the height longer than the width?
+                    var c = ((this.get('height') > this.get('width')) ? 'tall' : 'wide');
+                    this.addClass(c);
+                    if (c === 'tall') {
+                        //Move it to the end of the list.
+                        this.get('parentNode.parentNode').removeChild(this.get('parentNode'));
+                        wrapper.appendChild(this.get('parentNode'));
+                    }
+                    this.get('parentNode').removeClass('loading');
+                });
+            });
+            //Get all the newly added li's
+            wrapper.all('li').each(function(node) {
+                //Plugin the Drag plugin
+                this.plug(Y.Plugin.Drag, {
+                    offsetNode: false
+                });
+                //Plug the Proxy into the DD object
+                this.dd.plug(Y.Plugin.DDProxy, {
+                    resizeFrame: false,
+                    moveOnEnd: false,
+                    borderStyle: 'none'
+                });
+            });
+            //Create and render the slider
+            var sl = new Y.Slider({
+                length: '200px', value: 40, max: 70, min: 5
+            }).render('.horiz_slider');
+            //Listen for the change
+            sl.after('valueChange',function (e) {
+                //Insert a dynamic stylesheet rule:
+                var sheet = new Y.StyleSheet('image_slider');
+                sheet.set('#yui-main .yui-g ul li', {
+                    width: (e.newVal / 2) + '%'
+                });
+            });
+            //Remove the DDM as a bubble target..
+            sl._dd.removeTarget(Y.DD.DDM);
+            //Remove the wrappers loading class
+            wrapper.removeClass('loading');
+            Y.one('#ft').removeClass('loading');
+
+    //Listen for all mouseup's on the document (selecting/deselecting images)
+    Y.delegate('mouseup', function(e) {
+        if (!e.shiftKey) {
+            //No shift key - remove all selected images
+            wrapper.all('img.selected').removeClass('selected');
+        }
+        //Check if the target is an image and select it.
+        if (e.target.test('#yui-main .yui-g ul li img')) {
+            e.target.addClass('selected');
+        }
+    }, document, '*');
+
+    //Listen for all clicks on the '#photoList li' selector
+    Y.delegate('click', function(e) {
+        //Prevent the click
+        e.halt();
+        //Remove all the selected items
+        e.currentTarget.get('parentNode').all('li.selected').removeClass('selected');
+        //Add the selected class to the one that one clicked
+        e.currentTarget.addClass('selected');
+        //The "All Photos" link was clicked
+        if (e.currentTarget.hasClass('all')) {
+            //Remove all the hidden classes
+            wrapper.all('li').removeClass('hidden');
+        } else {
+            //Another "album" was clicked, get it's id
+            var c = e.currentTarget.get('id');
+            //Hide all items by adding the hidden class
+            wrapper.all('li').addClass('hidden');
+            //Now, find all the items with the class name the same as the album id
+            //and remove the hidden class
+            wrapper.all('li.' + c).removeClass('hidden');
+        }
+    }, document, '#photoList li');
+
+    //Stop the drag with the escape key
+    Y.one(document).on('keyup', function(e) {
+        //The escape key was pressed
+        if ((e.keyCode === 27) || (e.charCode === 27)) {
+            //We have an active Drag
+            if (Y.DD.DDM.activeDrag) {
+                //Stop the drag
+                Y.DD.DDM.activeDrag.stopDrag();
+            }
+        }
+    });
+    //On the drag:mouseDown add the selected class
+    Y.DD.DDM.on('drag:mouseDown', function(e) {
+        var img = e.target.get('node').one('img');
+        //If it's a gesture event, then we need to act differently
+        if (Y.DD.Drag.START_EVENT.indexOf('gesture') === 0) {
+            if (img.hasClass('selected')) {
+                img.removeClass('selected');
+            } else {
+                img.addClass('selected');
+            }
+        } else {
+            img.removeClass('selected');
+        }
+    });
+    //On drag start, get all the selected elements
+    //Add the count to the proxy element and offset it to the cursor.
+    Y.DD.DDM.on('drag:start', function(e) {
+        var img = e.target.get('node').one('img').addClass('selected');
+        //How many items are selected
+        var count = wrapper.all('img.selected').size();
+        //Set the style on the proxy node
+        e.target.get('dragNode').setStyles({
+            height: '25px', width: '25px'
+        }).set('innerHTML', '<span>' + count + '</span>');
+        //Offset the dragNode
+        e.target.deltaXY = [25, 5];
+    });
+    //We dropped on a drop target
+    Y.DD.DDM.on('drag:drophit', function(e) {
+        //get the images that are selected.
+        var imgs = wrapper.all('img.selected'),
+            //The xy position of the item we dropped on
+            toXY = e.drop.get('node').getXY();
+
+        imgs.each(function(node) {
+            //Clone the image, position it on top of the original and animate it to the drop target
+            node.get('parentNode').addClass(e.drop.get('node').get('id'));
+            var n = node.cloneNode().set('id', '').setStyle('position', 'absolute');
+            Y.one('body').appendChild(n);
+            n.setXY(node.getXY());
+            new Y.Anim({
+                node: n,
+                to: {
+                    height: 20, width: 20, opacity: 0,
+                    top: toXY[1], left: toXY[0]
+                },
+                from: {
+                    width: node.get('offsetWidth'),
+                    height: node.get('offsetHeight')
+                },
+                duration: .5
+            }).run();
+        });
+        //Update the count
+        var count = wrapper.all('li.' + e.drop.get('node').get('id')).size();
+        e.drop.get('node').one('span').set('innerHTML', '(' + count + ')');
+    });
+    //Add drop support to the albums
+    Y.all('#photoList li').each(function(node) {
+        if (!node.hasClass('all')) {
+            //make all albums Drop Targets except the all photos.
+            node.plug(Y.Plugin.Drop);
+        }
+    });
+});
+
+
+</script>
+
+
+
+
+</body>
+</html>
