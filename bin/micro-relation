@@ -1,87 +1,61 @@
-#!/usr/bin/perl -w
-
-use strict;
-use utf8;
-use File::Spec;
-#use AI::MicroStructure;
+#!/usr/bin/perl -X
+use JSON;
 use JSON::XS;
 use Data::Printer;
-use AI::MicroStructure::Cache;
-use AI::MicroStructure::Relations;
+use Data::Dumper;
+use WWW::Wikipedia;
+my $wiki = WWW::Wikipedia->new();
 
 
-my $cache = {};
-my $new = AI::MicroStructure::Relations->new();
-$new->{scale} = 0.1;
-#my $page_iter = iterate(\&gofor,[map{$_=sprintf("http://en.wikipedia.org/wiki/%s",$_)}@ARGV]);
-#print Dumper [iterate(\&fetch,[$urls[0]])];
+use Cache::Memcached::Fast;
+
+         our $memd = new Cache::Memcached::Fast({
+             servers => [ { address => 'localhost:11211', weight => 2.5 }],
+             namespace => 'my:',
+             connect_timeout => 0.2,
+             io_timeout => 0.1,
+             close_on_error => 1,
+             compress_threshold => 100_000,
+             compress_ratio => 0.9,
+             max_failures => 1,
+             max_size => 512 * 1024,
+         });
 
 
-if(!@ARGV) {
-push @ARGV,$_ for qw("Lie Conspiracy Politics President NWO International_relations War Crime Freedom Weapon Ufo");
+
+
+sub  decruft  {
+  my($file)  =  @_;
+  my($cruftSet)  =  q{%Â§&|#[^+*(]),'";};
+  my  $clean  =  $file;
+  $clean=~s/\Q$_//g  for  split("",$cruftSet);
+
+  return  $clean;
 }
 
-foreach(@ARGV)
-{
-  $new->gofor($_);#
+
+sub rel {
+  my $arg = shift;
+
+  if(defined(my $fromCache = $memd->get($arg))){
+    return $fromCache;
+  }
+
+  my $result = $wiki->search($arg);
+  my $str = "";
+
+  if (defined($result) &&  $result->text() ) {
+
+
+    $str = join( "\n", $result->related() );
+    $str = decruft($str);
+    $memd->set($arg,$str);
+  }
+  return $str;
 }
 
 
-#die(ref $new->{storage});
-$new->{storage}->{data} = $new->inspect($new->{scale});
-
-my $sense = JSON::XS->new->pretty(0)->allow_blessed($new->{storage});
-
-foreach(sort {$a <=> $b} keys %{$new->{storage}->{related}}){
-
-print join("\n", @{ $new->{storage}->{related}->{$_} }) unless(ref $new->{storage}->{related}->{$_} =~/ARRAY/);
-
-}
-
+print rel($_) for @ARGV; 
 
 1;
-__END__
-
-
-# ABSTRACT: AI::MicroStructure   Starts some relation aggregation supposed to grow to a server
-
-=head1 NAME
-
-  AI::MicroStructure::Deamon
-
-=head1 DESCRIPTION
-
-  Creates a session to work relations
-
-=head1 SYNOPSIS
-
-  perl Deamon.pm ufo secret
-
-=head1 AUTHOR
-
-  Hagen Geissler <santex@cpan.org>
-
-=head1 COPYRIGHT AND LICENCE
-
-  Hagen Geissler <santex@cpan.org>
-
-=head1 SUPPORT AND DOCUMENTATION
-
-  ☞ [sample using concepts](http://quantup.com)
-
-  ☞ [PDF info on my works](https://github.com/santex)
-
-=head1 SEE ALSO
-
-  AI-MicroStructure
-  AI-MicroStructure-Cache
-  AI-MicroStructure-Deamon
-  AI-MicroStructure-Relations
-  AI-MicroStructure-Concept
-  AI-MicroStructure-Data
-  AI-MicroStructure-Driver
-  AI-MicroStructure-Plugin-Pdf
-  AI-MicroStructure-Plugin-Twitter
-  AI-MicroStructure-Plugin-Wiki
-
-
+__DATA__

@@ -52,10 +52,9 @@ sub config {
     $state->{cfg}->{wikipedia}  ||= "http://en.wikipedia.org/wiki/";
     $state->{cfg}->{db}         ||= "table";
     $state->{cfg}->{out}        ||= "json";
-    $state->{cfg}->{jsonout}      = sprintf("%s/%s/%s-relations",
+    $state->{cfg}->{jsonout}      = sprintf("%s/%s/",
                                             $state->{cwd},
-                                            $state->{cfg}->{db},
-                                            $state->{cfg}->{query});
+                                            $state->{cfg}->{db});
 
 
 

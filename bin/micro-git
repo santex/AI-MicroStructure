@@ -33,7 +33,7 @@ createNewRepo(){
 dir=./$1/
 mkdir -p $dir;
 
-for q in `perl -MAI::MicroStructure -E  'my %s=AI::MicroStructure->find_structures(@INC); print join("\n",values %s);'`; do 
+for q in `perl -MAI::MicroStructure -E  'my %s=AI::MicroStructure->find_structures(@INC); '`; do
 cp $q $dir;
 echo $q; done
 cd $dir;

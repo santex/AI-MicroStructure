@@ -9,7 +9,7 @@ IFS=$'\n';
 
 
 
-stop=$(perl -MAI::MicroStructure::WordBlacklist -E  "my \$s=AI::MicroStructure::WordBlacklist::getStopWords('en'); my @s = keys %\$s; print join('|',@s);")
+stop=$(perl -MAI::MicroStructure::WordBlacklist -E  "my \$s=AI::MicroStructure::WordBlacklist::getStopWords('de'); my @s = keys %\$s; print join('|',@s);")
 
 
 

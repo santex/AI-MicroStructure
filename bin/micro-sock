@@ -99,7 +99,7 @@ sub search {
 
     use AnyEvent::Subprocess::Easy qw(qx_nonblock);
 
-           my $date = qx_nonblock('micro-search --match '.$search)->recv;
+    my $date = qx_nonblock('perl ObjectSet.pl '.$search)->recv;
 
     return encode_json({file=>$date});
 
@@ -111,26 +111,50 @@ sub printer {
 
      $msg = "space" unless($msg);
 
-     my $data = getAll($msg);
+     my $data = {};#getAll($msg);
 
-    my @data = @{$data->{set}};
+#    my @data = @{$data->{set}};
 
-     @data  = @data[0..5000] unless($#data<10000);
-     $cmd->{q} = join(" ",@data);
+ #    @data  = @data[0..5000] unless($#data<10000);
+  #   $cmd->{q} = join(" ",@data);
 
-     $cmd->{action} =
-      [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g;
-                    $_={nb => $a[0][1], sp => $a[0][0]}}
-                    split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq --limit 100`)];
+     $cmd->{action}  = [];
+    #  [map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g;
+     #               $_={nb => $a[0][1], sp => $a[0][0]}}
+      #              split ("\n",`echo "$cmd->{q}" | tr " " "\n" | data-freq --limit 10`)];
 
 
 
-     $cmd->{json} = JSON::XS->new->pretty(1)->encode({ "query" => $msg,
+
+     my @rel = split("\n",` micro-relation $msg`);
+
+     my $rel = join(" ",@rel);
+#map{sprintf("<li>%s</li>",$_)}
+#     $cmd->{"DensityMap"} =[split ("\n",`echo "$rel" | tr " " "\n" | data-freq --limit 15`)];
+
+#map{my @a= [split(":",$_)]; $a[0][0]=~ s/ //g;
+#                    $_={nb => $a[0][1], sp => $a[0][0]}}
+
+
+
+  #   my $xx=$cmd->{action}[0];
+
+
+#+      $xx->{sp}==1 ||
+     if(0){
+
+     $cmd->{json} = JSON::XS->new->pretty(0)->encode({"query" => $msg,
                                                       "callback" => "makeList",
-                                                      "responce" =>
-                                                      [$cmd->{action}]});
+                                                      "articles"=>[<DATA>],
+                                                      "DensityMap"=> $cmd->{"DensityMap"}});
+     }else{
+     $cmd->{json} = JSON::XS->new->pretty(0)->encode({ "query" => $msg,
+                                                      "callback" => "makeList",
+                                                      "DensityMap"=> $cmd->{"DensityMap"},
+                                                      "responce" =>[$cmd->{action}]});
 
 
+      }
       return $cmd->{json};
 
 }
@@ -145,13 +169,16 @@ my $server = Net::Async::WebSocket::Server->new(
          on_frame => sub {
             my ( $self, $frame ) = @_;
 
-            $list = printer($frame);
+            $list = printer(lc $frame) unless(!$frame);
+
             my %args = (max_payload_size=>9999999,buffer=> $list);
 
-
+            #if($list) {
             $self->send_frame(%args);
 
-            p $list;
+#            p $list;
+            #}
+
 
          },
       );
@@ -178,4 +205,5 @@ $loop->loop_forever;
 
 1;
 
-__END__
+__DATA__
+{"id":"Cox_Enterprises","key":["number"],"value":["Cox_Enterprises",{"media":9,"instance":1,"tags":1,"spawn":373},[],{"pdf":[],"image":["http:////upload.wikimedia.org/wikipedia/en/thumb/9/99/Question_book-new.svg/50px-Question_book-new.svg.png","http:////upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Cox_Enterprises.svg/150px-Cox_Enterprises.svg.png","http:////upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Increase2.svg/11px-Increase2.svg.png","http:////upload.wikimedia.org/wikipedia/commons/thumb/e/ea/AtlantaPhoenix.jpg/18px-AtlantaPhoenix.jpg","http:////upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Factory_1b.svg/32px-Factory_1b.svg.png","http:////upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Coca-ColaHQ.jpg/32px-Coca-ColaHQ.jpg","http:////bits.wikimedia.org/static-1.21wmf11/skins/vector/images/search-ltr.png?303-4","http:////bits.wikimedia.org/images/wikimedia-button.png","http:////bits.wikimedia.org/static-1.21wmf11/skins/common/images/poweredby_mediawiki_88x31.png"],"headings":["Major Subsidiaries","References","External links"],"categories":["Cable television companies of the United States","Companies based in Dayton, Ohio","Companies based in Sandy Springs, Georgia","Cox Enterprises|","Telecommunications companies of the United States","Privately held companies based in Georgia (U.S. state)"],"members":["1000000000"],"related":["Privately_held_company","Dayton,_Ohio","James_Middleton_Cox","Sandy_Springs,_Georgia","James_C._Kennedy","Jimmy_W._Hayes","Mass_media","Radio","Newspapers","Printing","1000000000_(number)","Anne_Cox_Chambers","James_Cox_Kennedy","Blair_Parry-Okeden","Garner_Anthony","Publishing","Dayton,_Ohio","James_Middleton_Cox","Nonagenarian","Anne_Cox_Chambers","Barbara_Cox_Anthony","James_C._Kennedy","Sandy_Springs,_Georgia","Cox_Communications","Manheim_Auctions","AutoTrader.com","Valpak","Rysher_Entertainment","2929_Entertainment","CBS","Cox_Communications","Manheim_Auctions","Cox_Media_Group"],"audio":[]}]}

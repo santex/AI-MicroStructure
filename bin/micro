@@ -1,7 +1,14 @@
 #!/usr/bin/perl -X
+
+eval 'exec /usr/bin/perl -X -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 use strict;
 use warnings;
 use AI::MicroStructure::Util;
+use Getopt::Long;
+use AI::MicroStructure;
+use Data::Dumper;
+use JSON::XS;
 
 my %conf = ( );
 GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
@@ -14,10 +21,6 @@ our ($new, $write,$drop,$all,$verbose) =(0,0,0,0,0);
 if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };
 
 
-use AI::MicroStructure;
-use Getopt::Long;
-use Data::Dumper;
-use JSON::XS;
 our $main = AI::MicroStructure->new();
 
 
@@ -39,6 +42,8 @@ if($conf{"init"}) {
 my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
 our $structdir = "structures";
 our $absstructdir = "$CWD[0]/$structdir";
+
+
 
 if ($conf{"export"}) {
     my $cwd = $CWD[0];
@@ -63,6 +68,9 @@ print $main->help;
 exit(0);
 }
 
+sub is_integer {
+   defined $_[0] && $_[0] =~ /^[+-]?\d+$/;
+}
 
 
 sub cleanArgs{
@@ -80,7 +88,35 @@ my $structure;
 
 if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
 
+
+
     @local = grep{!/any/}AI::MicroStructure->new()->structures();
+
+    if(defined($ARGV[1]) && is_integer($ARGV[1])){
+      my $index = rand $#local;
+         $index = $index-$ARGV[1];
+                  $index = $index?$index:0;
+      @local = @local[$index+1..$index+$ARGV[1]];
+
+    }
+
+    print join $sep, @local, @remote;
+    exit;
+}
+
+if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
+
+
+
+    @local = grep{!/any/}AI::MicroStructure->new()->structures();
+
+    if(defined($ARGV[1]) && is_integer($ARGV[1])){
+      my $index = rand $#local;
+         $index = $index-$ARGV[1];
+                  $index = $index?$index:0;
+      @local = @local[$index+1..$index+$ARGV[1]];
+
+    }
 
     print join $sep, @local, @remote;
     exit;
@@ -115,6 +151,12 @@ AI::MicroStructure->new( $structure, category => "new" )
 # my $module = "AI::MicroStructure::$structure";
 my $module = "$absstructdir/$structure.pm";
 
+if(!-f $module){
+warn("not there");
+
+`touch $module`;
+`micro $structure new verbose`;
+}
 
 # load the remote structure if needed
 if ( $conf{remote} || $conf{check} || $conf{sources}) {
@@ -138,12 +180,14 @@ exit if $conf{structures} || $conf{version} || $conf{help} || $conf{sources};
 
 my $meta = AI::MicroStructure->new( $structure, category => $conf{category} );
 
+
 @remote = $module->remote_list( $conf{category} )
     if $conf{remote} || $conf{check};
 if ( !$conf{remote} ) {
     my $count = shift;
     $count = 1 unless defined $count;
     $count = 0 if $conf{check};
+    
     if($all){
     @local = $meta->name(0,scalar "");
     }else{
@@ -170,3 +214,4 @@ END{
 }
 
 
+1;

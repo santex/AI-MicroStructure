@@ -11,9 +11,9 @@ use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
 use Data::Printer;
 use AI::MicroStructure;
-use AI::MicroStructure::Object;
+#use AI::MicroStructure::Object;
 use AI::MicroStructure::ObjectSet;
-use AI::MicroStructure::ObjectParser;
+#use AI::MicroStructure::ObjectParser;
 use Env qw(PWD);
 
 
@@ -84,9 +84,6 @@ sub translate {
 
   if (/\.(html|htm)$/) {
     $files->{html}->{$name}=$rel_name;
-  ok(my $obj = AI::MicroStructure::Object->new($rel_name));
-  ok($set->insert($obj));
-
   }
   elsif (/\.pdf$/) {
     $files->{pdf}->{$name}=$rel_name;
@@ -100,7 +97,7 @@ sub translate {
 
 
 }
-p $set;
+p $files;
 
 
 __DATA__

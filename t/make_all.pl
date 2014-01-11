@@ -14,7 +14,7 @@ my($in, $out, $err);
 foreach my $file (sort <./t/*>) {
  next if $file =~ /make_all\.pl/;
   print "  Running $file...";
-  run [$perl, "./$file"], \$in, \$out, \$err; # throw the output away
+  run [$perl, "../$file"], \$in, \$out, \$err; # throw the output away
   print "done\n";
 }
 

@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+
 use utf8;
 use File::Basename;
 use Data::Printer;
@@ -31,7 +32,13 @@ our $doc ={};
 our @links;
 our $linkdata = {};
 our $result;
+our $odir = "";
 
+    if(-d $ARGV[1]){
+      $config->{jsonout} = pop @ARGV;
+      $odir = $config->{jsonout};
+    }
+    
 my $url = $ARGV[0];
 my @inx;
 my @test;
@@ -234,7 +241,7 @@ my @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedi
 
 
 
-    $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
+        $doc->{$_} = $_=~/full/? smartdecode($hs->parse($result->{$_})) : smartdecode($result->{$_}) for qw(            cursor
                                           related
                                           categories
                                           headings
@@ -244,7 +251,8 @@ my @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedi
             $doc->{size} = length sprintf($doc);
 
 
-        eval '$couchdb->store("$url" ,$doc)' or warn "error: $@\n";
+        #eval '$couchdb->store("$url" ,$doc)' or warn "error: $@\n";
+
         createJsonFile($url,$doc);
 
 
@@ -265,23 +273,24 @@ if($urlx) { $result->{$urlx} = call(0,$urlx); }
 
 
 
-if(defined($result->{$urlx}) && @{$result->{$urlx}->{related}}){
-
-  my $url_iter = list_iter( @{$result->{$urlx}->{related}});
+#if(defined($result->{$urlx}) && defined($result->{$urlx}->{related}) && @{$result->{$urlx}->{related}}){
 
 
-  my $page_iter = iterate( \&call, $url_iter );
-
-      while ( my ( $index, $value ) = $page_iter->() ) {
-         $out[$index] = $value;
-         print "$index\n";
+ # my $url_iter = list_iter( @{$result->{$urlx}->{related}});
 
 
-  }
+#  my $page_iter = iterate( \&call, $url_iter );
+
+    #  while ( my ( $index, $value ) = $page_iter->() ) {
+   #      $out[$index] = $value;
+  #       print "$index\n";
+
+
+ # }
 
 
 
-}
+#}
 
 }
 
@@ -292,13 +301,14 @@ my $uri = shift;
 my $json = shift;
 
 
-   $couchdb->store("$uri" ,$json) ;
+#   $couchdb->store("$uri" ,$json) ;
 my $p = dirname($config->{jsonout});
-print `mkdir -p $p`;
-open (MYFILE,sprintf( '>%s-%s.json',$config->{jsonout},$uri));
+#print `mkdir -p $p`;
+open (MYFILE,sprintf('>%s%s.json',$odir,$uri));
 print MYFILE encode_json($json);
 close (MYFILE);
 
+return $json;
 }
 
 

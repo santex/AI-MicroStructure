@@ -22,7 +22,8 @@ our $meta = AI::MicroStructure->new();
 our @t = $meta->structures();
 
 my $TOP = "";
-   $TOP = "$PWD/t/canned/docs";
+#"/home/santex/wwwstuff/wikileaks.org";
+  $TOP = "$PWD/t/canned/docs";
 
    if($TOP  eq ""){
   $TOP =  $meta->{state}->{path}->{"cwd/structures"} unless(!$meta->{state}->{path}->{"cwd/structures"});

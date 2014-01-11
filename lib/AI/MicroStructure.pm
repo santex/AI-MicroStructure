@@ -1,20 +1,21 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -W
 package AI::MicroStructure;
 use strict;
 use warnings;
+use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use File::Basename;
 use File::Spec;
 use File::Glob;
 use Data::Dumper;
+use Data::Printer;
 use AI::MicroStructure::Util;
 use Carp qw(croak);
 
 our $absstructdir = "";
 our $structdir = "";
-our @CWD=();
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 our $Structure = 'any'; # default structure
 our $CODESET = 'utf8';
 our $LANG = '';
@@ -46,57 +47,39 @@ if( grep{/\bverbose\b/} @ARGV ){ $verbose = 1; cleanArgs("verbose");  };
 our $StructureName = $ARGV[0]; # default structure
 our $structure = $ARGV[0]; # default structure
 
+our $state  = AI::MicroStructure::Util::config();
+
+our @CWD=();
+push @CWD ,  $state->{path}->{"cwd/structures"};
+our $config = $state->{cfg};
 
 
 
 our $micro = AI::MicroStructure->new($Structure);
-$absstructdir = $micro->{state}->{path}->{"cwd/structures"};
 
-
-push @CWD,$absstructdir;
-#push @CWD,$_ for @INC;
-
-
-
-$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@CWD)} };
-$MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
-$search = join("|",keys %MICRO);
-
-#if( grep{/$search/} @ARGV ){ $Structure = $ARGV[0] unless(!$ARGV[0]); }
-
-# fetch the list of standard structures
-
-#print Dumper keys %MICRO;
-
-
+$absstructdir = $state->{path}->{"cwd/structures"};
 
 
 
 sub cleanArgs{
-    my ($key) = @_;
-    my @tmp=();
-    foreach(@ARGV){
-    push @tmp,$_ unless($_=~/$key/);}
-
-    @ARGV=@tmp;
+   my ($key) = @_;
+   my @tmp=();
+   foreach(@ARGV){
+   push @tmp,$_ unless($_=~/$key/);}
+   @ARGV=@tmp;
 }
-
-
 # private class method
 sub find_structures {
    my ( $class, @dirs ) = @_;
-
-
    $ALIEN{"base"} =  [map  @$_,
    map  { [ ( fileparse( $_, qr/\.pm$/ ) )[0] => $_ ] }
    map  { File::Glob::bsd_glob(
+   File::Spec->catfile( $_, ($structdir,"*") ) ) } @dirs];
 
+#  $ALIEN{"store"}=[split("\n",`cat @dirs/* | egrep -v "(our|my|use|sub|package)" | data-freq | egrep  -iv "^ [1]:`),
+ #                  split("\n",`cat @dirs/* | egrep -v "(our|my|use|sub|package)" | data-freq | egrep -i "^ [1]:`)];
 
-   File::Spec->catfile( $_, "*.pm" ) ) } @dirs];
-
-   $ALIEN{"store"}=[];
-
-
+##p %ALIEN;
 
    return @{$ALIEN{"base"}};
 }
@@ -125,15 +108,72 @@ sub find_modules {
 
 
 
-sub getComponents(){
+$MICRO{$_} = 0 for keys %{{__PACKAGE__->find_structures(@CWD)} };
+$MODS{$_} = $_ for keys %{{__PACKAGE__->find_modules(@INC)} };
+$search = join("|",keys %MICRO);
 
-  my $x= sprintf("%s",Dumper keys %MICRO);
+#p @{[__PACKAGE__->getComponents]};
+#die;
+#if( grep{/$search/} @ARGV ){ $Structure = $ARGV[0] unless(!$ARGV[0]); }
 
-  return $x;
+# fetch the list of standard structures
+
+#print Dumper keys %MICRO;
+sub getComponents{
+
+
+  my $x= {};
+
+
+        $x->{"all_structures"} = [keys %MICRO];
+        $x->{"count_struct"} = sprintf(keys %MICRO);
+        $x->{"structures"} = {};
+        $x->{"structures"}->{"json"} = sprintf(`ls  /home/santex/repos/KnowledgeInterDisciplinary/data/json | egrep -i "($structure)";`);
+
+
+           foreach my $con (@{$x->{"all_structures"}}){
+            next unless($con!~/any/);
+            my @in = split("\n",eval{`cat $state->{path}->{"cwd/structures"}/$con.pm`;});
+
+#            my $conc=join("|",@{$x->{"nsubcon"}->{$state->{path}->{"cwd/structures"}}->{$con}->{all}});
+
+$x->{"structures"}->{$state->{path}->{"cwd/structures"}}->{$con}->{name} = [grep{$_}grep {!/(our|my|use|sub|use|package|#|__|1)/}split("\n",`cat $state->{path}->{"cwd/structures"}/$con.pm`)];#,
+#split("\n",grep{$con}@{$x->{"structures"}->{"json"}})];
+$x->{"structures"}->{$state->{path}->{"cwd/structures"}}->{$con}->{files}  =  [split("\n",`ls -R  /home/santex/repos/KnowledgeInterDisciplinary/data/json | egrep -i "($con)";`)];
+          }
+
+#$x->{"nsubcon"}->{$state->{path}->{"cwd/structures"}}->{$con}->{n} = grep{$_}grep {!/(our|my|use|sub|use|package|#|__|1)/}split("\n",`cat $state->{path}->{"cwd/structures"}/$con.pm`) ;
+
+#
+        $x->{"structures"}->{"json"} = [];
+#p @{[$x]};
+
+# $x->{"structures"}->{json}=[];
+        #my @got = [values  %{$x->{"structures"}}];
+
+         # p @got;
+  #      foreach(@got){
+ #         if(!$#_ && 0){
+#$x->{"structures"}->{$_} = [grep{$_}ssplit("^*\n",`cat '$state->{path}->{"cwd/structures"}/$_.pm'`)];
+#die();
+  #        }
+  #}
+
+ #       if(!@{$x->{"structures"}->{$_}}){
+
+#    $x->{"structures"}->{$_} =   [split("^*\n",`cat $state->{path}->{"cwd/structures"}/$_.pm |  | egrep -i "($_)\$"`)] for( @{$x->{"all structures"}});
+
+#          "glue"=>split("\n",`cat  $CWD[0]/* | egrep -v "(our|my|use|sub|package)"  | egrep -i "($structure)$"  | data-freq | egrep  -v "^ [1]:"`)};
+#
+ return $x;
 }
 
 
+
+
 # the functions actually hide an instance
+
+
 # END OF INITIALISATION
 
 # support for use AI::MicroStructure 'stars'
@@ -146,9 +186,7 @@ sub import {
    : @_;
 
    $Structure = $structures[0] if @structures;
-   my $micro = AI::MicroStructure->new( $Structure );
-
-   $absstructdir = $micro->{state}->{path}->{"cwd/structures"};
+   $micro = AI::MicroStructure->new( $Structure );
 
    # export the microname() function
    no strict 'refs';
@@ -175,15 +213,8 @@ sub new {
    # defer croaking until name() is actually called
    my $self = bless { structure => $structure,
                      tools => { @tools }, micro => {}}, $class;
-
-
-    $self->{state}  =   AI::MicroStructure::Util::load_config();
-    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
-
-#    print Dumper $self;
-
-    return $self;
-
+  return $self;
+   #if(defined($driverarg) && join("" ,@_)  =~/couch|cache|berkeley/){
 }
 
 sub _rearrange{
@@ -218,7 +249,7 @@ EOC
    # export the microstructure() function
    no strict 'refs';
    my $callpkg = caller;
-   *{"$callpkg\::micro$structure"} = sub { $callpkg->name( $structure, @_ ) };
+   *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
    }
 }
 
@@ -279,11 +310,9 @@ sub fitnes {
 }
 
 # main function
-sub microname { my $self = shift; $self->name( @_ ) };
+sub microname { $micro->name( @_ ) };
 
-
-
-
+# corresponding method
 sub name {
    my $self = shift;
    my ( $structure, $count ) = ("any",1);
@@ -300,7 +329,7 @@ sub name {
    if( ! exists $self->{micro}{$structure} ) {
    if( ! $MICRO{$structure} ) {
    eval "require '$absstructdir/$structure.pm';";
-   warn  "MicroStructure list $structure does not exist!" if $@;
+   croak "MicroStructure list $structure does not exist!" if $@;
    $MICRO{$structure} = 1; # loaded
    }
    $self->{micro}{$structure} =
@@ -309,6 +338,10 @@ sub name {
 
    $self->{micro}{$structure}->name( $count );
 }
+
+
+
+
 
 
 # other methods
@@ -351,17 +384,11 @@ sub getBundle {
 
    my $self = shift;
 
-    $absstructdir = $self->{state}->{path}->{"cwd/structures"};
 
 
 my @structures = grep { !/^(?:any)/ } AI::MicroStructure->structures;
 my @micros;
 my @search=[];
-
-
-
-
-
 for my $structure (@structures) {
    no strict 'refs';
    eval "require '$absstructdir/$structure.pm';";
@@ -569,7 +596,7 @@ foreach my $k
    $k =~ s/[ ]/_/g;
    $k =~ s/[\(]|[\)]//g;
    next if($k=~/synonyms|hypernyms/);
- #  print $k;
+   print $k;
    $new->{$k}=[map{$_=[map{$_=$self->trim($_)}split("\n|, ",$_)]}
       grep{!/synonyms|hypernyms/}split("sense~~~~~~~~~",
                                       lc `micro-wnet $k`)];
@@ -602,6 +629,7 @@ my $self = shift;
 my $StructureName = shift;
 my $data = shift;
 
+
     $StructureName = lc $self->trim(`micro`) unless($StructureName);
     my $file = "$absstructdir/$StructureName.pm";
     print `mkdir $absstructdir` unless(-d $absstructdir);
@@ -624,107 +652,21 @@ sub drop {
 my $self = shift;
 my $StructureName = shift;
 
-my @fh = grep{/$StructureName.pm/}__PACKAGE__->find_structures(@CWD);
+my @file = grep{/$StructureName.pm/}map{File::Glob::bsd_glob(
+File::Spec->catfile( $_, ($structdir,"*.pm") ) )}@CWD;
+my $fh = shift @file;
+if(`ls $fh`)
+{
 
-
-  if(defined($fh[0]) &&  `ls $fh[0]`)
-  {
-    print  `rm $fh[0]`;
-
-  }else{
-
-   croak "The structure $StructureName does not exist!";
-
-  }
-
+print  `rm $fh`;
+}
+  #push @CWD,$file[1];
 
   return 1;
 }
 
-sub help {
-
-my $self = shift;
-my $usage = << 'EOT';
-
-  #current status
-  #did you create a micro structure yet ?
-  #try something like this
-
-  $ micro new ufo;      # creates a structure called ufo
-
-  $ micro drop ufo;     # deletes the structure called ufo
-
-  $ micro structures;   # shows all structure's you currently have
-
-  #after creation of a structure you can access it in lots of ways
 
 
-
-  $ micro;             # one word of a random structure
-
-  $ micro ufo;         # one word of the ufo structure
-
-  $ micro ufo all;     # all words of the ufo structure
-
-  $ micro ufo 5;       # 5 random words of the ufo structure
-
-  $ micro any 10;      # 10 random words of any structure you have created
-
-
-  $ micro --init        # initializes active memory
-
-  $ micro --export      # export relations from couchdb into git repo and tag data
-
-
-  # oneliners i like to use
-
-  $  for i in `micro structures`; do echo $i; done;       # echos all the structures
-
-  $  for i in `micro ufo all`;   do echo $i; done;       # echos all words in ufo
-
-  $  for i in `micro structures`; do micro all $i; done;  # echos all stuctures all words
-
-  $  for i in `micro ufo all`;   do micro new $i; done;  # new structure for all words in ufo
-
-  $  for i in `micro ufo all`;   do micro-wiki $i; done; # push all words against the wiki plugin dont forget setting user & password in /usr/local/bin/micro-wiki
-
-  ###################################################################################
-  # try to follow the logic combine
-  # your-word=micro new ? ->concept->concepts->relations->node
-
-
-  $ micro new biology
-  $ micro new biological_process
-
-  $ for i in `micro structures`; do
-  $ for y in `micro all $i `; do
-  $ echo "$i=$y";
-  $ micro new $y;
-  $ done
-  $ done
-
-  #!!!!!###Hard cpu to expect ### make sure couch is on   ######  or disable the store methode in micro-wiki and print $doc or consume otherweise
-  # test as single before you loope
-
-  $ micro-wiki ufo
-
-  # proceed
-
-  $ for i in `micro structures`; do
-  $ for y in `micro all $i `; do
-  $ echo "$i=$y";
-  $ micro-wiki $y;
-  $ done
-  $ done
-
-
-EOT
-
-
-
-return $usage;
-
-}
 
 
 
@@ -733,7 +675,10 @@ END{
 if($init){}
 if($available){}
 if($lib){}
-if($list){}
+if($list){
+p @{[__PACKAGE__->getComponents]};
+
+  }
 if($use){}
 if($off){}
 if($switch){}
@@ -908,6 +853,9 @@ foreach my $sensnrx (sort keys %{$data->{"rows"}->{"senses"}})
 return $usage;
 }
 
+1;
+
+__END__
 
 1;
 
@@ -956,49 +904,87 @@ __END__
 =head1 SEE ALSO
 
   AI-MicroStructure
-=cut
+  AI-MicroStructure-Cache
+  AI-MicroStructure-Deamon
+  AI-MicroStructure-Relations
+  AI-MicroStructure-Concept
+  AI-MicroStructure-Data
+  AI-MicroStructure-Driver
+  AI-MicroStructure-Plugin-Pdf
+  AI-MicroStructure-Plugin-Twitter
+  AI-MicroStructure-Plugin-Wiki
+
 
 
 __DATA__
 
-Fuck lots of stress with the bug series after the config implementation
+
+
+our $VERSION = '0.014';
+our $Structure = 'any'; # default structure
+our $CODESET = 'utf8';
+our $LANG = '';
+our %MICRO;
+our %MODS;
+our %ALIEN;
+our $str = "[A-Z]";
+our $special = "any";
+our $search;
+our $data={};
+our $item="";
+our @items;
+our @a=();
 
 
 
 
-# corresponding method
-sub name {
-   my $self = shift;
-   my ( $structure, $count ) = ("any",1);
 
-   if (@_) {
-   ( $structure, $count ) = @_;
-   ( $structure, $count ) = ( $self->{structure}, $structure )
-   if defined($structure) && $structure =~ /^(?:0|[1-9]\d*)$/;
-   }
-   else {
-   ( $structure, $count ) = ( $self->{structure}, 1 );
-   }
+our ($new, $write,$drop) =(0,0,0);
+
+my $state = AI::MicroStructure::util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+our $structdir = "structures";
+our $absstructdir = "$CWD[0]/$structdir";
+
+if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
+if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  };
+if( grep{/\bdrop\b/} @ARGV ){ $drop = 1; cleanArgs("drop");  };
+
+our $StructureName = $ARGV[0]; # default structure
+our $structure = $ARGV[0]; # default structure
+
+##########################################################################
+cat  $dir/* | egrep -v "(our|my|use|sub|package)"  | egrep -i "(instance|animal|whale|mammal|sea)$" | egrep  "^ [1]:"
+ 1: andaman_sea
+ 1: swansea
+ 1: domesticanimal
+ 1: fictionalanimal
+ 1: marineanimal
 
 
-#   croak "MicroStructure does not exist!" if (!defined $structure || $@);
 
-   if( ! exists $self->{micro}{$structure} ) {
-   if( ! $MICRO{$structure} ) {
-   eval "require '$absstructdir::$structure.pm';";
-
-
-
-   $MICRO{$structure} = 1 ;
-   }
-
-   if($MICRO{$structure} || $structure=~/any/){
-     use AI::MicroStructure::any;
-     $self->{micro}{$structure} = AI::MicroStructure::any->new($structure, %{ $self->{tools} } );
-     }else {
-     $self->{micro}{$structure} = AI::MicroStructure->new(%{ $self->{tools} } );
-       }
-   }
-
-   $self->{micro}{$structure}->name( $count );
-}
+cat  $dir/* | egrep -v "(our|my|use|sub|package)"  | egrep -i "(instance|animal|whale|mammal|sea)$"  | data-freq | egrep  -v "^ [1]:"
+84: animal
+26: mammal
+25: eutherian_mammal
+25: placental_mammal
+12: domesticated_animal
+11: domestic_animal
+ 6: predatory_animal
+ 6: sea_animal
+ 5: fictional_animal
+ 5: marine_animal
+ 5: range_animal
+ 5: work_animal
+ 5: hoofed_mammal
+ 3: artiodactyl_mammal
+ 2: perissodactyl_mammal
+ 2: instance
+ 2: moss_animal
+ 2: anglesea
+ 2: female_mammal
+ 2: fossorial_mammal
+ 2: mediterranean_sea
+ 2: aquatic_mammal
+ 2: cetacean_mammal
+ 2: toothed_whale
+ 2: whale

@@ -8,6 +8,23 @@ use AI::MicroStructure::Cache;
 use WWW::Wikipedia;
 use JSON::XS;
 use Statistics::Basic qw(:all);
+use Digest::MD5 qw(md5_hex);
+#use AI::MicroStructure::Memd;
+use Cache::Memcached::Fast;
+
+         our $memd = new Cache::Memcached::Fast({
+             servers => [ { address => 'localhost:11211', weight => 2.5 }],
+             namespace => 'my:',
+             connect_timeout => 0.2,
+             io_timeout => 0.1,
+             close_on_error => 1,
+             compress_threshold => 100_000,
+             compress_ratio => 0.9,
+             max_failures => 1,
+             max_size => 512 * 1024,
+         });
+
+
 
 our $supports = {};
 our $scale = 1;
@@ -17,6 +34,7 @@ sub new {
 
     no strict 'refs';
     my $self = bless { @_,storage=> AI::MicroStructure::Cache->new,
+                         # memd=>AI::MicroStructure::Memd->new(),
                           cache=>{},
                           dominant => [] }, $class;
 
@@ -28,20 +46,27 @@ sub gofor {
     my $next = shift;
     my $opt  = shift;
 
-
+    my $store={};	
+    $store = $memd->get(sprintf("micro-relation%s",md5_hex($next)));
+   if(!$store){
 
 my   $wiki = WWW::Wikipedia->new();
-my   $result = $wiki->search($next);
+my   $result = $wiki->search("$next");
 
 
       if(defined($result) and $result){
 
-        use AnyEvent::Subprocess::Easy qw(qx_nonblock);
-        my $micosense = qx_nonblock("micro-sense $next")->recv;
+
+        my $micosense = `micro-sense $next`;
+
+        if($micosense =~ /[{]/){
         my $sense = JSON::XS->new->pretty(1)->decode($micosense);
-        delete($sense->{rows}->{search});
 
         push @{$self->{storage}->{category}},{$next=>$sense} unless(!@{$sense->{senses}});
+        }
+        $self->{storage}->{all}->{$_} = $result->{$_} for qw(categories
+                                          headings
+                                          currentlang);
 
         $self->{storage}->{related}->{$next} = [grep{!/\(/}map{$_=~ s/ /_/g; $_=ucfirst $_;} $result->related()];
 
@@ -55,12 +80,12 @@ my   $result = $wiki->search($next);
 
 
         }
+  }
 
-        $self->{storage}->store($self->{storage});
-      }
-      return ();
-
-
+      $memd->set(sprintf("micro-relation%s",md5_hex($next)),$self->{storage});
+      return $self->{storage};
+ }
+ return $store;
 }
 
 

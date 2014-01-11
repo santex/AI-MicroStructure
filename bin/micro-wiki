@@ -13,18 +13,22 @@ use Storable::CouchDB;
 use LWP::UserAgent;
 
 
-
-
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 die("require a argument") unless($ARGV[0]);
-my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
-$config->{buffer} = "";
+
+use constant STRICT => $ARGV[1]?$ARGV[1]:0;
+#$config->{buffer} = "";
+my $state  = AI::MicroStructure::Util::config();
+
+my @CWD    = $state->{cwd};
+our $config = $state->{cfg};
 
 
 #exit(0) unless (!checkIsThere($ARGV[0]));
 
 
+our $n=0;
 our $doc ={};
 our @links;
 our $linkdata = {};
@@ -107,7 +111,7 @@ sub smartdecode {
   use utf8;
   my $x = my $y = uri_unescape($_[0]);
   return $x if utf8::decode($x);
-  return $y;
+  return $y->{internals};
 }
 
 sub imgTranslate {
@@ -145,7 +149,6 @@ sub call  {
 
   return () unless (!checkIsThere($url) || $idx==0 || $config->{out}=~/json/);
 
-  warn "doing $url";
 #
 
 #  return unless($url=~/Planet/);
@@ -173,7 +176,7 @@ sub call  {
           no warnings 'utf8';
           my $e = HTML::SimpleLinkExtor->new($response->base);
           $e->parse($response->decoded_content);
-          @links = grep {/$TOP|.pdf|.ogg|.mp3|.mpg|.avi/}grep{!/Disambig|Help:|Wikipedia:|Special:|:Contents|:Featured_content|Main_Pag|_talk:|Talk:|#|[Aa]rticle[s|_]|All_*_*/}$e->links;
+          @links = $e->links;
 
           $doc->{linknr}=$#links;
 
@@ -194,8 +197,8 @@ sub call  {
 
 
           #
-
-            warn $#links."\n";
+            $n += $#links;
+#          warn $n,"\t", $#links."\n";
 
 
 
@@ -271,8 +274,11 @@ my $hs = HTML::Strip->new();
                 $doc->{size} = length sprintf($doc);
 
 
-       $x->store("$url" ,$doc) ;
+#          $doneit->{$url} = $doc;
+#        $x->store("$url" ,$doc) ;
 
+
+     #    p $json;
   #      return $url;
         return $doc;
   }
@@ -288,47 +294,64 @@ foreach my $urlx (@ARGV) {
 
 
 if(defined($result->{$urlx}) && @{$result->{$urlx}->{related}}){
+my $iter={};
 
-my $url_iter = list_iter( @{$result->{$urlx}->{related}});
+
+
+$iter->{$_} = 1 for  STRICT==1?grep{/$ARGV[0]/i}@{$result->{$urlx}->{related}}:@{$result->{$urlx}->{related}};
+
+my $url_iter = list_iter(sort keys %$iter);
 
 
 my $page_iter = iterate( \&call, $url_iter );
 
   while ( my ( $index, $value ) = $page_iter->() ) {
-  printf("\n%s", $index);
+
+
+
+  $doneit->{$index} = $value unless ($value->{url} !~/$ARGV[0]/);
+
+  warn "doing ".$value->{url};
+  ##printf("\n%s", $index);
   }
 
+
+     $json = JSON::XS->new->pretty(0)->allow_blessed(1)->convert_blessed(1)->encode({return=>$doneit});
+    #p $doneit;
+
+
+
 }
- # our $out = {abs=>{pdf=>{},related=>{},image=>{},ogg=>{}}};
+our $out = {abs=>{pdf=>{},related=>{},image=>{},ogg=>{}}};
 
-  #   while ( my ( $index, $value ) = $page_iter->() ) {
-   #      $out->{$index} = $value;
+     while ( my ( $index, $value ) = $page_iter->() ) {
+        $out->{$index} = $value;
 
 
-    #     foreach(@{$value->{related}}) {
+        foreach(@{$value->{related}}) {
 
-     #    $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
+        $out->{abs}->{related}->{$_} = defined($out->{abs}->{related}->{$_})? $out->{abs}->{related}->{$_}++ : 1;
 
-      #   }
+        }
 
-       #  foreach(@{$value->{pdf}}) {
+        foreach(@{$value->{pdf}}) {
 
-        # $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
+        $out->{abs}->{pdf}->{$_} = defined($out->{abs}->{pdf}->{$_})? $out->{abs}->{pdf}->{$_}++ : 1;
 
-       #  }
-        # foreach(@{$value->{image}}) {
+        }
+        foreach(@{$value->{image}}) {
 
-         #$out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
+        $out->{abs}->{image}->{$_} = defined($out->{abs}->{image}->{$_})? $out->{abs}->{image}->{$_}++ : 1;
 
-    #     }
-     #    foreach(@{$value->{audio}}) {
+        }
+        foreach(@{$value->{audio}}) {
 
-      #   $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
+        $out->{abs}->{ogg}->{$_} = defined($out->{abs}->{ogg}->{$_})? $out->{abs}->{ogg}->{$_}++ : 1;
 
-       #  }
-    # }
+        }
+    }
 #    p $out;
- #   exit(0);
+   exit(0);
 
 
 
@@ -345,6 +368,7 @@ BEGIN{
 
 }
 END{
+
     #`IFS=\$IFS_BAK;`;
 
      #if($config->{out}=~/json/) {

@@ -5,7 +5,7 @@ use warnings;
 use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
 use Storable qw(lock_retrieve lock_store);
-our $VERSION = '0.017';
+our $VERSION = '0.000';
 sub new {
   my $pkg = shift;
   my $self = bless {}, $pkg;
@@ -131,58 +131,4 @@ sub includes_name  { exists $_[0]->{ $_[1] } }
 
 1;
 # ABSTRACT: this is part of AI-MicroStructure the cache will be containing micro structure parts in http user session context
-
-
-=head1 NAME
-
-  AI::MicroStructure::Cache
-
-=head1 DESCRIPTION
-
-  Creates Concepts for words  
-
-=head1 SYNOPSIS    
-  
-  ~$ micro new world
-  
-  ~$ micro structures
-  
-  ~$ micro any 2
-  
-  ~$ micro drop world
-  
-  ~$ micro
-  
-=head1 AUTHOR
-
-  Hagen Geissler <santex@cpan.org>
-
-=head1 COPYRIGHT AND LICENCE
-
-  Hagen Geissler <santex@cpan.org>
-
-=head1 SUPPORT AND DOCUMENTATION
-
-  ☞ [sample using concepts](http://quantup.com)
-
-  ☞ [PDF info on my works](https://github.com/santex)
-
-  
-=head1 SEE ALSO
-
-  AI-MicroStructure
-  AI-MicroStructure-Cache
-  AI-MicroStructure-Deamon
-  AI-MicroStructure-Relations
-  AI-MicroStructure-Concept
-  AI-MicroStructure-Data
-  AI-MicroStructure-Driver
-  AI-MicroStructure-Plugin-Pdf
-  AI-MicroStructure-Plugin-Twitter
-  AI-MicroStructure-Plugin-Wiki
-
-  
-__END__
-
-__DATA__
 
