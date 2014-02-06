@@ -49,7 +49,7 @@ sub has_remotelist { return defined $_[0]->source(); }
 
 # main method: return the list from the remote source
 sub remote_list {
-#  print Dumper @_;
+  print Dumper @_;
 
 
     my $class = ref $_[0] || $_[0];
@@ -58,8 +58,6 @@ sub remote_list {
     # check that we can access the network
     eval {
         require LWP::UserAgent;
-        die "version 5.802 required ($LWP::VERSION installed)\n"
-            if $LWP::VERSION < 5.802;
     };
     if ($@) {
         carp "LWP::UserAgent not available: $@";
@@ -92,9 +90,9 @@ sub remote_list {
 
 sub clean {
   my $str = shift;
-     $str = AI::MicroStructure::RemoteList::tr_utf8_basic($str);
+#     $str = AI::MicroStructure::RemoteList::tr_utf8_basic($str);
 
-     $str = AI::MicroStructure::RemoteList::tr_accent($str);
+#     $str = AI::MicroStructure::RemoteList::tr_accent($str);
 
 
      return $str;
@@ -107,38 +105,14 @@ sub clean {
 #
 sub tr_nonword {
     my $str = shift;
-    $str =~ tr/a-zA-Z0-9_/_/c;
-    $str;
 }
 
 sub tr_accent {
     my $str = shift;
-    $str =~ tr{ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåçèéêëìíîïñòóôõöøùúûüýÿ}
-              {AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy};
     return $str;
 }
 
-my %utf2asc = (
-    "\xc3\x89" => 'E',
-    "\xc3\xa0" => 'a',
-    "\xc3\xa1" => 'a',
-    "\xc3\xa9" => 'e',
-    "\xc3\xaf" => 'i',
-    "\xc3\xad" => 'i',
-    "\xc3\xb6" => 'o',
-    "\xc3\xb8" => 'o',
-    "\xc5\xa0" => 'S',
-    "\x{0160}" => 'S',
-    # for pokemons
-    "\x{0101}"     => 'a',
-    "\x{012b}"     => 'i',
-    "\x{014d}"     => 'o',
-    "\x{016b}"     => 'u',
-    "\xe2\x99\x80" => 'female',
-    "\xe2\x99\x82" => 'male',
-    "\x{2640}"     => 'female',
-    "\x{2642}"     => 'male',
-);
+my %utf2asc = ();
 my $utf_re = qr/(@{[join( '|', sort keys %utf2asc )]})/;
 
 sub tr_utf8_basic {
