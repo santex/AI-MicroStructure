@@ -17,9 +17,9 @@ sub get_cwd {
 sub load_config {
 
     my @CWD = AI::MicroStructure::Util::get_cwd();
-    my $config = Config::Auto::parse(".micro", path => @CWD) || {};
+    my $config = {};#Config::Auto::parse(".micro", path => @CWD) || {};
     if (-e ".micro" && -e $ENV{HOME}."/.micro") {
-        my $c = Config::Auto::parse("$ENV{HOME}/.micro");
+        my $c = Config::Auto::parse($ENV{HOME}."/.micro");
         foreach (keys %{$c}) { $config->{$_} ||= $c->{$_}; }
     }
     if($config->{default}) {
