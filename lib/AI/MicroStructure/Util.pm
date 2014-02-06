@@ -62,5 +62,6 @@ sub config {
 
     return $state;
 }
-
+use Data::Dumper;
+print Dumper  AI::MicroStructure::Util::config();
 1;
