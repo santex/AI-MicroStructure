@@ -632,10 +632,11 @@ my $data = shift;
 
     $StructureName = lc $self->trim(`micro`) unless($StructureName);
     my $file = "$absstructdir/$StructureName.pm";
+    
     print `mkdir $absstructdir` unless(-d $absstructdir);
     my $fh;
 
-    open($fh,">$file") || die $!;
+    open($fh,">$file") || warn @{[$file,$!]};
 
     print $fh $self->getBlank($StructureName,$data);
 
