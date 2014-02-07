@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+use JSON::XS;
+use threads;
+use threads::shared;
+use Data::Printer;
+use Getopt::Long;
+use Cache::Memcached::Fast;
+our $cmd = {SMALL => "micro-relation %s | data-freq  | tr ' -' '_' | sed -s 's/^.*.:_//'",
+            FULL  => "micro-relation %s | sort -u | tr ' -' '_'"};
+
+
+our %opts = (full=>1);
+
+GetOptions (\%opts, "full=i");
+
+
+
+
+our $search = $ARGV[0];
+    $search = 'planet' unless($search);
+
+    
+our @relation = split("\n",getRelation($search));
+
+
+INIT{
+
+  our $memd = new Cache::Memcached::Fast({
+     servers => [ { address => 'localhost:11211', weight => 2.5 }],
+     namespace => 'my:',
+     connect_timeout => 0.2,
+     io_timeout => 0.1,
+     close_on_error => 1,
+     compress_threshold => 100_000,
+     compress_ratio => 0.9,
+     max_failures => 1,
+     max_size => 512 * 1024,
+  });
+  
+   $memd->set("allkeys","");
+
+
+}
+
+END{
+
+  my @keys = split("\n",$memd->get("allkeys"));
+  my $main = {"name"=>$search,"size"=>$#keys};
+  
+  
+  foreach (@keys){
+    my @num = split("\n",$memd->get(sprintf("%s",$_)));
+    
+      my $new = {"name"=>$_,"size"=>$#num+1,"children"=>[map{$a=$_; $_={name=>$a,size=>1};}@num]};
+      
+      push @{$main->{children}},$new;
+  
+
+    
+  }
+  my $target = sprintf('%s%s',"/tmp/","test.json");
+  my $targetgz = sprintf('%s%s',"/tmp/","test.gz");
+  
+  open (MYFILE,">$target");
+  print MYFILE encode_json($main);
+  close (MYFILE);
+  
+  `cat $target | gzip > $targetgz`;
+  
+}
+
+sub getRelation
+{
+  my $search = shift;
+  my $cmd = sprintf($opts{full}==0?$cmd->{SMALL}:$cmd->{FULL},$search);
+  
+  return `$cmd`;
+
+}
+
+sub worker
+{
+   my ($i,$payload) = @_;
+   my $key = sprintf("%s_%s",$search,$payload);
+    my $str = "";
+   if(defined(my $str = $memd->get($key))){
+    
+   }else{
+     $str = getRelation($payload);
+     
+  }
+
+      $memd->set($key,$str);
+     my @set = split("\n",$str);
+     $memd->set(sprintf("%s_num",$key),$#set);
+     
+     
+     my @keys = split("\n",$memd->get("allkeys"));
+     @keys =() unless(@keys);
+
+     
+     push @keys,$key;
+     $memd->set("allkeys",join("\n",@keys));
+
+
+}
+
+my $NUM_WORKERS = $#relation;
+    
+
+
+my $I :shared = 1;
+my $last = $#relation;
+my @workers;
+
+sub run
+{
+  for (0..$NUM_WORKERS) {
+     push @workers, async {
+        while (1) {
+           my $i;
+           {
+              lock $I;
+              $i = $I;
+              return if ++$I > $last;
+           }
+           
+           worker($i,shift @relation);
+        }
+     };
+  }
+
+  $_->join() for @workers;
+}
+
+run;
+1;
