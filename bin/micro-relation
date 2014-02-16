@@ -43,7 +43,6 @@ sub rel {
   my $arg = shift;
   my $lang = shift;
 
-      die($arg);
 
   if(defined(my $fromCache = $memd->get(sprintf("%s_%s",$lang,$arg)))){
     return $fromCache;
