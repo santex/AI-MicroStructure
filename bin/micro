@@ -46,12 +46,11 @@ sub init {
   $keys = $memd->get("allkeys");
   $keys->{$kkey}=time();
   $memd->set("allkeys",$keys);
-  p $keys;
+
 
 if($kkey =~ /debug/){
   my $NORMAL=`tput sgr0`;
   my $REVERSE=`tput smso`;
-
   print "$REVERSE $_ $NORMAL " for @ARGV;
   print "\n";
 }else{
