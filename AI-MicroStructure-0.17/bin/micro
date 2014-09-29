@@ -2,110 +2,208 @@
 
 use strict;
 use warnings;
-use AI::MicroStructure;
+use Digest::MD5 qw(md5_hex);
+use AI::MicroStructure::Util;
 use Getopt::Long;
+use AI::MicroStructure;
 use Data::Dumper;
 use JSON::XS;
+use Try::Tiny;
+use Cache::Memcached::Fast;
+my %conf = ( );
+our $keys = {};
+GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
+                    "init", "export", "import",
+                    "check", "category=s", "sources" ,"drop");
 
-our ($new,$debug, $write,$drop) =(0,0,0,0); 
-
-my $usage = << 'EOT';
-
-  there are no structures created yet 
-  
-  $ micro new ufo
-
-  $ micro
-
-  $ micro ufo
-  
-  $ micro ufo 5
-
-  $ micro any 10
-  
-  $ micro drop ufo
-
-EOT
-
-
-if( grep{/\bnew\b/} @ARGV ){ $new = 1; cleanArgs("new"); }
-if( grep{/\bdebug\b/} @ARGV ){$debug = 1; cleanArgs("debug"); }; 
-if( grep{/\bwrite\b/} @ARGV ){ $write = 1; cleanArgs("write");  }; 
-if( grep{/\bdrop\b/} @ARGV ){ $write = 1; cleanArgs("drop");  }; 
-
-my $j = AI::MicroStructure->new()->structures();
-
-
-if($j == 0 || $j eq "any"){  
-
-print $usage;
-exit;
-}else{
-
-#   print $j;
+our ($new, $write,$drop,$all,$verbose) =(0,0,0,0,0);
+our $argkey = md5_hex(join "_",@ARGV);
+sub check {
 
 }
 
 
+sub init {
+
+  our $memd = new Cache::Memcached::Fast({
+     servers => [ { address => 'localhost:11211', weight => 2.5 }],
+     namespace => 'my:',
+     connect_timeout => 0.2,
+     io_timeout => 0.1,
+     close_on_error => 1,
+     compress_threshold => 100_000,
+     compress_ratio => 0.9,
+     max_failures => 1,
+     max_size => 512 * 1024,
+  });
+
+  if(!@ARGV){
+    push @ARGV,"any";
+   }
+  $keys = $memd->get("allkeys");
+
+
+
+   if(defined(my $ret = $memd->get($argkey))){
+
+   print $ret;
+
+    exit;
+   #die($ret);
+  }else{
+
+  }
+
+
+}
+init();
+if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };
+
+
+our $main = AI::MicroStructure->new();
+
+
+# check if this is an active memory or initialize it
+if($conf{"init"}) {
+    if (-e  ".micro") {
+        print STDERR "this is already an active memory!\n";
+    } else {
+        print `git init && touch .micro && echo .pmc > .gitignore && echo '*~' >> .gitignore && echo '*swp' >> .gitignore && echo .micro >> .gitignore && git add -f .micro .gitignore && git commit -m 'active memory born'`;
+    }
+    exit;
+} else {
+    if (!-e ".micro" && !-e $ENV{HOME}."/.micro") {
+        print STDERR "this directory is not an active memory!\n";
+        exit;
+    }
+}
+
+my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+our $structdir = "structures";
+our $absstructdir = "$CWD[0]/$structdir";
+
+
+
+if ($conf{"export"}) {
+    my $cwd = $CWD[0];
+    my $hash = $main->fitnes();
+    my $url = sprintf("%s/%s/_all_docs", $config->{couchdb}, $config->{db});
+    print `cd $cwd && mkdir -p relations && wget -O relations/any.json $url && git add relations/any.json $structdir/*.pm && git commit -m 'active memory release' && git tag $hash`; # FIXME check for errors FIXME also that we commit per structure and/or per relation
+
+    exit;
+}
+
+my (@remote, @local);
+# real processing starts here
+$\ = $/;
+my $sep = $conf{whitespace} ? ' ' : $\;
+
+my $j = $main->structures();
+
+
+if($j == 0 || $j eq "any"){
+
+print $main->help;
+exit(0);
+}
+
+sub is_integer {
+   defined $_[0] && $_[0] =~ /^[+-]?\d+$/;
+}
+
 
 sub cleanArgs{
-    my ($key) = @_; 
+    my ($key) = @_;
     my @tmp=();
-    foreach(@ARGV){ 
+    foreach(@ARGV){
     push @tmp,$_ unless($_=~/$key/);}
-    
+
     @ARGV=@tmp;
 }
 
 
-my %conf = ( );
-GetOptions( \%conf, "whitespace|ws!", "version","themes", "help", "remote","new",
-                    "check", "category=s", "sources" ,"drop");
 
-my $theme;
+my $structure;
 
-
-if(defined($ARGV[0]) && $ARGV[0] =~ m/themes/){
-  
-    my $json = encode_json([grep{!/any/}AI::MicroStructure->new()->structures()]);
-    print $json;
-    exit;
+if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
 
 
-}
 
-if($conf{"new"} and $ARGV[0] !~/themes/  and $ARGV[0] =~ m{^([^/]+)/(.*)}s) {
-    $theme          = $1;
-    $conf{category} = $2;
+    @local = grep{!/any/}AI::MicroStructure->new()->structures();
 
-    my $meta = AI::MicroStructure->new( $theme, category => "new" );
+    if(defined($ARGV[1]) && is_integer($ARGV[1])){
+      my $index = rand $#local;
+         $index = $index-$ARGV[1];
+                  $index = $index?$index:0;
+      @local = @local[$index+1..$index+$ARGV[1]];
+
+    }
+
+    $val = sprintf "%s" join $sep, @local, @remote;
+    $memd->set($val);
     exit;
 }
 
-
-
-if(!$conf{"drop"} && !$conf{"write"}and $ARGV[0] !~/themes/){
+if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
 
 
 
-# find out the theme name
-$theme = shift || $AI::MicroStructure::Theme;
+    @local = grep{!/any/}AI::MicroStructure->new()->structures();
 
-if (!length $conf{category} && $theme =~ m{^([^/]+)/(.*)}s) {
-    $theme          = $1;
+    if(defined($ARGV[1]) && is_integer($ARGV[1])){
+      my $index = rand $#local;
+         $index = $index-$ARGV[1];
+                  $index = $index?$index:0;
+      @local = @local[$index+1..$index+$ARGV[1]];
+
+    }
+
+    my $val = sprintf "%s" join $sep, @local, @remote;
+    $memd->set($argkey,$val);
+    exit;
+
+}
+
+if($conf{"new"} and $ARGV[0] !~/structures/  and $ARGV[0] =~ m{^([^/]+)/(.*)}s) {
+    $structure          = $1;
+    $conf{category} = $2;
+
+    my $meta = AI::MicroStructure->new( $structure, category => "new" );
+
+    $memd->set($argkey,$metal);
+    exit;
+}
+
+
+
+if(!$conf{"drop"} && !$conf{"write"}and $ARGV[0] !~/structures/){
+
+
+
+# find out the structure name
+$structure = shift || $AI::MicroStructure::structure;
+
+if (!length $conf{category} && $structure =~ m{^([^/]+)/(.*)}s) {
+    $structure          = $1;
     $conf{category} = $2;
 }
 
 
-AI::MicroStructure->new( $theme, category => "new" ) unless AI::MicroStructure->has_structure( $theme );
+AI::MicroStructure->new( $structure, category => "new" )
+ unless AI::MicroStructure->has_structure( $structure );
 
-my $module = "AI::MicroStructure::$theme";
+# my $module = "AI::MicroStructure::$structure";
+my $module = "$absstructdir/$structure.pm";
 
+if(!-f $module){
+`touch $module`;
+`micro $structure new verbose`;
+}
 
-# load the remote theme if needed
+# load the remote structure if needed
 if ( $conf{remote} || $conf{check} || $conf{sources}) {
-    eval "require $module;";
-    die "Theme '$theme' is not updatable!\n"
+    eval "require '$module';";
+    die "structure '$structure' is not updatable!\n"
         unless $module->has_remotelist();
 }
 
@@ -113,30 +211,36 @@ if ( $conf{remote} || $conf{check} || $conf{sources}) {
 print STDERR
 "meta, a simple front-end to AI::MicroStructure version $AI::MicroStructure::VERSION\n"
   if $conf{version};
-print STDERR $usage if $conf{help};
-
-print map "$_\n", AI::MicroStructure->structure if $conf{themes};
-
+print STDERR $main->help if $conf{help};
+print map "$_\n", AI::MicroStructure->structures if $conf{structures};
 if ( $conf{sources} ) {
     my @sources = $module->sources( $conf{category} );
-    print map "$_\n", @sources;
+
+
+    my $var = sprintf "%s" map "$_\n", @sources;
+
+    $memd->set($argkey,$var);
+    exit;
+
 }
-exit if $conf{themes} || $conf{version} || $conf{help} || $conf{sources};
+exit if $conf{structures} || $conf{version} || $conf{help} || $conf{sources};
 
-# real processing starts here
-$\ = $/;
-my $sep = $conf{whitespace} ? ' ' : $\;
 
-my $meta = AI::MicroStructure->new( $theme, category => $conf{category} );
+my $meta = AI::MicroStructure->new( $structure, category => $conf{category} );
 
-my (@remote, @local);
+
 @remote = $module->remote_list( $conf{category} )
     if $conf{remote} || $conf{check};
 if ( !$conf{remote} ) {
     my $count = shift;
     $count = 1 unless defined $count;
     $count = 0 if $conf{check};
+
+    if($all){
+    @local = $meta->name(0,scalar "");
+    }else{
     @local = $meta->name($count);
+    }
 }
 if ( $conf{check} ) {
     my %seen;
@@ -148,13 +252,16 @@ if ( $conf{check} ) {
     }
 }
 else {
-    print join $sep, @local, @remote;
+    my $val = sprintf "%s" join $sep, @local, @remote;
+    $memd->set($argkey,$val);
+    exit;
 }
 
 }
 
 END{
-#    print Dumper  [$theme,@ARGV,%conf];
+#    print Dumper  [$structure,@ARGV,%conf];
 }
 
 
+1;

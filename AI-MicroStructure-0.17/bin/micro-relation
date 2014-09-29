@@ -47,7 +47,7 @@ sub rel {
   if(defined(my $fromCache = $memd->get(sprintf("%s_%s",$lang,$arg)))){
     return $fromCache;
   }
-      
+
   my $result = $wiki->search($arg);
   my $str = "";
 
@@ -62,9 +62,9 @@ sub rel {
 }
 
 
-print rel(join (" ",reverse @ARGV), $lang);
+print rel($_, $lang)  for @ARGV;
 
-# for @ARGV; 
+#
 
 1;
 __DATA__

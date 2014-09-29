@@ -24,17 +24,12 @@ fi
 
 $cmd $1 |   tr A-Z a-z |                # Convert to lowercase.
         tr ' ' '\012' |             # New: change spaces to newlines.
-        #tr -cd '\012[a-z][0-9]$' |   #  Get rid of everything
+   #    tr -cd '\012[a-z][0-9]' |   #  Get rid of everything
                                     #+ non-alphanumeric (in orig. script).
-        #tr -c '\012a-z'  '\012' |   #  Rather than deleting non-alpha
-        tr -d '"' | 
-        grep -v '^#' |
-        egrep -v "^\W$"  |
-        sed -s "s/^[(|,|.)|!|?]//" |
-        sed -s "s/[,|.)|!|?]$//" |
+        tr -c '\012a-z'  '\012' |   #  Rather than deleting non-alpha
+        grep -v '^#' |              # Delete lines starting with hashmark.
         egrep -v "^($stop)$" |
-        egrep -v "^[ ]*([A-Za-z][A-Za-z]|[A-Za-z])$" |
-        grep -v '^$' | data-freq | sort -t $'\n' -u -k 1f,1 -k 2n;
+        egrep -v "^[ ]*([A-Za-z][A-Za-z]|[A-Za-z])$" | grep -v "^$" | data-freq | sort -n
 
 
 
@@ -60,8 +55,9 @@ $cmd $1 | tr A-Z a-z |                # Convert to lowercase.
                                     #+ chars, change them to newlines.
         grep -v '^#' |              # Delete lines starting with hashmark.
         egrep -v "^($stop)$" |
-        #egrep -v "^[ ]*([A-Za-z][A-Za-z]|[A-Za-z])$" |
+        egrep -v "^[ ]*([A-Za-z][A-Za-z]|[A-Za-z])$" |
         grep -v '^$'
+
 
 
 

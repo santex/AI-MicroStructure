@@ -61,7 +61,7 @@ sub new {
   return $self;
 }
 
-sub  decruft  {
+sub  xdecruft  {
   my  $self  =  shift;
   my($file)  =  @_;
   my($cruftSet)  =  q{%§&|#[^+*(  ]),'";  };
@@ -71,7 +71,7 @@ sub  decruft  {
   return  $clean;
 }
 
-sub TO_JSON {
+sub xTO_JSON {
     my $self = shift;
     return { class => 'Object', data => { %$self } };
 }
@@ -230,9 +230,7 @@ sub insert {
     $self->{ $element->name } = $element;
     if($element->{files}){
     foreach(values $element->{files}){
-
-
-    $self->{files}->{  $element->name } = $_; }
+  $self->{files}->{  $element->name } = $_; }
     }}
     $self->{obj}->{center}->{$_} = defined($self->{obj}->{center}->{$_}) ?
                                     $self->{obj}->{center}->{$_} + 1 : 1

@@ -1,12 +1,12 @@
-#!/usr/bin/perl -X
 package AI::MicroStructure::List;
 use strict;
-use AI::MicroStructure (); # do not export microname and friends
+use AI::MicroStructure (); # do not export metaname and friends
 use AI::MicroStructure::RemoteList;
 use List::Util qw( shuffle );
 use Carp;
 
 our @ISA = qw( AI::MicroStructure::RemoteList );
+our $VERSION = '1.001';
 
 sub init {
     my ($self, $data) = @_;
@@ -18,15 +18,16 @@ sub init {
 
     no strict 'refs';
     no warnings;
-    ${"$class\::structure"} = ( split /::/, $class )[-1];
-    @{"$class\::List"} = split /\s+/, $data->{names};
+    ${"$class\::Theme"} = ( split /::/, $class )[-1];
+    @{"$class\::List"}  = do { my %seen;
+         grep !$seen{$_}++, split /\s+/, $data->{names} };
     *{"$class\::import"} = sub {
         my $callpkg = caller(0);
-        my $structure   = ${"$class\::structure"};
-        my $micro    = $class->new();
-        *{"$callpkg\::micro$structure"} = sub { $micro->name(@_) };
+        my $structure   = ${"$class\::Theme"};
+        my $meta    = $class->new();
+        *{"$callpkg\::meta$structure"} = sub { $meta->name(@_) };
       };
-    ${"$class\::micro"} = $class->new();
+    ${"$class\::meta"} = $class->new();
 }
 
 sub name {
@@ -36,16 +37,15 @@ sub name {
     if( ! $class ) { # called as a class method!
         $class = $self;
         no strict 'refs';
-        $self = ${"$class\::micro"};
+        $self = ${"$class\::meta"};
     }
-  no strict 'refs';
 
-    if( defined $count){
-    if ($count == 0 ) {
+    if( defined $count && $count == 0 ) {
+        no strict 'refs';
         return
           wantarray ? shuffle @{"$class\::List"} : scalar @{"$class\::List"};
     }
-    }
+
     $count ||= 1;
     my $list = $self->{cache};
     {
@@ -66,65 +66,87 @@ sub new {
 sub structure {
     my $class = ref $_[0] || $_[0];
     no strict 'refs';
-    return ${"$class\::structure"};
+    return ${"$class\::Theme"};
 }
-
-
-
 
 1;
 
-
+__END__
 
 =head1 NAME
 
-  AI::MicroStructure::List
-
-=head1 DESCRIPTION
-
-  Gets Relations for Concepts based on  words
+AI::MicroStructure::List - Base class for simple lists of names
 
 =head1 SYNOPSIS
 
+    package AI::MicroStructure::beatles;
+    use AI::MicroStructure::List;
+    our @ISA = ( AI::MicroStructure::List );
+    __PACKAGE__->init();
+    1;
 
-  ~$ micro new world
+    =head1 NAME
+    
+    AI::MicroStructure::beatles - The fab four structure
+    
+    =head1 DESCRIPTION
+    
+    Ladies and gentlemen, I<The Beatles>. I<(hysteric cries)>
 
-  ~$ micro structures
+    =cut
+    
+    __DATA__
+    # names
+    john paul
+    george ringo
 
-  ~$ micro any 2
+=head1 DESCRIPTION
 
-  ~$ micro drop world
+C<AI::MicroStructure::List> is the base class for all structures that are
+meant to return a random excerpt from a predefined list.
 
-  ~$ micro
+=head1 METHOD
 
+AI::MicroStructure::List offers several methods, so that the subclasses
+are easy to write (see full example in L<SYNOPSIS>):
+
+=over 4
+
+=item new()
+
+The constructor of a single instance. An instance will not repeat items
+until the list is exhausted.
+
+=item init()
+
+init() must be called when the subclass is loaded, so as to read the
+__DATA__ section and fully initialise it.
+
+=item name( $count )
+
+Return $count names (default: C<1>).
+
+Using C<0> will return the whole list in list context, and the size of the
+list in scalar context.
+
+=item structure()
+
+Return the structure name.
+
+=back
 
 =head1 AUTHOR
 
-  Hagen Geissler <santex@cpan.org>
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT
 
-  Hagen Geissler <santex@cpan.org>
+Copyright 2005-2012 Philippe 'BooK' Bruhat, All Rights Reserved.
 
-=head1 SUPPORT AND DOCUMENTATION
+=head1 LICENSE
 
-  ☞ [sample using concepts](http://quantup.com)
-
-  ☞ [PDF info on my works](https://github.com/santex)
-
-
-=head1 SEE ALSO
-
-  AI-MicroStructure
-  AI-MicroStructure-Cache
-  AI-MicroStructure-Deamon
-  AI-MicroStructure-Relations
-  AI-MicroStructure-Concept
-  AI-MicroStructure-Data
-  AI-MicroStructure-Driver
-  AI-MicroStructure-Plugin-Pdf
-  AI-MicroStructure-Plugin-Twitter
-  AI-MicroStructure-Plugin-Wiki
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 

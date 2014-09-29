@@ -1,18 +1,23 @@
 package AI::MicroStructure::MultiList;
 use strict;
-use AI::MicroStructure ();    # do not export microname and friends
+use AI::MicroStructure ();    # do not export metaname and friends
 use AI::MicroStructure::RemoteList;
 use List::Util qw( shuffle );
 use Carp;
 
 our @ISA = qw( AI::MicroStructure::RemoteList );
+our $VERSION = '1.000';
 
 sub init {
+    my ($self, $data) = @_;
     my $class = caller(0);
-    my $data  = AI::MicroStructure->load_data($class);
+
+    $data ||= AI::MicroStructure->load_data($class);
     no strict 'refs';
 
-    my $sep = ${"$class\::Separator"} ||= '/';
+    # note: variables mentioned twice to avoid a warning
+
+    my $sep = ${"$class\::Separator"} = ${"$class\::Separator"} ||= '/';
     my $tail = qr/$sep?[^$sep]*$/;
 
     # compute all categories
@@ -31,17 +36,17 @@ sub init {
         }
     }
 
-    ${"$class\::Default"} = $data->{default} || ':all';
-    ${"$class\::structure"} = ( split /::/, $class )[-1];
+    ${"$class\::Default"} = ${"$class\::Default"} = $data->{default} || ':all';
+    ${"$class\::Theme"} = ${"$class\::Theme"} = ( split /::/, $class )[-1];
 
     *{"$class\::import"} = sub {
         my $callpkg = caller(0);
-        my $structure   = ${"$class\::structure"};
-        my $micro    = $class->new;
-        *{"$callpkg\::micro$structure"} = sub { $micro->name(@_) };
+        my $structure   = ${"$class\::Theme"};
+        my $meta    = $class->new;
+        *{"$callpkg\::meta$structure"} = sub { $meta->name(@_) };
     };
 
-    ${"$class\::micro"} = $class->new();
+    ${"$class\::meta"} = ${"$class\::meta"} = $class->new();
 }
 
 sub name {
@@ -51,16 +56,14 @@ sub name {
     if ( !$class ) {    # called as a class method!
         $class = $self;
         no strict 'refs';
-        $self = ${"$class\::micro"};
+        $self = ${"$class\::meta"};
     }
-	no strict 'refs';
 
-    if ( defined $count && $count !~ /A-Za-z/){
-		if($count eq 0 ) {
+    if ( defined $count && $count == 0 ) {
+        no strict 'refs';
         return wantarray
             ? shuffle @{ $self->{base} }
             : scalar @{ $self->{base} };
-		}
     }
 
     $count ||= 1;
@@ -127,12 +130,135 @@ sub has_category {
 sub structure {
     my $class = ref $_[0] || $_[0];
     no strict 'refs';
-    return ${"$class\::structure"};
+    return ${"$class\::Theme"};
 }
-
-
 
 1;
 
 __END__
+
+=head1 NAME
+
+AI::MicroStructure::MultiList - Base class for structures with multiple lists
+
+=head1 SYNOPSIS
+
+    package AI::MicroStructure::digits;
+    use AI::MicroStructure::MultiList;
+    our @ISA = ( AI::MicroStructure::MultiList );
+    __PACKAGE__->init();
+    1;
+
+    =head1 NAME
+    
+    AI::MicroStructure::digits - The numbers structure
+    
+    =head1 DESCRIPTION
+    
+    You can count on this module. Almost.
+
+    =cut
+    
+    __DATA__
+    # default
+    :all
+    # names primes even
+    two
+    # names primes odd
+    three five seven
+    # names composites even
+    four six eight
+    # names composites odd
+    nine
+    # names other
+    zero one
+
+=head1 DESCRIPTION
+
+C<AI::MicroStructure::MultiList> is the base class for all structures
+that are meant to return a random excerpt from a predefined list
+I<divided in categories>.
+
+The category is selected at construction time from:
+
+=over 4
+
+=item 1.
+
+the given C<category> parameter,
+
+=item 2.
+
+the default category for the selected structure.
+
+=back
+
+Categories and sub-categories are separated by a C</> character.
+
+=head1 METHODS
+
+AI::MicroStructure::MultiList offers several methods, so that the subclasses
+are easy to write (see full example in L<SYNOPSIS>):
+
+=over 4
+
+=item new( category => $category )
+
+The constructor of a single instance. An instance will not repeat items
+until the list is exhausted.
+
+    $meta = AI::MicroStructure::digits->new( category => 'primes' );
+    $meta = AI::MicroStructure::digits->new( category => 'primes/odd' );
+
+The special category C<:all> will use all the items in all categories.
+
+    $meta = AI::MicroStructure::digits->new( category => ':all' );
+
+If no C<category> parameter is given, C<AI::MicroStructure::MultiList>
+will use the class default. If the class doesn't define a default,
+then C<:all> is used.
+
+=item init()
+
+init() must be called when the subclass is loaded, so as to read the
+__DATA__ section and fully initialise it.
+
+=item name( $count )
+
+Return $count names (default: C<1>).
+
+Using C<0> will return the whole list in list context, and the size of the
+list in scalar context (according to the C<category> parameter passed to the
+constructor).
+
+=item category()
+
+Return the selected category for this instance.
+
+=item categories()
+
+Return the categories supported by the structure (except C<:all>).
+
+=item has_category( $category )
+
+Return a boolean value indicating if the structure contains the given category.
+
+=item structure()
+
+Return the structure name.
+
+=back
+
+=head1 AUTHOR
+
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
 

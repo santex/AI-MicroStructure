@@ -7,7 +7,7 @@ use Env qw/PWD/;
 
 sub get_cwd {
     my @CWD; if (!-e ".micro") {
-        push @CWD, $ENV{HOME};
+        push @CWD, $ENV{HOME}."/data-hub/";
     } else {
         push @CWD, getcwd();
     }
@@ -62,6 +62,4 @@ sub config {
 
     return $state;
 }
-#use Data::Dumper;
-#print Dumper  AI::MicroStructure::Util::config();
 1;

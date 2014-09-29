@@ -5,6 +5,7 @@ use warnings;
 use Carp;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
+use Try::Tiny;
 use File::Basename;
 use File::Spec;
 use File::Glob;
@@ -171,51 +172,41 @@ $x->{"structures"}->{$state->{path}->{"cwd/structures"}}->{$con}->{files}  =  [s
 
 
 
-# the functions actually hide an instance
-
-
-# END OF INITIALISATION
-
-# support for use AI::MicroStructure 'stars'
-# that automatically loads the required classes
 sub import {
-   my $class = shift;
-   # 'stars' is still first
-   my @structures = ( grep { $_ eq ':all' } @_ )
-   ? ( 'stars', grep { !/^(?:stars|:all)$/ } keys %MICRO )
-   : @_;
+    my $class = shift;
 
-   $Structure = $structures[0] if @structures;
-   $micro = AI::MicroStructure->new( $Structure );
+    my @structures = ( grep { $_ eq ':all' } @_ )
+      ? ( 'foo', grep { !/^(?:foo|:all)$/ } keys %MICRO  ) # 'foo' is still first
+      : @_;
 
-   # export the microname() function
-   no strict 'refs';
-   my $callpkg = caller;
-   *{"$callpkg\::microname"} = \&microname;   # standard structure
+    $Structure = $structures[0] if @structures;
+    $micro = AI::MicroStructure->new( $Structure );
 
-   # load the classes in @structures
-   for my $structure( @structures ) {
-   eval "require '$absstructdir/$structure.pm';".
-        "import  '$absstructdir/$structure.pm';";
-   croak $@ if $@;
-   *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
-   }
+    # export the microname() function
+    no strict 'refs';
+    my $callpkg = caller;
+    *{"$callpkg\::microname"} = \&microname;    # standard theme
+
+    # load the classes in @structures
+    for my $structure( @structures ) {
+        eval "require AI::MicroStructure::$structure; import AI::MicroStructure::$structure;";
+        croak $@ if $@;
+        *{"$callpkg\::micro$structure"} = sub { $micro->name( $structure, @_ ) };
+    }
 }
 
 sub new {
-   my ( $class, @tools ) = ( @_ );
-   my $structure;
-   $structure = shift @tools if @tools % 2;
-   $structure = $Structure unless $structure; # same default everywhere
-  #  my $driver = {};
-   #   $driver = AI::MicroStructure::Driver->new;
+    my ( $class, @args ) = ( @_ );
+    my $structure;
+    $structure = shift @args if @args % 2;
+    $structure = $Structure unless $structure; # same default everywhere
 
-   # defer croaking until name() is actually called
-   my $self = bless { structure => $structure,
-                     tools => { @tools }, micro => {}}, $class;
-  return $self;
-   #if(defined($driverarg) && join("" ,@_)  =~/couch|cache|berkeley/){
+    # defer croaking until name() is actually called
+    bless { structure => $structure, args => { @args }, micro => {} ,state=>$state}, $class;
 }
+
+
+
 
 sub _rearrange{
    my $self = shift;
@@ -312,6 +303,44 @@ sub fitnes {
 # main function
 sub microname { $micro->name( @_ ) };
 
+
+
+sub shitname {
+    my $self = shift;
+    my ( $structure, $count ) = ("any",1);
+
+    if (@_) {
+        ( $structure, $count ) = @_;
+        ( $structure, $count ) = ( $self->{structure}, $structure )
+          if $structure =~ /^(?:0|[1-9]\d*)$/;
+    }
+    else {
+        ( $structure, $count ) = ( $self->{structure}, 1 );
+    }
+
+    if( ! exists $self->{micro}{$structure} ) {
+        my ( $structure, $category ) = split /\//, $structure, 2;
+        if( ! $MICRO{$structure}  ) {
+            try{
+
+#            `micro new $structure`;
+
+            eval "require '$absstructdir/$structure.pm';";
+            $MICRO{$structure} = 1; # loaded
+            $self->{micro}{$structure}  = AI::MicroStructure->new($structure,category => $category);
+            print $self->{micro}{$structure}->name( $count );
+            return;
+            }  catch{
+
+            }
+        }
+
+    }
+
+
+
+}
+
 # corresponding method
 sub name {
    my $self = shift;
@@ -333,7 +362,46 @@ sub name {
    $MICRO{$structure} = 1; # loaded
    }
    $self->{micro}{$structure} =
-   "AI::MicroStructure::$structure"->new( %{ $self->{tools} } );
+   "AI::MicroStructure::$structure"->new( %{ $self->{args} } );
+   }
+
+   $self->{micro}{$structure}->name( $count );
+}
+
+# corresponding method
+sub namex {
+   my $self = shift;
+   my ( $structure, $count ) = ("any",1);
+
+   if (@_) {
+   ( $structure, $count ) = @_;
+   ( $structure, $count ) = ( $self->{structure}, $structure )
+   if defined($structure) && $structure =~ /^(?:0|[1-9]\d*)$/;
+   }
+   else {
+   ( $structure, $count ) = ( $self->{structure}, 1 );
+   }
+
+   if( ! exists $self->{micro}{$structure} ) {
+   if( ! $MICRO{$structure} ) {
+    try {
+   eval "require '$absstructdir/$structure.pm';";
+   $MICRO{$structure} = 1; # loaded
+   croak "MicroStructure list $structure does not exist!" if $@;
+
+    }catch{
+
+      }
+   }
+   $self->{micro}{$structure} =
+   "AI::MicroStructure::$structure"->new( %{ $self->{args} } );
+
+
+
+
+
+
+
    }
 
    $self->{micro}{$structure}->name( $count );
@@ -629,11 +697,11 @@ my $self = shift;
 my $StructureName = shift;
 my $data = shift;
 
-
-    $StructureName = lc $self->trim(`micro`) unless($StructureName);
+    if($StructureName){
+    #$StructureName = lc $self->trim(`micro`) unless($StructureName);
     my $file = "$absstructdir/$StructureName.pm";
-    
-    print `mkdir $absstructdir` unless(-d $absstructdir);
+
+    print `mkdir -p $absstructdir` unless(-d $absstructdir);
     my $fh;
 
     open($fh,">$file") || warn @{[$file,$!]};
@@ -644,6 +712,7 @@ my $data = shift;
     $Structure = $StructureName;
     push @CWD,$file;
     return 1;
+  }
 }
 
 
