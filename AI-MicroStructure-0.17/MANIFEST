@@ -45,7 +45,9 @@ bin/ptar
 bin/quicky.pl
 bin/replacer.sh
 bin/route.sh
+bin/run2.pl
 bin/runfeeds.sh
+bin/t5.pl
 bin/websock002.pl
 bin/x
 dist.ini
@@ -92,6 +94,7 @@ lib/icro.pm
 make_all.pl
 radebeul.pm
 scripts/bob
+structures
 t/canned/2013-04-04_.cache
 t/canned/2013-09-16_.cache
 t/canned/2013-12-29_.cache

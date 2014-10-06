@@ -5,7 +5,7 @@ use JSON::XS;
 use Data::Printer;
 use Data::Dumper;
 use WWW::Wikipedia;
-
+use Try::Tiny;
 my $lang =  $ENV{MICRO_LANG} || "en" ;
 
 my $wiki = WWW::Wikipedia->new(language => $lang);
@@ -44,7 +44,7 @@ sub rel {
   my $lang = shift;
 
 
-  if(defined(my $fromCache = $memd->get(sprintf("%s_%s",$lang,$arg)))){
+  if(defined(my $fromCache = $memd->get($arg))){
     return $fromCache;
   }
 
@@ -53,17 +53,18 @@ sub rel {
 
   if (defined($result) &&  $result->text() ) {
 
-
+    try{
     $str = join( "\n", $result->related() );
     $str = decruft($str);
-    $memd->set(sprintf("%s_%s",$lang,$arg),$str);
+    $memd->set($arg,$str);
+    };
   }
   return $str;
 }
 
-
-print rel($_, $lang)  for @ARGV;
-
+try{
+print rel(eval qw{$_}, $lang)  for @ARGV;
+}
 #
 
 1;

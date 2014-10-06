@@ -64,7 +64,7 @@ sub rel {
 
 try{
 print rel(eval qw{$_}, $lang)  for @ARGV;
-}
+};
 #
 
 1;
