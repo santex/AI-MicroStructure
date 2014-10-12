@@ -138,7 +138,7 @@ my %utf2asc = (
     "\x{2640}"     => 'female',
     "\x{2642}"     => 'male',
 );
-my $utf_re = qr/(@{[join( '|', sort keys %utf2asc )]})/; 
+my $utf_re = qr/(@{[join( '|', sort keys %utf2asc )]})/;
 
 sub tr_utf8_basic {
     my $str = shift;
@@ -160,11 +160,11 @@ AI::MicroStructure::RemoteList - Retrieval of a remote source for a structure
     use strict;
     use AI::MicroStructure::List;
     our @ISA = qw( AI::MicroStructure::List );
-    
+
     # data regarding the remote source
     our %Remote = (
         source =>
-            'http://search.cpan.org/dist/Acme-MetaSyntactic/CONTRIBUTORS',
+            'http://search.cpan.org/dist/AI-MicroStructure/CONTRIBUTORS',
         extract => sub {
             my $content = shift;
             my @items   =
@@ -274,7 +274,7 @@ the category).
 C<LWP::Simple> is used to download the remote data.
 
 All existing C<AI::MicroStructure> behaviours
-(C<AI::MicroStructure::List> and C<Acme::MetaSyntactic::Locale> are
+(C<AI::MicroStructure::List> and C<AI::MicroStructure::Locale> are
 subclasses of C<AI::MicroStructure::RemoteList>.
 
 =head1 METHODS
@@ -344,31 +344,19 @@ and depend on the proper module to do that.
 
 =head1 AUTHOR
 
-Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
-
-=head1 ACKNOWLEDGEMENTS
-
-Thanks to Michael Scherer for his help in finding the name of this
-module on C<#perlfr>. Welcome in F<CONTRIBUTORS>, Michael! C<:-)>
-
-    #perlfr Tue Nov  1 19:33 CET 2005
-    <@BooK> bon, je sais toujours pas comment appeler mon module moi
-    <@BooK> AMS::RemoteSource ?
-    < misc> RemoteListing ?
-    <@BooK> RemoteList, même
+'santex'  << <santex@cpan.org> >>.
 
 =head1 SEE ALSO
 
-L<AI::MicroStructure>, L<Acme::MetaSyntactic::List>,
+L<AI::MicroStructure>, L<AI::MicroStructure::List>,
 L<AI::MicroStructure::Locale>.
 
 =head1 COPYRIGHT
 
-Copyright 2005-2012 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2009-2016 Hagen Geissler, All Rights Reserved.
 
 =head1 LICENSE
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-

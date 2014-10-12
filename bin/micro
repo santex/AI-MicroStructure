@@ -56,7 +56,7 @@ if($kkey =~ /debug/){
 }else{
 }
 
-   if(defined(my $ret = $memd->get($argkey)) && $kkey !~ m/(any|structures)/i){
+   if(defined(my $ret = $memd->get($argkey)) && ($kkey !~ m/(any|structures)/i) &&  @ARGV){
 
    print "$ret\n";
 

@@ -1,5 +1,22 @@
+package AI::MicroStructure::germany;
+use AI::MicroStructure::MultiList;
+our @ISA = ( AI::MicroStructure::MultiList );
+__PACKAGE__->init();
+1;
 
+=head1 NAME
 
+AI::MicroStructure::germany - The numbers structure
+
+=head1 DESCRIPTION
+
+You can count on this module. Almost.
+
+=cut
+
+__DATA__
+# default
+Dresden
 # names Dresden
 01067 01069 01097 01099 01108 01109 01127 01129 01139 01156 01157 01159 01169 01187 01189 01217 01219 01237 01239 01257 01259 01277 01279 01307 01309 01324 01326 01328 01462 01465 01478 
 # names Radebeul
